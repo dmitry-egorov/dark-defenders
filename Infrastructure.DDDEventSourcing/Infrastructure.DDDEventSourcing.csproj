@@ -34,16 +34,10 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Domain\IRoot.cs" />
-    <Compile Include="Domain\IRootEvent.cs" />
-    <Compile Include="ICommandPublisher.cs" />
-    <Compile Include="ICommand.cs" />
-    <Compile Include="ICommandProcessor.cs" />
-    <Compile Include="Domain\Identity.cs" />
-    <Compile Include="IEventMarker.cs" />
-    <Compile Include="IEventStore.cs" />
-    <Compile Include="Domain\IRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Domain\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

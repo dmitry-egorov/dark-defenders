@@ -37,6 +37,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActionObserver.cs" />
     <Compile Include="ArgumentAssertionExtensions.cs" />
     <Compile Include="DecimalExtensions.cs" />
     <Compile Include="EnumerableExtensions.cs" />

@@ -57,13 +57,17 @@
       <Project>{27F91716-3957-49C9-94BB-8AA160BF96AA}</Project>
       <Name>DarkDefenders.Domain</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.DDDEventSourcing.Implementations\Infrastructure.DDDEventSourcing.Implementations.csproj">
-      <Project>{567527BE-AEAE-44BB-9484-891765ED98A2}</Project>
-      <Name>Infrastructure.DDDEventSourcing.Implementations</Name>
+    <ProjectReference Include="..\Infrastructure.DDDES.Implementations\Infrastructure.DDDES.Implementations.csproj">
+      <Project>{5E4CA423-37F5-4B6A-B00C-0ADC06EC0378}</Project>
+      <Name>Infrastructure.DDDES.Implementations</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.DDDEventSourcing\Infrastructure.DDDEventSourcing.csproj">
-      <Project>{AE2D50ED-38BC-4141-A124-4912EAD8428C}</Project>
-      <Name>Infrastructure.DDDEventSourcing</Name>
+    <ProjectReference Include="..\Infrastructure.DDDES\Infrastructure.DDDES.csproj">
+      <Project>{457CCF4D-7E52-4A7F-867C-13BAC32E13F0}</Project>
+      <Name>Infrastructure.DDDES</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Math\Infrastructure.Math.csproj">
+      <Project>{9DA761FD-492C-4BF7-A50D-10930664021D}</Project>
+      <Name>Infrastructure.Math</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Util\Infrastructure.Util.csproj">
       <Project>{0B407BC3-7B5B-431A-96E7-A41F25AB27BE}</Project>

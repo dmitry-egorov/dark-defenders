@@ -1,9 +1,8 @@
-﻿using DarkDefenders.Domain.Player;
-using DarkDefenders.Domain.Player.Command;
-using DarkDefenders.Domain.Player.Event;
-using Infrastructure.DDDEventSourcing;
-using Infrastructure.DDDEventSourcing.Implementations;
-using Infrastructure.DDDEventSourcing.Implementations.Domain;
+﻿using DarkDefenders.Domain.Players;
+using DarkDefenders.Domain.Terrains;
+using Infrastructure.DDDES;
+using Infrastructure.DDDES.Implementations;
+using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain
 {
@@ -11,9 +10,11 @@ namespace DarkDefenders.Domain
     {
         public static void ConfigureDomain(this CommandProcessor processor, IEventStore eventStore)
         {
-            var playerRepository = new Repository<Root, RootState, IEvent, IEventReciever, Id>(eventStore);
+            var terrainRepository = new Repository<Terrain, TerrainSnapshot, ITerrainEvent, ITerrainEventsReciever, TerrainId>(eventStore, () => new Terrain());
+            var playerRepository  = new Repository<Player,  PlayerSnapshot,  IPlayerEvent,  IPlayerEventsReciever,  PlayerId> (eventStore, () => new Player(terrainRepository));
 
-            processor.AddHandlerFor<Create, Root, Id>(playerRepository);
+            processor.AddRepository(terrainRepository);
+            processor.AddRepository(playerRepository);
         }
     }
 }
