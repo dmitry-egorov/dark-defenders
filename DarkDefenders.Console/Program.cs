@@ -33,11 +33,12 @@ namespace DarkDefenders.Console
 
             var sw = Stopwatch.StartNew();
             var last = TimeSpan.Zero;
-            var minFrameElapsed = TimeSpan.FromMilliseconds(50);
+
+            const int maxFps = 200000;
+            var minFrameElapsed = TimeSpan.FromMilliseconds(1000.0 / maxFps);
 
             while (true)
             {
-                
                 if (NativeKeyboard.IsKeyDown(KeyCode.Left))
                 {
                     bus.PublishTo<Player>(playerId, x => x.SetDesiredOrientation(new Vector(-1, 0)));
@@ -56,6 +57,8 @@ namespace DarkDefenders.Console
                 last = current;
 
                 bus.PublishToAllOfType<IUpdateable>(x => x.Update(elapsed));
+                var fps = Math.Round(10000.0 / elapsed.TotalMilliseconds) / 10;
+                renderer.RenderFps(fps);
 
                 if (elapsed < minFrameElapsed)
                 {

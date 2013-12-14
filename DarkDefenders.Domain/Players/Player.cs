@@ -41,6 +41,8 @@ namespace DarkDefenders.Domain.Players
 
         public IEnumerable<IEvent> Update(TimeSpan elapsed)
         {
+            AssertExists();
+
             var delta = Snapshot.DesiredOrientation * elapsed.TotalMilliseconds * Speed;
 
             if (delta.X == 0 && delta.Y == 0)

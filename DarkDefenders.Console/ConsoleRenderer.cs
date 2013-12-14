@@ -100,5 +100,11 @@ namespace DarkDefenders.Console
                 System.Console.Write('|');
             }
         }
+
+        public void RenderFps(double fps)
+        {
+            System.Console.SetCursorPosition(70, 0);
+            System.Console.Write(fps);
+        }
     }
 }
