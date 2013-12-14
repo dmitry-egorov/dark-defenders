@@ -1,11 +1,16 @@
-using Infrastructure.DDDEventSourcing.Implementations;
+using Infrastructure.DDDEventSourcing.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Player.Event
 {
-    public class Created : EventBase<Id>
+    public class Created : EventBase<Id>, IEvent
     {
-        public Created(Id aggregateRootId) : base(aggregateRootId)
+        public Created(Id rootId) : base(rootId)
         {
+        }
+
+        public void ApplyTo(IEventReciever reciever)
+        {
+            reciever.Apply(this);
         }
     }
 }

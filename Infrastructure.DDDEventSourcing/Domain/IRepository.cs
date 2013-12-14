@@ -1,7 +1,7 @@
 ﻿namespace Infrastructure.DDDEventSourcing.Domain
 {
-    public interface IRepository<out TAggregateRoot, in TIdentity>
+    public interface IRepository<out TRoot, in TRootId>
     {
-        TAggregateRoot GetById(TIdentity id);
+        TRoot GetById(TRootId id);
     }
 }

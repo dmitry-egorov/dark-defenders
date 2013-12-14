@@ -34,16 +34,15 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Domain\IAggregateRoot.cs" />
-    <Compile Include="Domain\IAggregateRootState.cs" />
+    <Compile Include="Domain\IRoot.cs" />
+    <Compile Include="Domain\IRootEvent.cs" />
     <Compile Include="ICommandPublisher.cs" />
     <Compile Include="ICommand.cs" />
-    <Compile Include="ICommandHandler.cs" />
+    <Compile Include="ICommandProcessor.cs" />
     <Compile Include="Domain\Identity.cs" />
-    <Compile Include="IEvent.cs" />
+    <Compile Include="IEventMarker.cs" />
     <Compile Include="IEventStore.cs" />
     <Compile Include="Domain\IRepository.cs" />
-    <Compile Include="Domain\IState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

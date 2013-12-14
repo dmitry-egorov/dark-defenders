@@ -1,6 +1,6 @@
 ﻿namespace Infrastructure.DDDEventSourcing
 {
-    public interface IEvent
+    public interface IEventMarker
     {
     }
 }

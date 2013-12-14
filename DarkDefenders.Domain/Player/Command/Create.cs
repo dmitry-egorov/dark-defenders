@@ -1,4 +1,4 @@
-﻿using Infrastructure.DDDEventSourcing.Implementations;
+﻿using Infrastructure.DDDEventSourcing.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Player.Command
 {

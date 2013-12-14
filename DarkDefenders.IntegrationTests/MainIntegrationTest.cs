@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Security.Cryptography.X509Certificates;
 using DarkDefenders.Domain;
 using DarkDefenders.Domain.Player;
 using DarkDefenders.Domain.Player.Command;
@@ -28,12 +31,16 @@ namespace DarkDefenders.IntegrationTests
             var playerId = CreatePlayerId();
 
             _commandPublisher.Publish(new Create(playerId));
+            //_commandPublisher.Publish<Root>(playerId, x => x.Create(playerId));
 
-            var events = _eventStore.Get(playerId).AsReadOnly();
+            AssertEvents(playerId, new[] { new Created(playerId) });
+        }
 
-            var expectedEvents = new[] {new Created(playerId)}.AsReadOnly();
+        private void AssertEvents(Id playerId, IEnumerable<Created> expectedEvents)
+        {
+            var actualEvents = _eventStore.Get(playerId).AsReadOnly();
 
-            CollectionAssert.AreEqual(expectedEvents, events);
+            CollectionAssert.AreEqual(expectedEvents.AsReadOnly(), actualEvents);
         }
 
         private static Id CreatePlayerId()
@@ -43,11 +50,11 @@ namespace DarkDefenders.IntegrationTests
 
         private static ICommandPublisher CreateBus(IEventStore eventStore)
         {
-            var bus = new Bus(eventStore);
+            var processor = new CommandProcessor();
 
-            bus.ConfigureDomain(eventStore);
+            processor.ConfigureDomain(eventStore);
 
-            return bus;
+            return new Bus(processor, eventStore);
         }
     }
 }

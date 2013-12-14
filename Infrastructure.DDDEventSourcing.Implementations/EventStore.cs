@@ -6,14 +6,14 @@ namespace Infrastructure.DDDEventSourcing.Implementations
 {
     public class EventStore : IEventStore
     {
-        private readonly MultiDictionary<Identity, IEvent> _events = new MultiDictionary<Identity,IEvent>(true);
+        private readonly MultiDictionary<Identity, IEventMarker> _events = new MultiDictionary<Identity,IEventMarker>(true);
 
-        public IEnumerable<IEvent> Get(Identity id)
+        public IEnumerable<IEventMarker> Get(Identity id)
         {
             return _events[id];
         }
 
-        public void Append(Identity id, IEnumerable<IEvent> events)
+        public void Append(Identity id, IEnumerable<IEventMarker> events)
         {
             _events.AddMany(id, events);
         }

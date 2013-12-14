@@ -4,12 +4,12 @@ namespace Infrastructure.DDDEventSourcing
 {
     public interface ICommand
     {
-        Identity AggregateRootId { get; }
+        Identity RootId { get; }
     }
 
-    public interface ICommand<out TAggregateRootIdentity>: ICommand
-        where TAggregateRootIdentity: Identity
+    public interface ICommand<out TRootId>: ICommand
+        where TRootId: Identity
     {
-        new TAggregateRootIdentity AggregateRootId { get; }
+        new TRootId RootId { get; }
     }
 }
