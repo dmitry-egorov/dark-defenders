@@ -1,9 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using DarkDefenders.Commands;
-using DarkDefenders.Infrastructure.CommandHandling;
-using DarkDefenders.Infrastructure.CommandHandling.Direct;
+using DarkDefenders.Domain;
+using DarkDefenders.Domain.Player;
+using DarkDefenders.Domain.Player.Command;
+using DarkDefenders.Domain.Player.Event;
+using Infrastructure.DDDEventSourcing;
+using Infrastructure.DDDEventSourcing.Implementations;
+using Infrastructure.Util;
 using NUnit.Framework;
 
 namespace DarkDefenders.IntegrationTests
@@ -11,40 +13,41 @@ namespace DarkDefenders.IntegrationTests
     [TestFixture]
     public class MainIntegrationTest
     {
+        private readonly IEventStore _eventStore;
+        private readonly ICommandPublisher _commandPublisher;
+
+        public MainIntegrationTest()
+        {
+            _eventStore = new EventStore();
+            _commandPublisher = CreateBus(_eventStore);
+        }
+
         [Test]
         public void Should_work()
         {
-            var actions = CreateActions();
-            var bus = new DirectBus(actions);
+            var playerId = CreatePlayerId();
 
-            const int addPlayerRequestId = 1;
-            bus.Publish(new AddPlayerCommand(addPlayerRequestId));
+            _commandPublisher.Publish(new Create(playerId));
 
-            bus.Publish(new SpawnAvatarCommand());
+            var events = _eventStore.Get(playerId).AsReadOnly();
+
+            var expectedEvents = new[] {new Created(playerId)}.AsReadOnly();
+
+            CollectionAssert.AreEqual(expectedEvents, events);
         }
 
-        private static ReadOnlyDictionary<Type, Action<ICommand>> CreateActions()
+        private static Id CreatePlayerId()
         {
-            var addPlayerCommandHandler = new AddPlayerCommand.Handler();
-            var spawnAvatarCommandHandler = new SpawnAvatarCommand.Handler();
-
-            var dictionary = new Dictionary<Type, Action<ICommand>>();
-
-            RegisterHandler(dictionary, addPlayerCommandHandler);
-            RegisterHandler(dictionary, spawnAvatarCommandHandler);
-
-            return new ReadOnlyDictionary<Type, Action<ICommand>>(dictionary);
+            return new Id(Guid.NewGuid());
         }
 
-        private static void RegisterHandler<T>(IDictionary<Type, Action<ICommand>> dictionary, ICommandHandler<T> handler) 
-            where T : ICommand
+        private static ICommandPublisher CreateBus(IEventStore eventStore)
         {
-            dictionary.Add(typeof (T), CreateHandleAction(handler));
-        }
+            var bus = new Bus(eventStore);
 
-        private static Action<ICommand> CreateHandleAction<T>(ICommandHandler<T> handler) where T : ICommand
-        {
-            return c => handler.Handle((T) c);
+            bus.ConfigureDomain(eventStore);
+
+            return bus;
         }
     }
 }

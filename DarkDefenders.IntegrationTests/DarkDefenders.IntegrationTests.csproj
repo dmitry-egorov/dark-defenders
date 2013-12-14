@@ -53,17 +53,21 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DarkDefenders.Commands\DarkDefenders.Commands.csproj">
-      <Project>{713E946E-4CC4-4146-AC55-422FCDF31C5F}</Project>
-      <Name>DarkDefenders.Commands</Name>
+    <ProjectReference Include="..\DarkDefenders.Domain\DarkDefenders.Domain.csproj">
+      <Project>{27F91716-3957-49C9-94BB-8AA160BF96AA}</Project>
+      <Name>DarkDefenders.Domain</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DarkDefenders.Infrastructure.CommandHandling.Direct\DarkDefenders.Infrastructure.CommandHandling.Direct.csproj">
-      <Project>{EE08DECB-29DA-4473-87AB-112288231174}</Project>
-      <Name>DarkDefenders.Infrastructure.CommandHandling.Direct</Name>
+    <ProjectReference Include="..\Infrastructure.DDDEventSourcing.Implementations\Infrastructure.DDDEventSourcing.Implementations.csproj">
+      <Project>{567527BE-AEAE-44BB-9484-891765ED98A2}</Project>
+      <Name>Infrastructure.DDDEventSourcing.Implementations</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DarkDefenders.Infrastructure.CommandHandling\DarkDefenders.Infrastructure.CommandHandling.csproj">
-      <Project>{7CDAA3DF-B0D2-4436-A5ED-2A69760AB4D3}</Project>
-      <Name>DarkDefenders.Infrastructure.CommandHandling</Name>
+    <ProjectReference Include="..\Infrastructure.DDDEventSourcing\Infrastructure.DDDEventSourcing.csproj">
+      <Project>{AE2D50ED-38BC-4141-A124-4912EAD8428C}</Project>
+      <Name>Infrastructure.DDDEventSourcing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Util\Infrastructure.Util.csproj">
+      <Project>{0B407BC3-7B5B-431A-96E7-A41F25AB27BE}</Project>
+      <Name>Infrastructure.Util</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
