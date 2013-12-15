@@ -21,12 +21,6 @@ namespace Infrastructure.DDDES.Implementations
             return _allEvents;
         }
 
-        public void Append(IEvent e)
-        {
-            _allEvents.Add(e);
-            _eventsMap.Add(e.RootId, e);
-        }
-
         public void Append(IEnumerable<IEvent> events)
         {
             var readOnly = events.AsReadOnly();
@@ -35,15 +29,7 @@ namespace Infrastructure.DDDES.Implementations
 
             readOnly
                 .GroupBy(x => x.RootId)
-                .ForEach(x =>
-                {
-                    _eventsMap.AddMany(x.Key, x);
-                });
-        }
-
-        public IEnumerable<Identity> GetAllIds()
-        {
-            return _eventsMap.Keys;
+                .ForEach(x => _eventsMap.AddMany(x.Key, x));
         }
     }
 }

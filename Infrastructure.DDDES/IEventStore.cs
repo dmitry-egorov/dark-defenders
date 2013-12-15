@@ -8,10 +8,6 @@ namespace Infrastructure.DDDES
 
         IEnumerable<IEvent> GetAll();
 
-        void Append(IEvent e);
-
         void Append(IEnumerable<IEvent> events);
-
-        IEnumerable<Identity> GetAllIds();
     }
 }
