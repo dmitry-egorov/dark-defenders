@@ -42,7 +42,6 @@
     <Compile Include="IRepository.cs" />
     <Compile Include="IRoot.cs" />
     <Compile Include="IRootEvent.cs" />
-    <Compile Include="IRootSnapshot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

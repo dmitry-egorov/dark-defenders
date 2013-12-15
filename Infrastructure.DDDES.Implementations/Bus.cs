@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using Infrastructure.Concurrent;
+using Infrastructure.Util;
 using MoreLinq;
 
 namespace Infrastructure.DDDES.Implementations
 {
     public class Bus: IBus
     {
-        private readonly ConcurrentHashSet<IObserver<IEvent>> _observers = new ConcurrentHashSet<IObserver<IEvent>>();
+        private readonly ConcurrentHashSet<IObserver<IEnumerable<IEvent>>> _observers = new ConcurrentHashSet<IObserver<IEnumerable<IEvent>>>();
 
         private readonly ICommandProcessor _processor;
 
@@ -23,13 +24,6 @@ namespace Infrastructure.DDDES.Implementations
             PublishEvents(events);
         }
 
-        private void PublishEvents(IEnumerable<IEvent> events)
-        {
-            var observers = _observers.GetAll();
-
-            events.ForEach(e => observers.ForEach(obs => obs.OnNext(e)));
-        }
-
         public void PublishToAllOfType<T>(Func<T, IEnumerable<IEvent>> command)
         {
             var events = _processor.ProcessAllImplementing(command);
@@ -37,7 +31,7 @@ namespace Infrastructure.DDDES.Implementations
             PublishEvents(events);
         }
 
-        public IDisposable Subscribe(IObserver<IEvent> observer)
+        public IDisposable Subscribe(IObserver<IEnumerable<IEvent>> observer)
         {
             if (!_observers.TryAdd(observer))
             {
@@ -47,12 +41,21 @@ namespace Infrastructure.DDDES.Implementations
             return new ObserverUnsubscriper(_observers, observer);
         }
 
+        private void PublishEvents(IEnumerable<IEvent> events)
+        {
+            var observers = _observers.GetAll();
+
+            var eventsReadOnly = events.AsReadOnly();
+
+            observers.ForEach(obs => obs.OnNext(eventsReadOnly));
+        }
+
         private class ObserverUnsubscriper : IDisposable
         {
-            private readonly ConcurrentHashSet<IObserver<IEvent>> _observers;
-            private readonly IObserver<IEvent> _observer;
+            private readonly ConcurrentHashSet<IObserver<IEnumerable<IEvent>>> _observers;
+            private readonly IObserver<IEnumerable<IEvent>> _observer;
 
-            public ObserverUnsubscriper(ConcurrentHashSet<IObserver<IEvent>> observers, IObserver<IEvent> observer)
+            public ObserverUnsubscriper(ConcurrentHashSet<IObserver<IEnumerable<IEvent>>> observers, IObserver<IEnumerable<IEvent>> observer)
             {
                 _observers = observers;
                 _observer = observer;

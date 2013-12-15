@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.AccessControl;
 using DarkDefenders.Domain.Players.Events;
 using DarkDefenders.Domain.Terrains;
 using Infrastructure.DDDES;
@@ -8,12 +9,12 @@ using Infrastructure.Math;
 
 namespace DarkDefenders.Domain.Players
 {
-    public class Player : RootBase<PlayerSnapshot, PlayerId>, IUpdateable
+    public class Player : RootBase<PlayerId, PlayerSnapshot, IPlayerEventsReciever, IPlayerEvent>, IUpdateable
     {
         private readonly IRepository<Terrain, TerrainId> _terrainRepository;
         private const double Speed = 0.001d;
 
-        public Player(IRepository<Terrain, TerrainId> terrainRepository)
+        public Player(PlayerId id, IRepository<Terrain, TerrainId> terrainRepository) : base(id)
         {
             _terrainRepository = terrainRepository;
         }
@@ -29,34 +30,44 @@ namespace DarkDefenders.Domain.Players
             yield return new PlayerCreated(id, terrainId, spawnPosition);
         }
 
-        public IEnumerable<IEvent> SetDesiredOrientation(Vector orientation)
+        public IEnumerable<IEvent> Stop()
         {
-            AssertExists();
+            return SetDesiredOrientation(Vector.Zero);
+        }
 
+        public IEnumerable<IEvent> Move(MoveDirection direction)
+        {
+            var orientation = direction == MoveDirection.Left ? new Vector(-1, 0) : new Vector(1, 0);
+
+            return SetDesiredOrientation(orientation);
+        }
+
+        private IEnumerable<IEvent> SetDesiredOrientation(Vector orientation)
+        {
             if (Snapshot.DesiredOrientation != orientation)
             {
-                yield return new PlayersDesiredOrientationIsSet(Snapshot.Id, orientation);
+                yield return new PlayersDesiredOrientationIsSet(Id, orientation);
             }
         }
 
         public IEnumerable<IEvent> Update(TimeSpan elapsed)
         {
-            AssertExists();
+            var snapshot = Snapshot;
 
-            var delta = Snapshot.DesiredOrientation * elapsed.TotalMilliseconds * Speed;
+            var delta = snapshot.DesiredOrientation * elapsed.TotalMilliseconds * Speed;
 
             if (delta.X == 0 && delta.Y == 0)
             {
                 yield break;
             }
 
-            var newPosition = Snapshot.Position + delta;
+            var newPosition = snapshot.Position + delta;
 
-            var terrain = _terrainRepository.GetById(Snapshot.TerrainId);
+            var terrain = _terrainRepository.GetById(snapshot.TerrainId);
 
             if (terrain.IsAllowedPosition(newPosition))
             {
-                yield return new PlayerMoved(Snapshot.Id, newPosition);
+                yield return new PlayerMoved(Id, newPosition);
             }
         }
     }

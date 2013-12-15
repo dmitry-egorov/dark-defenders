@@ -1,7 +1,9 @@
+using System.Collections.Generic;
+
 namespace Infrastructure.DDDES
 {
-    public interface IRoot<out TSnapshot>
+    public interface IRoot<in TRootEvent>
     {
-        TSnapshot Snapshot { get; }
+        void Apply(IEnumerable<TRootEvent> events);
     }
 }

@@ -4,6 +4,8 @@ namespace Infrastructure.Math
 {
     public class Vector
     {
+        public static readonly Vector Zero = new Vector(0, 0);
+
         public double X { get; private set; }
         public double Y { get; private set; }
 

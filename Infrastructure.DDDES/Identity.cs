@@ -11,6 +11,11 @@ namespace Infrastructure.DDDES
             _value = value;
         }
 
+        protected Identity()
+        {
+            _value = Guid.NewGuid();
+        }
+
         public override string ToString()
         {
             return _value.ToString();

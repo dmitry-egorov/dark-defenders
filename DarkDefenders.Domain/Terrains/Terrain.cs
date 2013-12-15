@@ -5,8 +5,12 @@ using Infrastructure.Math;
 
 namespace DarkDefenders.Domain.Terrains
 {
-    public class Terrain : RootBase<TerrainSnapshot, TerrainId>
+    public class Terrain : RootBase<TerrainId, TerrainSnapshot, ITerrainEventsReciever, ITerrainEvent>
     {
+        public Terrain(TerrainId id) : base(id)
+        {
+        }
+
         public IEnumerable<ITerrainEvent> Create(TerrainId id, Vector spawnPosition)
         {
             AssertDoesntExist();
@@ -16,9 +20,9 @@ namespace DarkDefenders.Domain.Terrains
 
         public Vector GetSpawnPosition()
         {
-            AssertExists();
+            var snapshot = Snapshot;
 
-            return Snapshot.SpawnPosition;
+            return snapshot.SpawnPosition;
         }
 
         public bool IsAllowedPosition(Vector position)

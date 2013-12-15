@@ -10,8 +10,8 @@ namespace DarkDefenders.Domain
     {
         public static void ConfigureDomain(this CommandProcessor processor, IEventStore eventStore)
         {
-            var terrainRepository = new Repository<Terrain, TerrainSnapshot, ITerrainEvent, ITerrainEventsReciever, TerrainId>(eventStore, () => new Terrain());
-            var playerRepository  = new Repository<Player,  PlayerSnapshot,  IPlayerEvent,  IPlayerEventsReciever,  PlayerId> (eventStore, () => new Player(terrainRepository));
+            var terrainRepository = new Repository<Terrain, ITerrainEvent, ITerrainEventsReciever, TerrainId>(eventStore, id => new Terrain(id));
+            var playerRepository  = new Repository<Player, IPlayerEvent, IPlayerEventsReciever, PlayerId> (eventStore, id => new Player(id, terrainRepository));
 
             processor.AddRepository(terrainRepository);
             processor.AddRepository(playerRepository);

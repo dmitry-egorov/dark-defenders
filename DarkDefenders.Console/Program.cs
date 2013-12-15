@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using DarkDefenders.Domain;
@@ -8,6 +9,7 @@ using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations;
 using Infrastructure.Math;
 using Infrastructure.Util;
+using MoreLinq;
 
 namespace DarkDefenders.Console
 {
@@ -21,10 +23,10 @@ namespace DarkDefenders.Console
 
             var renderer = new ConsoleRenderer();
 
-            bus.Subscribe(new ActionObserver<IEvent>(renderer.Apply));
+            bus.Subscribe(events => events.ForEach(renderer.Apply));
 
-            var terrainId = new TerrainId(Guid.NewGuid());
-            var playerId = new PlayerId(Guid.NewGuid());
+            var terrainId = new TerrainId();
+            var playerId = new PlayerId();
 
             var spawnPosition = new Vector(0, 0);
 
@@ -41,15 +43,15 @@ namespace DarkDefenders.Console
             {
                 if (NativeKeyboard.IsKeyDown(KeyCode.Left))
                 {
-                    bus.PublishTo<Player>(playerId, x => x.SetDesiredOrientation(new Vector(-1, 0)));
+                    bus.PublishTo<Player>(playerId, x => x.Move(MoveDirection.Left));
                 }
                 else if (NativeKeyboard.IsKeyDown(KeyCode.Right))
                 {
-                    bus.PublishTo<Player>(playerId, x => x.SetDesiredOrientation(new Vector(1, 0)));
+                    bus.PublishTo<Player>(playerId, x => x.Move(MoveDirection.Right));
                 }
                 else
                 {
-                    bus.PublishTo<Player>(playerId, x => x.SetDesiredOrientation(new Vector(0, 0)));
+                    bus.PublishTo<Player>(playerId, x => x.Stop());
                 }
 
                 var current = sw.Elapsed;
@@ -75,7 +77,7 @@ namespace DarkDefenders.Console
 
             var bus = new Bus(processor);
 
-            bus.Subscribe(new ActionObserver<IEvent>(eventStore.Append));
+            bus.Subscribe(eventStore.Append);
 
             return bus;
         }

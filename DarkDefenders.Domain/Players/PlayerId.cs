@@ -8,5 +8,9 @@ namespace DarkDefenders.Domain.Players
         public PlayerId(Guid value) : base(value)
         {
         }
+
+        public PlayerId()
+        {
+        }
     }
 }

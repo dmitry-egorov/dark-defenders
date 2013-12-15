@@ -8,5 +8,9 @@ namespace DarkDefenders.Domain.Terrains
         public TerrainId(Guid value) : base(value)
         {
         }
+
+        public TerrainId()
+        {
+        }
     }
 }

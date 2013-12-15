@@ -39,6 +39,7 @@
     <Compile Include="Players\IPlayerEvent.cs" />
     <Compile Include="Players\IPlayerEventsReciever.cs" />
     <Compile Include="Players\Events\PlayerCreated.cs" />
+    <Compile Include="Players\MoveDirection.cs" />
     <Compile Include="Players\PlayerId.cs" />
     <Compile Include="Players\Player.cs" />
     <Compile Include="Players\Events\PlayersDesiredOrientationIsSet.cs" />

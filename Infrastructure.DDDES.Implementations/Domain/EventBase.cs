@@ -1,6 +1,6 @@
 namespace Infrastructure.DDDES.Implementations.Domain
 {
-    public abstract class EventBase<TRootId, TEvent> : IEvent
+    public abstract class EventBase<TRootId, TEvent> : IEvent<TRootId>
         where TRootId: Identity
         where TEvent: EventBase<TRootId, TEvent>
     {
