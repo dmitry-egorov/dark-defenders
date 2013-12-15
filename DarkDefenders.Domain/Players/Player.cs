@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.AccessControl;
 using DarkDefenders.Domain.Players.Events;
 using DarkDefenders.Domain.Terrains;
 using Infrastructure.DDDES;
@@ -11,15 +10,15 @@ namespace DarkDefenders.Domain.Players
 {
     public class Player : RootBase<PlayerId, PlayerSnapshot, IPlayerEventsReciever, IPlayerEvent>, IUpdateable
     {
-        private readonly IRepository<Terrain, TerrainId> _terrainRepository;
+        private readonly IRepository<TerrainId, Terrain> _terrainRepository;
         private const double Speed = 0.001d;
 
-        public Player(PlayerId id, IRepository<Terrain, TerrainId> terrainRepository) : base(id)
+        public Player(PlayerId id, IRepository<TerrainId, Terrain> terrainRepository) : base(id)
         {
             _terrainRepository = terrainRepository;
         }
 
-        public IEnumerable<IPlayerEvent> Create(PlayerId id, TerrainId terrainId)
+        public IEnumerable<IPlayerEvent> Create(TerrainId terrainId)
         {
             AssertDoesntExist();
 
@@ -27,7 +26,7 @@ namespace DarkDefenders.Domain.Players
 
             var spawnPosition = terrain.GetSpawnPosition();
 
-            yield return new PlayerCreated(id, terrainId, spawnPosition);
+            yield return new PlayerCreated(Id, terrainId, spawnPosition);
         }
 
         public IEnumerable<IEvent> Stop()
@@ -37,17 +36,9 @@ namespace DarkDefenders.Domain.Players
 
         public IEnumerable<IEvent> Move(MoveDirection direction)
         {
-            var orientation = direction == MoveDirection.Left ? new Vector(-1, 0) : new Vector(1, 0);
+            var orientation = direction == MoveDirection.Left ? Vector.Left : Vector.Right;
 
             return SetDesiredOrientation(orientation);
-        }
-
-        private IEnumerable<IEvent> SetDesiredOrientation(Vector orientation)
-        {
-            if (Snapshot.DesiredOrientation != orientation)
-            {
-                yield return new PlayersDesiredOrientationIsSet(Id, orientation);
-            }
         }
 
         public IEnumerable<IEvent> Update(TimeSpan elapsed)
@@ -56,7 +47,7 @@ namespace DarkDefenders.Domain.Players
 
             var delta = snapshot.DesiredOrientation * elapsed.TotalMilliseconds * Speed;
 
-            if (delta.X == 0 && delta.Y == 0)
+            if (delta == Vector.Zero)
             {
                 yield break;
             }
@@ -68,6 +59,14 @@ namespace DarkDefenders.Domain.Players
             if (terrain.IsAllowedPosition(newPosition))
             {
                 yield return new PlayerMoved(Id, newPosition);
+            }
+        }
+
+        private IEnumerable<IEvent> SetDesiredOrientation(Vector orientation)
+        {
+            if (Snapshot.DesiredOrientation != orientation)
+            {
+                yield return new PlayersDesiredOrientationIsSet(Id, orientation);
             }
         }
     }

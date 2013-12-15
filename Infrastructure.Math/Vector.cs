@@ -5,6 +5,8 @@ namespace Infrastructure.Math
     public class Vector
     {
         public static readonly Vector Zero = new Vector(0, 0);
+        public static readonly Vector Left = new Vector(-1, 0);
+        public static readonly Vector Right = new Vector(1, 0);
 
         public double X { get; private set; }
         public double Y { get; private set; }

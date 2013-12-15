@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 using DarkDefenders.Domain;
 using DarkDefenders.Domain.Players;
@@ -13,73 +11,73 @@ using MoreLinq;
 
 namespace DarkDefenders.Console
 {
-    class Program
+    static class Program
     {
         static void Main()
         {
-            var eventStore = new EventStore();
+            var renderer = new ConsoleRenderer(100, 40);
 
-            var bus = CreateBus(eventStore);
-
-            var renderer = new ConsoleRenderer();
-
-            bus.Subscribe(events => events.ForEach(renderer.Apply));
-
-            var terrainId = new TerrainId();
-            var playerId = new PlayerId();
+            renderer.Initialize();
+            
+            var bus = CreateBus(renderer);
 
             var spawnPosition = new Vector(0, 0);
+            var terrainId = new TerrainId();
 
-            bus.PublishTo<Terrain>(terrainId, terrain => terrain.Create(terrainId, spawnPosition));
-            bus.PublishTo<Player>(playerId, player => player.Create(playerId, terrainId));
+            bus.PublishTo<Terrain>(terrainId, t => t.Create(spawnPosition));
+            var player  = bus.Create<Player>(new PlayerId(), p => p.Create(terrainId));
 
-            var sw = Stopwatch.StartNew();
-            var last = TimeSpan.Zero;
-
-            const int maxFps = 200000;
-            var minFrameElapsed = TimeSpan.FromMilliseconds(1000.0 / maxFps);
+            var clock = Clock.StartNew();
 
             while (true)
             {
                 if (NativeKeyboard.IsKeyDown(KeyCode.Left))
                 {
-                    bus.PublishTo<Player>(playerId, x => x.Move(MoveDirection.Left));
+                    player.Do(x => x.Move(MoveDirection.Left));
                 }
                 else if (NativeKeyboard.IsKeyDown(KeyCode.Right))
                 {
-                    bus.PublishTo<Player>(playerId, x => x.Move(MoveDirection.Right));
+                    player.Do(x => x.Move(MoveDirection.Right));
                 }
                 else
                 {
-                    bus.PublishTo<Player>(playerId, x => x.Stop());
+                    player.Do(x => x.Stop());
                 }
 
-                var current = sw.Elapsed;
-                var elapsed = current - last;
-                last = current;
+                var elapsed = clock.ElapsedSinceLastCall;
 
                 bus.PublishToAllOfType<IUpdateable>(x => x.Update(elapsed));
+
                 var fps = Math.Round(10000.0 / elapsed.TotalMilliseconds) / 10;
+
                 renderer.RenderFps(fps);
 
-                if (elapsed < minFrameElapsed)
-                {
-                    Thread.Sleep(minFrameElapsed - elapsed);
-                }
+                LimitFps(elapsed);
             }
         }
 
-        private static IBus CreateBus(IEventStore eventStore)
+        private static IBus CreateBus(ConsoleRenderer renderer)
         {
             var processor = new CommandProcessor();
 
-            processor.ConfigureDomain(eventStore);
+            processor.ConfigureDomain();
 
             var bus = new Bus(processor);
 
-            bus.Subscribe(eventStore.Append);
+            bus.Subscribe(events => events.ForEach(renderer.Apply));
 
             return bus;
+        }
+
+        private static void LimitFps(TimeSpan elapsed)
+        {
+            const int maxFps = 200000;
+            var minFrameElapsed = TimeSpan.FromMilliseconds(1000.0 / maxFps);
+
+            if (elapsed < minFrameElapsed)
+            {
+                Thread.Sleep(minFrameElapsed - elapsed);
+            }
         }
     }
 }

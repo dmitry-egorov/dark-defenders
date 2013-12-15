@@ -11,11 +11,11 @@ namespace DarkDefenders.Domain.Terrains
         {
         }
 
-        public IEnumerable<ITerrainEvent> Create(TerrainId id, Vector spawnPosition)
+        public IEnumerable<ITerrainEvent> Create(Vector spawnPosition)
         {
             AssertDoesntExist();
 
-            yield return new TerrainCreated(id, spawnPosition);
+            yield return new TerrainCreated(Id, spawnPosition);
         }
 
         public Vector GetSpawnPosition()

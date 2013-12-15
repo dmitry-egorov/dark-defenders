@@ -135,12 +135,12 @@ namespace DarkDefenders.IntegrationTests
 
         private void CreateTerrain(TerrainId terrainId, Vector spawnPosition)
         {
-            _bus.PublishTo<Terrain>(terrainId, terrain => terrain.Create(terrainId, spawnPosition));
+            _bus.PublishTo<Terrain>(terrainId, terrain => terrain.Create(spawnPosition));
         }
 
         private void CreatePlayer(PlayerId playerId, TerrainId terrainId)
         {
-            _bus.PublishTo<Player>(playerId, player => player.Create(playerId, terrainId));
+            _bus.PublishTo<Player>(playerId, player => player.Create(terrainId));
         }
 
         private void SetPlayersDesiredOrientation(PlayerId playerId, MoveDirection direction)
@@ -159,7 +159,7 @@ namespace DarkDefenders.IntegrationTests
         {
             var processor = new CommandProcessor();
 
-            processor.ConfigureDomain(eventStore);
+            processor.ConfigureDomain();
 
             var bus = new Bus(processor);
 
