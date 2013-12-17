@@ -1,5 +1,5 @@
 ﻿using DarkDefenders.Domain.Players;
-using DarkDefenders.Domain.Terrains;
+using DarkDefenders.Domain.Worlds;
 using Infrastructure.DDDES.Implementations;
 using Infrastructure.DDDES.Implementations.Domain;
 
@@ -9,11 +9,11 @@ namespace DarkDefenders.Domain
     {
         public static void ConfigureDomain(this CommandProcessor processor)
         {
-            var terrainRepository = new Repository<TerrainId, Terrain, ITerrainEvent, ITerrainEventsReciever>(id => new Terrain(id));
-            var playerRepository  = new Repository<PlayerId, Player, IPlayerEvent, IPlayerEventsReciever> (id => new Player(id, terrainRepository));
+            var worldRepository = new Repository<WorldId, World>(id => new World(id));
+            var playerRepository  = new Repository<PlayerId, Player> (id => new Player(id, worldRepository));
 
-            processor.AddRepository(terrainRepository);
-            processor.AddRepository(playerRepository);
+            processor.AddRepository<WorldId, World, IWorldEvent>(worldRepository);
+            processor.AddRepository<PlayerId, Player, IPlayerEvent>(playerRepository);
         }
     }
 }

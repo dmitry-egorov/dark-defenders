@@ -1,76 +1,148 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Util;
 
 namespace Infrastructure.DDDES.Implementations
 {
     public class CommandProcessor : ICommandProcessor
     {
-        private readonly Dictionary<Type, Func<Func<object, IEnumerable<IEvent>>, IEnumerable<IEvent>>> _processAllFuncs = new Dictionary<Type, Func<Func<object, IEnumerable<IEvent>>, IEnumerable<IEvent>>>();
-        private readonly Dictionary<Type, Func<Identity, Func<object, IEnumerable<IEvent>>, IEnumerable<IEvent>>> _processRootFuncs = new Dictionary<Type, Func<Identity, Func<object, IEnumerable<IEvent>>, IEnumerable<IEvent>>>();
+        private readonly Dictionary<Type, IRootCommmandProcessor> _containersTypeMap = new Dictionary<Type, IRootCommmandProcessor>();
+        private readonly Dictionary<Type, IRootEventsApplier> _idTypeAppliersMap = new Dictionary<Type, IRootEventsApplier>();
 
-        public void AddRepository<TRoot, TRootId, TRootEvent>(IRootsStorage<TRootId, TRoot, TRootEvent> repository)
+        private readonly Queue<IEvent> _commitQueue = new Queue<IEvent>();
+
+        private readonly IEventsLinstener _eventsLinstener;
+
+        public CommandProcessor(IEventsLinstener eventsLinstener)
+        {
+            _eventsLinstener = eventsLinstener;
+        }
+
+        public void AddRepository<TRootId, TRoot, TRootEvent>(IRepository<TRootId, TRoot> repository)
             where TRootId : Identity
-            where TRoot: class
+            where TRoot: class, IRoot<TRootEvent>
         {
-            _processAllFuncs[typeof(TRoot)] = command => ProcessAllEvents(repository, command);
-            _processRootFuncs[typeof(TRoot)] = (id, command) => ProcessRootEvents(repository, id, command);
+            _containersTypeMap[typeof (TRoot)] = new RootCommmandProcessor<TRootId, TRoot, TRootEvent>(repository, _commitQueue);
+            _idTypeAppliersMap[typeof (TRootId)] = new RootEventsApplier<TRootId, TRoot, TRootEvent>(repository);
         }
 
-        public IEnumerable<IEvent> Process<TRoot>(Identity id, Func<TRoot, IEnumerable<IEvent>> command)
+        public T Request<T, TRoot>(Identity id, Func<TRoot, T> request)
         {
-            var func = GetFunc<TRoot>();
-
-            return func(id, c => command((TRoot)c));
+            return _containersTypeMap[typeof(TRoot)].Request(id, request);
         }
 
-        public IEnumerable<IEvent> ProcessAllImplementing<TInterface>(Func<TInterface, IEnumerable<IEvent>> command)
+        public void Process<TRoot>(Identity id, Func<TRoot, IEnumerable<IEvent>> command)
         {
-            return _processAllFuncs
-                   .Where(x => typeof(TInterface).IsAssignableFrom(x.Key))
-                   .SelectMany(x => x.Value(o => command((TInterface)o)));
+            _containersTypeMap[typeof (TRoot)].Process(id, command);
         }
 
-        private Func<Identity, Func<object, IEnumerable<IEvent>>, IEnumerable<IEvent>> GetFunc<TRoot>()
+        public void ProcessAllImplementing<T>(Func<T, IEnumerable<IEvent>> command)
         {
-            Func<Identity, Func<object, IEnumerable<IEvent>>, IEnumerable<IEvent>> func;
-            if (!_processRootFuncs.TryGetValue(typeof (TRoot), out func))
+            _containersTypeMap
+            .Where(x => typeof(T).IsAssignableFrom(x.Key))
+            .ForEach(x => x.Value.ProcessAllImplementing(command));
+        }
+
+        public void Commit()
+        {
+            var events = _commitQueue.DequeueAll().AsReadOnly();
+
+            events
+            .GroupBy(x => x.RootId.GetType())
+            .ForEach(x => _idTypeAppliersMap[x.Key].Apply(x));
+
+            _eventsLinstener.Apply(events);
+        }
+
+        public void Rollback()
+        {
+            _commitQueue.Clear();
+        }
+
+        private interface IRootCommmandProcessor
+        {
+            void Process<TRoot>(Identity id, Func<TRoot, IEnumerable<IEvent>> command);
+            void ProcessAllImplementing<T>(Func<T, IEnumerable<IEvent>> command);
+            T Request<T, TRoot>(Identity id, Func<TRoot, T> request);
+        }
+
+        private interface IRootEventsApplier
+        {
+            void Apply(IEnumerable<IEvent> events);
+        }
+
+        private class RootCommmandProcessor<TRootId, TRoot, TRootEvent>: IRootCommmandProcessor
+            where TRootId: Identity
+            where TRoot: IRoot<TRootEvent>
+        {
+            private readonly IRepository<TRootId, TRoot> _repository;
+            private readonly Queue<IEvent> _queue;
+
+            public RootCommmandProcessor(IRepository<TRootId, TRoot> repository, Queue<IEvent> queue)
             {
-                throw new ApplicationException("Unknown command");
+                _repository = repository;
+                _queue = queue;
             }
 
-            return func;
+            public void Process<TRequestedRoot>(Identity id, Func<TRequestedRoot, IEnumerable<IEvent>> command)
+            {
+                var root = GetRoot<TRequestedRoot>(id);
+
+                var events = command(root);
+
+                _queue.Enqueue(events);
+            }
+
+            public void ProcessAllImplementing<T>(Func<T, IEnumerable<IEvent>> command)
+            {
+                var roots = _repository.GetAll().Cast<T>();
+
+                var events = roots.SelectMany(command);
+
+                _queue.Enqueue(events);
+            }
+
+            public T Request<T, TRequestedRoot>(Identity id, Func<TRequestedRoot, T> request)
+            {
+                var root = GetRoot<TRequestedRoot>(id);
+
+                return request(root);
+            }
+
+            private TRequestedRoot GetRoot<TRequestedRoot>(Identity id)
+            {
+                if (typeof (TRequestedRoot) != typeof (TRoot))
+                {
+                    throw new InvalidOperationException("Wrong type requested");
+                }
+
+                var rootOriginal = _repository.GetById((TRootId) id);
+                return (TRequestedRoot) (object) rootOriginal;
+            }
         }
 
-        private static IEnumerable<IEvent> ProcessRootEvents<TRoot, TRootId, TRootEvent>(IRootsStorage<TRootId, TRoot, TRootEvent> repository, Identity id, Func<object, IEnumerable<IEvent>> command) 
-            where TRootId : Identity 
+        private class RootEventsApplier<TRootId, TRoot, TRootEvent> : IRootEventsApplier
+            where TRootId: Identity
+            where TRoot: IRoot<TRootEvent>
         {
-            var rootId = (TRootId) id;
-            var root = repository.GetById(rootId);
-            var events = command(root).AsReadOnly();
-            return Apply(repository, events);
-        }
+            private readonly IRepository<TRootId, TRoot> _repository;
 
-        private static IEnumerable<IEvent> ProcessAllEvents<TRoot, TRootId, TRootEvent>(IRootsStorage<TRootId, TRoot, TRootEvent> repository, Func<object, IEnumerable<IEvent>> command)
-            where TRootId : Identity where TRoot : class
-        {
-            var roots = repository.GetAll();
-            var events = roots.SelectMany(root => command(root)).AsReadOnly();
+            public RootEventsApplier(IRepository<TRootId, TRoot> repository)
+            {
+                _repository = repository;
+            }
 
-            return Apply(repository, events);
-        }
-
-        private static IEnumerable<IEvent> Apply<TRoot, TRootId, TRootEvent>(IRootsStorage<TRootId, TRoot, TRootEvent> repository, ReadOnlyCollection<IEvent> events)
-            where TRootId : Identity
-        {
-            var rootEvents = events.Cast<TRootEvent>();
-
-            repository.Apply(rootEvents);
-
-            return events;
+            public void Apply(IEnumerable<IEvent> events)
+            {
+                events
+                .GroupBy(x => x.RootId)
+                .ForEach(x =>
+                {
+                    var root = _repository.GetById((TRootId)x.Key);
+                    root.Apply(x.Cast<TRootEvent>());
+                });
+            }
         }
     }
 }

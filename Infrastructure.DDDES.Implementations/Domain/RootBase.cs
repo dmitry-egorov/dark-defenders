@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Infrastructure.DDDES.Implementations.Domain.Exceptions;
 using Infrastructure.Util;
-using MoreLinq;
 
 namespace Infrastructure.DDDES.Implementations.Domain
 {

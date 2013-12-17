@@ -3,10 +3,12 @@ using System.Collections.Generic;
 
 namespace Infrastructure.DDDES
 {
-    public interface ICommandProcessor
+    public interface ICommandProcessor : IUnitOfWork
     {
-        IEnumerable<IEvent> Process<TRoot>(Identity id, Func<TRoot, IEnumerable<IEvent>> command);
+        T Request<T, TRoot>(Identity id, Func<TRoot, T> request);
 
-        IEnumerable<IEvent> ProcessAllImplementing<T>(Func<T, IEnumerable<IEvent>> command);
+        void Process<TRoot>(Identity id, Func<TRoot, IEnumerable<IEvent>> command);
+
+        void ProcessAllImplementing<T>(Func<T, IEnumerable<IEvent>> command);
     }
 }

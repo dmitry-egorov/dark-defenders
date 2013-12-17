@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using DarkDefenders.Domain;
+using DarkDefenders.Domain.Other;
 using DarkDefenders.Domain.Players;
 using DarkDefenders.Domain.Players.Events;
-using DarkDefenders.Domain.Terrains;
-using DarkDefenders.Domain.Terrains.Events;
+using DarkDefenders.Domain.Worlds;
+using DarkDefenders.Domain.Worlds.Events;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations;
 using Infrastructure.DDDES.Implementations.Domain.Exceptions;
@@ -17,8 +18,8 @@ namespace DarkDefenders.IntegrationTests
     [TestFixture]
     public class MainIntegrationTest
     {
-        private IEventStore _eventStore;
-        private IBus _bus;
+        private EventStore _eventStore;
+        private ICommandProcessor _bus;
 
         [SetUp]
         public void SetUp()
@@ -32,13 +33,13 @@ namespace DarkDefenders.IntegrationTests
         {
             var spawnPosition = new Vector(0, 0);
 
-            var terrainId = CreateTerrain(spawnPosition);
-            var playerId = CreatePlayer(terrainId);
+            var worldId = CreateWorld(spawnPosition);
+            var playerId = CreatePlayer(worldId);
 
             var expectedEvents = new IEvent[]
             {
-                new TerrainCreated(terrainId, spawnPosition), 
-                new PlayerCreated(playerId, terrainId, spawnPosition)
+                new WorldCreated(worldId, spawnPosition), 
+                new PlayerCreated(playerId, worldId, spawnPosition)
             };
 
             AssertEvents(expectedEvents);
@@ -48,19 +49,18 @@ namespace DarkDefenders.IntegrationTests
         public void Should_create_and_set_desired_orientation_to_player()
         {
             var spawnPosition = new Vector(0, 0);
-            var direction = MoveDirection.Right;
-            var desiredOrientation = new Vector(1, 0);
+            var desiredOrientation = MovementForce.Left;
 
-            var terrainId = CreateTerrain(spawnPosition);
-            var playerId = CreatePlayer(terrainId);
+            var worldId = CreateWorld(spawnPosition);
+            var playerId = CreatePlayer(worldId);
 
-            SetPlayersDesiredOrientation(playerId, direction);
+            MovePlayerLeft(playerId);
 
             var expectedEvents = new IEvent[]
             {
-                new TerrainCreated(terrainId, spawnPosition), 
-                new PlayerCreated(playerId, terrainId, spawnPosition),
-                new PlayersDesiredOrientationIsSet(playerId, desiredOrientation), 
+                new WorldCreated(worldId, spawnPosition), 
+                new PlayerCreated(playerId, worldId, spawnPosition),
+                new MovementForceChanged(playerId, desiredOrientation), 
             };
 
             AssertEvents(expectedEvents);
@@ -70,22 +70,21 @@ namespace DarkDefenders.IntegrationTests
         public void Should_create_and_set_desired_orientation_to_player_and_move_player_on_update()
         {
             var spawnPosition = new Vector(0, 0);
-            var direction = MoveDirection.Right;
-            var desiredOrientation = new Vector(1, 0);
+            var desiredOrientation = MovementForce.Left;
             var elapsed = TimeSpan.FromMilliseconds(20);
-            var newPosition = new Vector(0.02, 0);
+            var newPosition = new Vector(-0.08, 0);
 
-            var terrainId = CreateTerrain(spawnPosition);
-            var playerId = CreatePlayer(terrainId);
+            var worldId = CreateWorld(spawnPosition);
+            var playerId = CreatePlayer(worldId);
 
-            SetPlayersDesiredOrientation(playerId, direction);
+            MovePlayerLeft(playerId);
             UpdateAll(elapsed);
 
             var expectedEvents = new IEvent[]
             {
-                new TerrainCreated(terrainId, spawnPosition), 
-                new PlayerCreated(playerId, terrainId, spawnPosition),
-                new PlayersDesiredOrientationIsSet(playerId, desiredOrientation), 
+                new WorldCreated(worldId, spawnPosition), 
+                new PlayerCreated(playerId, worldId, spawnPosition),
+                new MovementForceChanged(playerId, desiredOrientation), 
                 new PlayerMoved(playerId, newPosition)
             };
 
@@ -93,59 +92,59 @@ namespace DarkDefenders.IntegrationTests
         }
 
         [Test]
-        public void Should_throw_when_terrain_is_not_created()
+        public void Should_throw_when_world_is_not_created()
         {
-            var fakeTerrainId = new TerrainId();
+            var fakeWorldId = new WorldId();
             var playerId = new PlayerId();
 
-            Assert.Throws<RootDoesntExistException>(() => CreatePlayer(playerId, fakeTerrainId));
+            Assert.Throws<RootDoesntExistException>(() => CreatePlayer(playerId, fakeWorldId));
         }
 
         [Test]
-        public void Should_throw_when_terrain_is_created_twice()
+        public void Should_throw_when_world_is_created_twice()
         {
             var spawnPosition = new Vector(0, 0);
-            var terrainId = CreateTerrain(spawnPosition);
+            var worldId = CreateWorld(spawnPosition);
 
-            Assert.Throws<RootAlreadyExistsException>(() => CreateTerrain(terrainId, spawnPosition));
+            Assert.Throws<RootAlreadyExistsException>(() => CreateWorld(worldId, spawnPosition));
         }
 
         private void UpdateAll(TimeSpan elapsed)
         {
-            _bus.PublishToAllOfType<IUpdateable>(root => root.Update(elapsed));
+            _bus.ProcessAllAndCommit<IUpdateable>(root => root.Update(elapsed));
         }
 
-        private PlayerId CreatePlayer(TerrainId terrainId)
+        private PlayerId CreatePlayer(WorldId worldId)
         {
             var playerId = new PlayerId();
 
-            CreatePlayer(playerId, terrainId);
+            CreatePlayer(playerId, worldId);
 
             return playerId;
         }
 
-        private TerrainId CreateTerrain(Vector spawnPosition)
+        private WorldId CreateWorld(Vector spawnPosition)
         {
-            var terrainId = new TerrainId();
+            var worldId = new WorldId();
 
-            CreateTerrain(terrainId, spawnPosition);
+            CreateWorld(worldId, spawnPosition);
 
-            return terrainId;
+            return worldId;
         }
 
-        private void CreateTerrain(TerrainId terrainId, Vector spawnPosition)
+        private void CreateWorld(WorldId worldId, Vector spawnPosition)
         {
-            _bus.PublishTo<Terrain>(terrainId, terrain => terrain.Create(spawnPosition));
+            _bus.CreateAndCommit<World>(worldId, world => world.Create(spawnPosition));
         }
 
-        private void CreatePlayer(PlayerId playerId, TerrainId terrainId)
+        private void CreatePlayer(PlayerId playerId, WorldId worldId)
         {
-            _bus.PublishTo<Player>(playerId, player => player.Create(terrainId));
+            _bus.CreateAndCommit<Player>(playerId, player => player.Create(worldId));
         }
 
-        private void SetPlayersDesiredOrientation(PlayerId playerId, MoveDirection direction)
+        private void MovePlayerLeft(PlayerId playerId)
         {
-            _bus.PublishTo<Player>(playerId, player => player.Move(direction));
+            _bus.ProcessAndCommit<Player>(playerId, player => player.MoveLeft());
         }
 
         private void AssertEvents(IEnumerable<IEvent> expectedEvents)
@@ -155,17 +154,30 @@ namespace DarkDefenders.IntegrationTests
             CollectionAssert.AreEqual(expectedEvents.AsReadOnly(), actualEvents);
         }
 
-        private static IBus CreateBus(IEventStore eventStore)
+        private static ICommandProcessor CreateBus(EventStore eventStore)
         {
-            var processor = new CommandProcessor();
+            var processor = new CommandProcessor(eventStore);
 
             processor.ConfigureDomain();
 
-            var bus = new Bus(processor);
+            return processor;
+        }
 
-            bus.Subscribe(eventStore.Append);
+        public class EventStore: IEventsLinstener
+        {
+            private readonly List<IEvent> _allEvents = new List<IEvent>();
 
-            return bus;
+            public IEnumerable<IEvent> GetAll()
+            {
+                return _allEvents;
+            }
+
+            public void Apply(IEnumerable<IEvent> events)
+            {
+                var readOnly = events.AsReadOnly();
+
+                _allEvents.AddRange(readOnly);
+            }
         }
     }
 }

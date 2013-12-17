@@ -13,6 +13,11 @@ namespace DarkDefenders.Domain.Players.Events
             NewPosition = newPosition;
         }
 
+        public void ApplyTo(IPlayerEventsReciever reciever)
+        {
+            reciever.Apply(this);
+        }
+
         protected override string EventToString()
         {
             return "Player moved: {0} {1}".FormatWith(RootId, NewPosition);
@@ -26,11 +31,6 @@ namespace DarkDefenders.Domain.Players.Events
         protected override int GetEventHashCode()
         {
             return NewPosition.GetHashCode();
-        }
-
-        public void ApplyTo(IPlayerEventsReciever reciever)
-        {
-            reciever.Apply(this);
         }
     }
 }

@@ -4,9 +4,15 @@ namespace Infrastructure.Math
 {
     public class Vector
     {
-        public static readonly Vector Zero = new Vector(0, 0);
-        public static readonly Vector Left = new Vector(-1, 0);
+        public static readonly Vector Zero  = new Vector(0, 0);
+        public static readonly Vector Left  = new Vector(-1, 0);
         public static readonly Vector Right = new Vector(1, 0);
+        public static readonly Vector Down  = new Vector(0, -1);
+
+        public static Vector XY(double x, double y)
+        {
+            return new Vector(x, y);
+        }
 
         public double X { get; private set; }
         public double Y { get; private set; }
@@ -20,6 +26,11 @@ namespace Infrastructure.Math
         public override string ToString()
         {
             return "({0}, {1})".FormatWith(X, Y);
+        }
+
+        public string ToString(string formatting)
+        {
+            return "({0}, {1})".FormatWith(X.ToString(formatting), Y.ToString(formatting));
         }
 
         public bool Equals(Vector other)
@@ -68,6 +79,11 @@ namespace Infrastructure.Math
         public static Vector operator -(Vector vector1, Vector vector2)
         {
             return new Vector(vector1.X - vector2.X, vector1.Y - vector2.Y);
+        }
+
+        public double LengthSquared()
+        {
+            return X*X + Y*Y;
         }
     }
 }

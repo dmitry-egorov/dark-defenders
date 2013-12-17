@@ -1,83 +1,88 @@
 ﻿using System;
-using System.Threading;
 using DarkDefenders.Domain;
 using DarkDefenders.Domain.Players;
-using DarkDefenders.Domain.Terrains;
+using DarkDefenders.Domain.Worlds;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations;
 using Infrastructure.Math;
-using Infrastructure.Util;
-using MoreLinq;
 
 namespace DarkDefenders.Console
 {
     static class Program
     {
+        private const int MaxFps = 30;
+        private static readonly TimeSpan _minFrameElapsed = TimeSpan.FromSeconds(1.0 / MaxFps);
+
         static void Main()
         {
-            var renderer = new ConsoleRenderer(100, 40);
+            var renderer = ConsoleRenderer.InitializeNew();
 
-            renderer.Initialize();
-            
-            var bus = CreateBus(renderer);
+            var countingListener = new CountingEventsListener();
 
-            var spawnPosition = new Vector(0, 0);
-            var terrainId = new TerrainId();
+            var composite = new CompositeEventsListener(renderer, countingListener);
 
-            bus.PublishTo<Terrain>(terrainId, t => t.Create(spawnPosition));
-            var player  = bus.Create<Player>(new PlayerId(), p => p.Create(terrainId));
+            var processor = CreateProcessor(composite);
 
+            var player = InitializeDomain(processor);
+
+            var fpsCounter = new PerformanceCounter();
+            var eventsCounter = new PerformanceCounter();
             var clock = Clock.StartNew();
+            var executor = FixedTimeFrameExecutor.StartNew(_minFrameElapsed);
 
             while (true)
             {
-                if (NativeKeyboard.IsKeyDown(KeyCode.Left))
-                {
-                    player.Do(x => x.Move(MoveDirection.Left));
-                }
-                else if (NativeKeyboard.IsKeyDown(KeyCode.Right))
-                {
-                    player.Do(x => x.Move(MoveDirection.Right));
-                }
-                else
-                {
-                    player.Do(x => x.Stop());
-                }
-
                 var elapsed = clock.ElapsedSinceLastCall;
 
-                bus.PublishToAllOfType<IUpdateable>(x => x.Update(elapsed));
+                processor.ProcessAllAndCommit<IUpdateable>(x => x.Update(elapsed));
 
-                var fps = Math.Round(10000.0 / elapsed.TotalMilliseconds) / 10;
+                fpsCounter.Tick(elapsed, renderer.RenderFps);
+                eventsCounter.Tick(countingListener.EventsSinceLastCall, elapsed, renderer.RenderAverageEventsCount);
+                renderer.RenderEventsCount(countingListener.TotalCount);
 
-                renderer.RenderFps(fps);
-
-                LimitFps(elapsed);
+                executor.FillTimeFrame(() => ProcessKeyboard(player, processor));
             }
         }
 
-        private static IBus CreateBus(ConsoleRenderer renderer)
+        private static ICommandProcessor CreateProcessor(IEventsLinstener eventsLinstener)
         {
-            var processor = new CommandProcessor();
+            var processor = new CommandProcessor(eventsLinstener);
 
             processor.ConfigureDomain();
 
-            var bus = new Bus(processor);
-
-            bus.Subscribe(events => events.ForEach(renderer.Apply));
-
-            return bus;
+            return processor;
         }
 
-        private static void LimitFps(TimeSpan elapsed)
+        private static RootToProcessorAdapter<Player> InitializeDomain(ICommandProcessor processor)
         {
-            const int maxFps = 200000;
-            var minFrameElapsed = TimeSpan.FromMilliseconds(1000.0 / maxFps);
+            var worldId = new WorldId();
+            var spawnPosition = new Vector(0, 0.03);
 
-            if (elapsed < minFrameElapsed)
+            processor.CreateAndCommit<World>(worldId, t => t.Create(spawnPosition));
+            return processor.CreateAndCommit<Player>(new PlayerId(), p => p.Create(worldId));
+        }
+
+        private static void ProcessKeyboard(RootToProcessorAdapter<Player> player, IUnitOfWork unitOfWork)
+        {
+            if (NativeKeyboard.IsKeyDown(KeyCode.Left))
             {
-                Thread.Sleep(minFrameElapsed - elapsed);
+                player.Do(x => x.MoveLeft());
             }
+            else if (NativeKeyboard.IsKeyDown(KeyCode.Right))
+            {
+                player.Do(x => x.MoveRight());
+            }
+            else
+            {
+                player.Do(x => x.Stop());
+            }
+
+            if (NativeKeyboard.IsKeyDown(KeyCode.Up))
+            {
+                player.Do(x => x.TryJump());
+            }
+
+            unitOfWork.Commit();
         }
     }
 }

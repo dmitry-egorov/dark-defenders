@@ -1,20 +1,30 @@
-﻿using System.Drawing;
+﻿using System.Collections.Generic;
+using System.Drawing;
+using System.Globalization;
+using System.Linq;
 using DarkDefenders.Domain.Players;
 using DarkDefenders.Domain.Players.Events;
-using DarkDefenders.Domain.Terrains;
-using DarkDefenders.Domain.Terrains.Events;
+using DarkDefenders.Domain.Worlds;
+using DarkDefenders.Domain.Worlds.Events;
 using Infrastructure.DDDES;
 using Infrastructure.Math;
 
 namespace DarkDefenders.Console
 {
-    internal class ConsoleRenderer: IPlayerEventsReciever, ITerrainEventsReciever
+    internal class ConsoleRenderer: IPlayerEventsReciever, IWorldEventsReciever, IEventsLinstener
     {
         private readonly int _width;
         private readonly int _height;
 
         private Point _lastPlayerPosition;
-        private long _eventCount;
+
+        public static ConsoleRenderer InitializeNew()
+        {
+            var renderer = new ConsoleRenderer(100, 40);
+
+            renderer.Initialize();
+            return renderer;
+        }
 
         public ConsoleRenderer(int width, int height)
         {
@@ -30,12 +40,12 @@ namespace DarkDefenders.Console
             System.Console.CursorVisible = false;
         }
 
-        public void Apply(IEvent @event)
+        public void Apply(IEnumerable<IEvent> events)
         {
-            ((dynamic) @event).ApplyTo((dynamic) this);
-
-            _eventCount++;
-            RenderEventCount();
+            foreach (var @event in events)
+            {
+                Apply(@event);
+            }
         }
 
         public void Apply(PlayerCreated playerCreated)
@@ -47,14 +57,19 @@ namespace DarkDefenders.Console
             _lastPlayerPosition = position;
         }
 
-        public void Apply(PlayersDesiredOrientationIsSet playersDesiredOrientationIsSet)
+        public void Apply(MovementForceChanged movementForceChanged)
         {
-            
+            var text = "d: " + movementForceChanged.MovementForce;
+            RenderFloatRight(text, 3, 30);
         }
 
         public void Apply(PlayerMoved playerMoved)
         {
+            RenderPosition(playerMoved.NewPosition);
+
             var position = Transform(playerMoved.NewPosition);
+
+
             if (position == _lastPlayerPosition)
             {
                 return;
@@ -66,23 +81,95 @@ namespace DarkDefenders.Console
             _lastPlayerPosition = position;
         }
 
-        public void Apply(TerrainCreated terrainCreated)
+        public void Apply(PlayerAccelerated playerAccelerated)
         {
-            RenderTerrain();
+            RenderVelocity(playerAccelerated.NewMomentum);
         }
 
-        private void RenderEventCount()
+        public void Apply(WorldCreated worldCreated)
         {
-            System.Console.SetCursorPosition(0, 0);
-            System.Console.Write(_eventCount);
+            RenderWorld();
+        }
+
+        public void RenderFps(double fps)
+        {
+            var fpsString = fps.ToString(CultureInfo.InvariantCulture);
+            RenderFloatRight(fpsString, 0, 8);
+        }
+
+        public void RenderAverageEventsCount(double averageEventsCount)
+        {
+            Render(0, 1, "     ");
+            Render(0, 1, averageEventsCount.ToString(CultureInfo.InvariantCulture));
+        }
+
+        public void RenderEventsCount(long eventsCount)
+        {
+            Render(0, 0, eventsCount.ToString(CultureInfo.InvariantCulture));
+        }
+
+        private void Apply(IEvent @event)
+        {
+            ((dynamic) @event).ApplyTo((dynamic) this);
         }
 
         private Point Transform(Vector spawnPosition)
         {
-            var x = (int)(_width * (1 + spawnPosition.X) / 2);
-            var y = _height - 2;
+            var x = spawnPosition.X;
+            var y = spawnPosition.Y;
+            var cx = 1 + (int)((_width - 2) * (1 + x) / 2);
+            var cy = 1 + (int)((_height - 2) * (1 - y));
 
-            return new Point(x, y);
+            return new Point(cx, cy);
+        }
+
+        private void RenderWorld()
+        {
+            RenderHorizontalLine(0, 1, _width - 2);
+            RenderHorizontalLine(_height - 1, 1, _width - 2);
+            RenderVerticalLine(1, 0, _height - 1);
+            RenderVerticalLine(1, _width - 1, _height - 1);
+        }
+
+        private void RenderPosition(Vector position)
+        {
+            RenderFloatRight("p: " + position.ToString("0.00"), 1, 30);
+        }
+
+        private void RenderVelocity(Vector velocity)
+        {
+            RenderFloatRight("v: " + velocity.ToString("0.00"), 2, 30);
+        }
+
+        private static void RenderHorizontalLine(int top, int left, int length)
+        {
+            var end = left + length;
+            for (var i = left; i < end; i++)
+            {
+                Render(i, top, '-');
+            }
+        }
+
+        private static void RenderVerticalLine(int top, int left, int length)
+        {
+            for (var i = top; i < length; i++)
+            {
+                Render(left, i, '|');
+            }
+        }
+
+        private void RenderFloatRight(string text, int top, int max)
+        {
+            var spaces = new string(Enumerable.Repeat(' ', max).ToArray());
+
+            Render(_width - max, top, spaces);
+            Render(_width - text.Length, top, text);
+        }
+
+        private static void Render(int x, int y, char c)
+        {
+            System.Console.SetCursorPosition(x, y);
+            System.Console.Write(c);
         }
 
         private static void Render(Point position, char c)
@@ -91,37 +178,10 @@ namespace DarkDefenders.Console
             System.Console.Write(c);
         }
 
-        private void RenderTerrain()
+        private static void Render(int left, int top, string str)
         {
-            RenderHorizontalLine(0, 1, _width - 2);
-            RenderHorizontalLine(_height - 1, 1, _width - 2);
-            RenderVerticalLine(1, 0, _height - 2);
-            RenderVerticalLine(1, _width - 1, _height - 1);
-        }
-
-        private static void RenderHorizontalLine(int top, int left, int length)
-        {
-            var end = left + length;
-            for (var i = left; i < end; i++)
-            {
-                System.Console.SetCursorPosition(i, top);
-                System.Console.Write('-');
-            }
-        }
-
-        private static void RenderVerticalLine(int top, int left, int length)
-        {
-            for (var i = top; i < length; i++)
-            {
-                System.Console.SetCursorPosition(left, i);
-                System.Console.Write('|');
-            }
-        }
-
-        public void RenderFps(double fps)
-        {
-            System.Console.SetCursorPosition(70, 0);
-            System.Console.Write(fps);
+            System.Console.SetCursorPosition(left, top);
+            System.Console.Write(str);
         }
     }
 }

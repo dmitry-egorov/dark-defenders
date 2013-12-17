@@ -30,35 +30,21 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MoreLinq, Version=1.0.16006.0, Culture=neutral, PublicKeyToken=384d532d7e88985d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\morelinq.1.0.16006\lib\net35\MoreLinq.dll</HintPath>
-    </Reference>
-    <Reference Include="PowerCollections, Version=1.0.2141.24679, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\XAct.Wintellect.PowerCollections.0.0.1\lib\net20\PowerCollections.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bus.cs" />
     <Compile Include="CommandProcessor.cs" />
+    <Compile Include="CompositeEventsListener.cs" />
     <Compile Include="Domain\EventBase.cs" />
     <Compile Include="Domain\Exceptions\RootAlreadyExistsException.cs" />
     <Compile Include="Domain\Exceptions\RootDoesntExistException.cs" />
     <Compile Include="Domain\Repository.cs" />
     <Compile Include="Domain\RootBase.cs" />
-    <Compile Include="EventStore.cs" />
+    <Compile Include="CountingEventsListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Infrastructure.Concurrent\Infrastructure.Concurrent.csproj">
-      <Project>{CB8FB90D-74E6-4E06-9870-6CEDF49A2E64}</Project>
-      <Name>Infrastructure.Concurrent</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Infrastructure.DDDES\Infrastructure.DDDES.csproj">
       <Project>{457CCF4D-7E52-4A7F-867C-13BAC32E13F0}</Project>
       <Name>Infrastructure.DDDES</Name>

@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Infrastructure.Util;
-using MoreLinq;
 
 namespace Infrastructure.DDDES.Implementations.Domain
 {
-    public class Repository<TRootId, TRoot, TEvent, TEventReciever> : IRootsStorage<TRootId, TRoot, TEvent> 
-        where TRoot: IRoot<TEvent> 
-        where TEvent : IRootEvent<TRootId, TEventReciever>
+    public class Repository<TRootId, TRoot> : IRepository<TRootId, TRoot> 
         where TRootId: Identity
     {
         private readonly Dictionary<TRootId, TRoot> _roots = new Dictionary<TRootId, TRoot>();
@@ -28,13 +24,6 @@ namespace Infrastructure.DDDES.Implementations.Domain
         public IEnumerable<TRoot> GetAll()
         {
             return _roots.Values;
-        }
-
-        public void Apply(IEnumerable<TEvent> events)
-        {
-            events
-                .GroupBy(x => x.RootId)
-                .ForEach(x => _roots[x.Key].Apply(x));
         }
     }
 }
