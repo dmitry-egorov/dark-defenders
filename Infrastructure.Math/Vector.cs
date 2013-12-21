@@ -2,7 +2,7 @@ using Infrastructure.Util;
 
 namespace Infrastructure.Math
 {
-    public class Vector
+    public class Vector: ValueObject<Vector>
     {
         public static readonly Vector Zero  = new Vector(0, 0);
         public static readonly Vector Left  = new Vector(-1, 0);
@@ -23,7 +23,7 @@ namespace Infrastructure.Math
             Y = y;
         }
 
-        public override string ToString()
+        protected override string ToStringInternal()
         {
             return "({0}, {1})".FormatWith(X, Y);
         }
@@ -33,20 +33,12 @@ namespace Infrastructure.Math
             return "({0}, {1})".FormatWith(X.ToString(formatting), Y.ToString(formatting));
         }
 
-        public bool Equals(Vector other)
+        protected override bool EqualsInternal(Vector other)
         {
             return X.Equals(other.X) && Y.Equals(other.Y);
         }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-            return Equals((Vector)obj);
-        }
-
-        public override int GetHashCode()
+        protected override int GetHashCodeInternal()
         {
             unchecked
             {

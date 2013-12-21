@@ -1,6 +1,8 @@
+using Infrastructure.Util;
+
 namespace Infrastructure.DDDES.Implementations.Domain
 {
-    public abstract class EventBase<TRootId, TEvent> : IEvent<TRootId>
+    public abstract class EventBase<TRootId, TEvent> : ValueObject<TEvent>, IEvent<TRootId>
         where TRootId: Identity
         where TEvent: EventBase<TRootId, TEvent>
     {
@@ -13,31 +15,18 @@ namespace Infrastructure.DDDES.Implementations.Domain
 
         public TRootId RootId { get; private set; }
 
-        public override string ToString()
-        {
-            return EventToString();
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-            return Equals((TEvent) obj);
-        }
-
-        public override int GetHashCode()
+        protected override int GetHashCodeInternal()
         {
             return (GetEventHashCode()*397) ^ RootId.GetHashCode();
         }
 
-        protected abstract string EventToString();
+        protected override bool EqualsInternal(TEvent other)
+        {
+            return RootId.Equals(other.RootId) 
+                   && EventEquals(other);
+        }
+
         protected abstract bool EventEquals(TEvent other);
         protected abstract int GetEventHashCode();
-
-        private bool Equals(TEvent other)
-        {
-            return RootId.Equals(other.RootId) && EventEquals(other);
-        }
     }
 }

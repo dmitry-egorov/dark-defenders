@@ -15,7 +15,7 @@ namespace DarkDefenders.Domain.RigidBodies.Events
             NewMomentum = newMomentum;
         }
 
-        protected override string EventToString()
+        protected override string ToStringInternal()
         {
             return "RigidBody accelerated: {0} {1}".FormatWith(RootId, NewMomentum);
         }

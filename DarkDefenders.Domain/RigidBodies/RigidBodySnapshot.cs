@@ -7,21 +7,21 @@ namespace DarkDefenders.Domain.RigidBodies
     public class RigidBodySnapshot : IRigidBodyEventsReciever
     {
         public WorldId WorldId { get; private set; }
-        public Vector Position { get; private set; }
+        public Circle BoundingCircle { get; private set; }
         public Vector Momentum { get; private set; }
         public Vector ExternalForce { get; private set; }
         
         public void Apply(RigidBodyCreated rigidBodyCreated)
         {
             WorldId = rigidBodyCreated.WorldId;
-            Position = rigidBodyCreated.SpawnPosition;
+            BoundingCircle = rigidBodyCreated.BoundingCircle;
             Momentum = Vector.Zero;
             ExternalForce = Vector.Zero;
         }
 
-        public void Apply(Moved rigidBodyAccelerated)
+        public void Apply(Moved moved)
         {
-            Position = rigidBodyAccelerated.NewPosition;
+            BoundingCircle = BoundingCircle.ChangePosition(moved.NewPosition);
         }
 
         public void Apply(Accelerated accelerated)

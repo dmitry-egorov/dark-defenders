@@ -14,7 +14,7 @@ namespace DarkDefenders.Domain.RigidBodies.Events
             ExternalForce = externalForce;
         }
 
-        protected override string EventToString()
+        protected override string ToStringInternal()
         {
             return "External force changed: {0}, {1}".FormatWith(RootId, ExternalForce);
         }

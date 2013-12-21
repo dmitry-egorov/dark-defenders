@@ -10,7 +10,6 @@ namespace DarkDefenders.Domain.Players.Events
         public WorldId WorldId { get; private set; }
         public RigidBodyId RigidBodyId { get; private set; }
 
-
         public PlayerCreated(PlayerId playerId, WorldId worldId, RigidBodyId rigidBodyId) : base(playerId)
         {
             WorldId = worldId;
@@ -22,7 +21,7 @@ namespace DarkDefenders.Domain.Players.Events
             reciever.Apply(this);
         }
 
-        protected override string EventToString()
+        protected override string ToStringInternal()
         {
             return "Player created {0}, {1}, {2}".FormatWith(RootId, WorldId, RigidBodyId);
         }

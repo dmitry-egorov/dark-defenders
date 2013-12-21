@@ -1,4 +1,3 @@
-using DarkDefenders.Domain.Players;
 using DarkDefenders.Domain.Worlds;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
@@ -10,13 +9,13 @@ namespace DarkDefenders.Domain.RigidBodies.Events
     {
         public WorldId WorldId { get; private set; }
 
-        public Vector SpawnPosition { get; private set; }
+        public Circle BoundingCircle { get; private set; }
 
-        public RigidBodyCreated(RigidBodyId rigidBodyId, WorldId worldId, Vector spawnPosition) : base(rigidBodyId)
+        public RigidBodyCreated(RigidBodyId rigidBodyId, WorldId worldId, Circle boundingCircle) : base(rigidBodyId)
         {
             WorldId = worldId;
 
-            SpawnPosition = spawnPosition;
+            BoundingCircle = boundingCircle;
         }
 
         public void ApplyTo(IRigidBodyEventsReciever reciever)
@@ -24,19 +23,19 @@ namespace DarkDefenders.Domain.RigidBodies.Events
             reciever.Apply(this);
         }
 
-        protected override string EventToString()
+        protected override string ToStringInternal()
         {
-            return "RigidBody created {0}, {1}, {2}".FormatWith(RootId, WorldId, SpawnPosition);
+            return "RigidBody created {0}, {1}, {2}".FormatWith(RootId, WorldId, BoundingCircle);
         }
 
         protected override bool EventEquals(RigidBodyCreated other)
         {
-            return WorldId.Equals(other.WorldId) && SpawnPosition.Equals(other.SpawnPosition);
+            return WorldId.Equals(other.WorldId) && BoundingCircle.Equals(other.BoundingCircle);
         }
 
         protected override int GetEventHashCode()
         {
-            return (WorldId.GetHashCode() * 397) ^ SpawnPosition.GetHashCode();
+            return (WorldId.GetHashCode() * 397) ^ BoundingCircle.GetHashCode();
         }
     }
 }

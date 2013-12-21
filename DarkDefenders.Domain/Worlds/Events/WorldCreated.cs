@@ -19,7 +19,7 @@ namespace DarkDefenders.Domain.Worlds.Events
             reciever.Apply(this);
         }
 
-        protected override string EventToString()
+        protected override string ToStringInternal()
         {
             return "World created: {0}, {1}".FormatWith(RootId, SpawnPosition);
         }

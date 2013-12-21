@@ -59,6 +59,10 @@ namespace DarkDefenders.Console
         /// <summary>
         /// The down arrow key.
         /// </summary>
-        Down
+        Down,
+
+        Escape = 0x1B,
+
+        Ctrl = 0xA2
     }
 }

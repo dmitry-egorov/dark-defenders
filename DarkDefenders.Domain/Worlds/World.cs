@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using DarkDefenders.Domain.Worlds.Events;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
@@ -8,13 +7,6 @@ namespace DarkDefenders.Domain.Worlds
 {
     public class World : RootBase<WorldId, WorldSnapshot, IWorldEventsReciever, IWorldEvent>
     {
-        private const double Friction = 2d;
-        private const double GravityAcceleration = 4d;
-
-        internal World(WorldId id) : base(id)
-        {
-        }
-
         public IEnumerable<IWorldEvent> Create(Vector spawnPosition)
         {
             AssertDoesntExist();
@@ -29,8 +21,10 @@ namespace DarkDefenders.Domain.Worlds
             return snapshot.SpawnPosition;
         }
 
-        public Vector AdjustPosition(Vector position, double radius)
+        public Vector AdjustCirclePosition(Circle circle)
         {
+            var position = circle.Position;
+            var radius = circle.Radius;
             var x = position.X;
             var y = position.Y;
 
@@ -54,24 +48,9 @@ namespace DarkDefenders.Domain.Worlds
             return Vector.XY(x, y);
         }
 
-        public bool IsInTheAir(Vector position, double radius)
+        public bool IsInTheAir(Circle boundingCircle)
         {
-            return position.Y - radius > 0d;
-        }
-
-        public Vector GetFrictionForce(Vector momentum, double mass, TimeSpan elapsed)
-        {
-            var px = momentum.X;
-
-            var sign = -Math.Sign(px);
-            var vx = Math.Abs(momentum.X);
-
-            var totalSeconds = elapsed.TotalSeconds;
-            var frictionForce = mass * Friction;
-
-            var fx = Math.Min(vx / totalSeconds, frictionForce);
-
-            return Vector.XY(sign * fx, 0);
+            return boundingCircle.IsAboveHorizontalAxis();
         }
 
         public Vector GetGravityForce(double mass)
@@ -79,13 +58,14 @@ namespace DarkDefenders.Domain.Worlds
             return Vector.XY(0, -mass * GravityAcceleration);
         }
 
-        public Vector ApplyInelasticTerrainImpact(Vector position, double radius, Vector momentum)
+        public Vector ApplyInelasticTerrainImpact(Vector momentum, Circle boundingCircle)
         {
             var px = momentum.X;
             var py = momentum.Y;
 
-            var x = position.X;
-            var y = position.Y;
+            var x = boundingCircle.Position.X;
+            var y = boundingCircle.Position.Y;
+            var radius = boundingCircle.Radius;
 
             if (px >= 0)
             {
@@ -119,5 +99,11 @@ namespace DarkDefenders.Domain.Worlds
 
             return Vector.XY(px, py);
         }
+
+        internal World(WorldId id) : base(id)
+        {
+        }
+
+        private const double GravityAcceleration = 4d;
     }
 }

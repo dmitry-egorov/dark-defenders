@@ -13,7 +13,7 @@ namespace DarkDefenders.Domain.Players.Events
             MovementForce = movementForce;
         }
 
-        protected override string EventToString()
+        protected override string ToStringInternal()
         {
             return "Movement force changed: {0}, {1}".FormatWith(RootId, MovementForce);
         }

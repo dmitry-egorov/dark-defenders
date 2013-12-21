@@ -19,7 +19,7 @@ namespace DarkDefenders.Domain.RigidBodies.Events
             reciever.Apply(this);
         }
 
-        protected override string EventToString()
+        protected override string ToStringInternal()
         {
             return "RigidBody moved: {0} {1}".FormatWith(RootId, NewPosition);
         }

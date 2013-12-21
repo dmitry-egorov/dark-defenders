@@ -35,6 +35,7 @@ namespace DarkDefenders.IntegrationTests
         public void Should_create_player()
         {
             var spawnPosition = new Vector(0, 0);
+            var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRaius);
 
             var worldId = CreateWorld(spawnPosition);
             var playerId = CreatePlayer(worldId);
@@ -43,7 +44,7 @@ namespace DarkDefenders.IntegrationTests
             var expectedEvents = new IEvent[]
             {
                 new WorldCreated(worldId, spawnPosition), 
-                new RigidBodyCreated(rigidBodyId, worldId, spawnPosition),
+                new RigidBodyCreated(rigidBodyId, worldId, boundingCircle),
                 new PlayerCreated(playerId, worldId, rigidBodyId)
             };
 
@@ -54,6 +55,7 @@ namespace DarkDefenders.IntegrationTests
         public void Should_create_and_set_desired_orientation_to_player()
         {
             var spawnPosition = new Vector(0, 0);
+            var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRaius);
             var desiredOrientation = MovementForce.Left;
 
             var worldId = CreateWorld(spawnPosition);
@@ -65,7 +67,7 @@ namespace DarkDefenders.IntegrationTests
             var expectedEvents = new IEvent[]
             {
                 new WorldCreated(worldId, spawnPosition), 
-                new RigidBodyCreated(rigidBodyId, worldId, spawnPosition),
+                new RigidBodyCreated(rigidBodyId, worldId, boundingCircle),
                 new PlayerCreated(playerId, worldId, rigidBodyId),
                 new MovementForceChanged(playerId, desiredOrientation), 
             };
@@ -80,11 +82,13 @@ namespace DarkDefenders.IntegrationTests
         [Test]
         public void Should_create_and_set_desired_orientation_to_player_and_move_player_on_update()
         {
-            var spawnPosition = new Vector(0, 0);
+            var spawnPosition = new Vector(0, 0.025);
+            var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRaius);
             var desiredOrientation = MovementForce.Left;
-            var externalForce = Vector.XY(-8.0, 0);
+            var externalForce = Vector.XY(-4.0, 0);
             var elapsed = TimeSpan.FromMilliseconds(20);
-            var newMomentum = new Vector(-0.16, 0);
+            var newMomentum = Vector.XY(-0.08, 0);
+            var newPosition = Vector.XY(-0.0016, 0.025);
 
             var worldId = CreateWorld(spawnPosition);
             var playerId = CreatePlayer(worldId);
@@ -96,11 +100,12 @@ namespace DarkDefenders.IntegrationTests
             var expectedEvents = new IEvent[]
             {
                 new WorldCreated(worldId, spawnPosition), 
-                new RigidBodyCreated(rigidBodyId, worldId, spawnPosition),
+                new RigidBodyCreated(rigidBodyId, worldId, boundingCircle),
                 new PlayerCreated(playerId, worldId, rigidBodyId),
                 new MovementForceChanged(playerId, desiredOrientation), 
                 new ExternalForceChanged(rigidBodyId, externalForce), 
-                new Accelerated(rigidBodyId, newMomentum)
+                new Accelerated(rigidBodyId, newMomentum),
+                new Moved(rigidBodyId, newPosition), 
             };
 
             _eventStore.AssertEvents(expectedEvents);
@@ -127,7 +132,8 @@ namespace DarkDefenders.IntegrationTests
         private void UpdateAll(TimeSpan elapsed)
         {
             _bus.ProcessAllAndCommit<Player>(root => root.ApplyMovementForce());
-            _bus.ProcessAllAndCommit<RigidBody>(root => root.UpdateKineticState(elapsed));
+            _bus.ProcessAllAndCommit<RigidBody>(root => root.UpdateMomentum(elapsed.TotalSeconds));
+            _bus.ProcessAllAndCommit<RigidBody>(root => root.UpdatePosition(elapsed.TotalSeconds));
         }
 
         private PlayerId CreatePlayer(WorldId worldId)

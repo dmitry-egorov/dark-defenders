@@ -1,4 +1,5 @@
 ﻿using System;
+using DarkDefenders.Console.ViewModels;
 using DarkDefenders.Domain;
 using DarkDefenders.Domain.Players;
 using DarkDefenders.Domain.RigidBodies;
@@ -16,7 +17,7 @@ namespace DarkDefenders.Console
 
         static void Main()
         {
-            var renderer = ConsoleRenderer.InitializeNew();
+            var renderer = GameViewModel.InitializeNew();
 
             var countingListener = new CountingEventsListener();
 
@@ -33,12 +34,14 @@ namespace DarkDefenders.Console
             var clock = Clock.StartNew();
             var executor = FixedTimeFrameExecutor.StartNew(_minFrameElapsed);
 
-            while (true)
+            while (!NativeKeyboard.IsKeyDown(KeyCode.Escape))
             {
                 var elapsed = clock.ElapsedSinceLastCall;
+                var elapsedSeconds = elapsed.TotalSeconds;
 
                 players.DoAndCommit(x => x.ApplyMovementForce());
-                rigidBodies.DoAndCommit(x => x.UpdateKineticState(elapsed));
+                rigidBodies.DoAndCommit(x => x.UpdateMomentum(elapsedSeconds));
+                rigidBodies.DoAndCommit(x => x.UpdatePosition(elapsedSeconds));
 
                 fpsCounter.Tick(elapsed, renderer.RenderFps);
                 eventsCounter.Tick(countingListener.EventsSinceLastCall, elapsed, renderer.RenderAverageEventsCount);
@@ -86,6 +89,11 @@ namespace DarkDefenders.Console
             if (NativeKeyboard.IsKeyDown(KeyCode.Up))
             {
                 player.Do(x => x.TryJump());
+            }
+
+            if (NativeKeyboard.IsKeyDown(KeyCode.Ctrl))
+            {
+                player.Do(x => x.Fire());
             }
 
             unitOfWork.Commit();
