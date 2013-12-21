@@ -35,18 +35,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configurator.cs" />
-    <Compile Include="IUpdateable.cs" />
+    <Compile Include="Other\Direction.cs" />
     <Compile Include="Other\MovementForce.cs" />
-    <Compile Include="Players\Events\PlayerAccelerated.cs" />
     <Compile Include="Players\IPlayerEvent.cs" />
     <Compile Include="Players\IPlayerEventsReciever.cs" />
     <Compile Include="Players\Events\PlayerCreated.cs" />
+    <Compile Include="Players\Events\MovementForceChanged.cs" />
     <Compile Include="Players\PlayerId.cs" />
     <Compile Include="Players\Player.cs" />
-    <Compile Include="Players\Events\MovementForceChanged.cs" />
-    <Compile Include="Players\Events\PlayerMoved.cs" />
     <Compile Include="Players\PlayerSnapshot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RigidBodies\Events\Accelerated.cs" />
+    <Compile Include="RigidBodies\Events\RigidBodyCreated.cs" />
+    <Compile Include="RigidBodies\Events\Moved.cs" />
+    <Compile Include="RigidBodies\IRigidBodyEvent.cs" />
+    <Compile Include="RigidBodies\IRigidBodyEventsReciever.cs" />
+    <Compile Include="RigidBodies\Events\ExternalForceChanged.cs" />
+    <Compile Include="RigidBodies\RigidBody.cs" />
+    <Compile Include="RigidBodies\RigidBodyId.cs" />
+    <Compile Include="RigidBodies\RigidBodySnapshot.cs" />
     <Compile Include="Worlds\Events\WorldCreated.cs" />
     <Compile Include="Worlds\IWorldEvent.cs" />
     <Compile Include="Worlds\IWorldEventsReciever.cs" />

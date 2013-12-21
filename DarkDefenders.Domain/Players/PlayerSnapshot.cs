@@ -1,38 +1,43 @@
 using DarkDefenders.Domain.Other;
 using DarkDefenders.Domain.Players.Events;
+using DarkDefenders.Domain.RigidBodies;
 using DarkDefenders.Domain.Worlds;
-using Infrastructure.Math;
 
 namespace DarkDefenders.Domain.Players
 {
     public class PlayerSnapshot : IPlayerEventsReciever
     {
         public WorldId WorldId { get; private set; }
-        public Vector Position { get; private set; }
-        public Vector Momentum { get; private set; }
         public MovementForce MovementForce { get; private set; }
-        
+        public Direction Direction { get; private set; }
+        public RigidBodyId RigidBodyId { get; private set; }
+
         public void Apply(PlayerCreated playerCreated)
         {
             WorldId = playerCreated.WorldId;
-            Position = playerCreated.SpawnPosition;
+            RigidBodyId = playerCreated.RigidBodyId;
             MovementForce = MovementForce.Stop;
-            Momentum = Vector.Zero;
+            Direction = Direction.Right;
         }
 
         public void Apply(MovementForceChanged movementForceChanged)
         {
-            MovementForce = movementForceChanged.MovementForce;
+            var movementForce = movementForceChanged.MovementForce;
+            MovementForce = movementForce;
+            Direction = GetDirectionFrom(movementForce);
         }
 
-        public void Apply(PlayerMoved playerMoved)
+        private Direction GetDirectionFrom(MovementForce movementForce)
         {
-            Position = playerMoved.NewPosition;
-        }
-
-        public void Apply(PlayerAccelerated playerAccelerated)
-        {
-            Momentum = playerAccelerated.NewMomentum;
+            switch (movementForce)
+            {
+                case MovementForce.Left:
+                    return Direction.Left;
+                case MovementForce.Right:
+                    return Direction.Right;
+                default:
+                    return Direction;
+            }
         }
     }
 }

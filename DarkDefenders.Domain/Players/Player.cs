@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using DarkDefenders.Domain.Other;
 using DarkDefenders.Domain.Players.Events;
+using DarkDefenders.Domain.RigidBodies;
 using DarkDefenders.Domain.Worlds;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
@@ -9,22 +10,21 @@ using Infrastructure.Math;
 
 namespace DarkDefenders.Domain.Players
 {
-    public class Player : RootBase<PlayerId, PlayerSnapshot, IPlayerEventsReciever, IPlayerEvent>, IUpdateable
+    public class Player : RootBase<PlayerId, PlayerSnapshot, IPlayerEventsReciever, IPlayerEvent>
     {
-        private readonly IRepository<WorldId, World> _worldRepository;
         private static readonly Vector _jumpMomentum = Vector.XY(0, 1.5d);
-        private const double BoundingCircleRaius = 1d / 40d;
-        private const double TopHorizontalMomentum = 0.8d;
         private const double MovementForce = 4d;
-        private const double Mass = 1d;
-        private const double InverseMass = 1d / Mass;
 
-        internal Player(PlayerId id, IRepository<WorldId, World> worldRepository) : base(id)
+        private readonly IRepository<WorldId, World> _worldRepository;
+        private readonly IRepository<RigidBodyId, RigidBody> _rigidBodyRepository;
+
+        internal Player(PlayerId id, IRepository<WorldId, World> worldRepository, IRepository<RigidBodyId, RigidBody> rigidBodyRepository) : base(id)
         {
             _worldRepository = worldRepository;
+            _rigidBodyRepository = rigidBodyRepository;
         }
 
-        public IEnumerable<IPlayerEvent> Create(WorldId worldId)
+        public IEnumerable<IEvent> Create(WorldId worldId)
         {
             AssertDoesntExist();
 
@@ -32,12 +32,13 @@ namespace DarkDefenders.Domain.Players
 
             var spawnPosition = world.GetSpawnPosition();
 
-            yield return new PlayerCreated(Id, worldId, spawnPosition);
-        }
+            var rigidBody = _rigidBodyRepository.GetNew();
 
-        public IEnumerable<IEvent> Stop()
-        {
-            return SetMovementForce(Other.MovementForce.Stop);
+            var events = rigidBody.Create(worldId, spawnPosition);
+
+            foreach (var rigidBodyEvent in events) { yield return rigidBodyEvent; }
+
+            yield return new PlayerCreated(Id, worldId, rigidBody.Id);
         }
 
         public IEnumerable<IEvent> MoveLeft()
@@ -53,85 +54,53 @@ namespace DarkDefenders.Domain.Players
         public IEnumerable<IEvent> TryJump()
         {
             var snapshot = Snapshot;
-            var world = _worldRepository.GetById(snapshot.WorldId);
+            var rigidBody = _rigidBodyRepository.GetById(snapshot.RigidBodyId);
 
-            if (world.IsInTheAir(snapshot.Position, BoundingCircleRaius) 
-                || HasVerticalMomentum(snapshot))
+            if (rigidBody.IsInTheAir() || rigidBody.HasVerticalMomentum())
             {
                 yield break;
             }
 
-            var newMomentum = Snapshot.Momentum + _jumpMomentum;
-
-            yield return new PlayerAccelerated(Id, newMomentum);
+            foreach (var @event in rigidBody.AddMomentum(_jumpMomentum)) { yield return @event; }
         }
 
-        public IEnumerable<IEvent> Update(TimeSpan elapsed)
+        public IEnumerable<IEvent> Stop()
+        {
+            return SetMovementForce(Other.MovementForce.Stop);
+        }
+
+        public IEnumerable<IEvent> ApplyMovementForce()
         {
             var snapshot = Snapshot;
+            var rigidBody = _rigidBodyRepository.GetById(snapshot.RigidBodyId);
 
-            var world = _worldRepository.GetById(snapshot.WorldId);
-            
-            foreach (var @event in ApplyMomentum(elapsed, snapshot, world)) yield return @event;
-            foreach (var @event in ApplyForce(elapsed, snapshot, world)) yield return @event;
+            var force = GetMovementForce(snapshot, rigidBody);
+
+            foreach (var @event in rigidBody.SetExternalForce(force)) { yield return @event; }
         }
 
-        private IEnumerable<IEvent> ApplyForce(TimeSpan elapsed, PlayerSnapshot snapshot, World world)
+        private IEnumerable<IEvent> SetMovementForce(MovementForce movementForce)
         {
-            var momentum = snapshot.Momentum;
-            var position = snapshot.Position;
-
-            var newMomentum = ApplyMovementForce(elapsed, snapshot, world);
-
-            newMomentum = world.ApplyGravityForce(position, BoundingCircleRaius, newMomentum, Mass, elapsed);
-            if (snapshot.MovementForce == Other.MovementForce.Stop)
+            if (Snapshot.MovementForce != movementForce)
             {
-                newMomentum = world.ApplyFrictionForce(position, BoundingCircleRaius, newMomentum, Mass, elapsed);
-            }
-            newMomentum = LimitMomentum(newMomentum);
-
-            newMomentum = world.ApplyInelasticTerrainImpact(position, BoundingCircleRaius, newMomentum);
-
-            if (newMomentum != momentum)
-            {
-                yield return new PlayerAccelerated(Id, newMomentum);
+                yield return new MovementForceChanged(Id, movementForce);
             }
         }
 
-        private IEnumerable<IEvent> ApplyMomentum(TimeSpan elapsed, PlayerSnapshot snapshot, World world)
+        private static Vector GetMovementForce(PlayerSnapshot snapshot, RigidBody rigidBody)
         {
-            var momentum = snapshot.Momentum;
-            var position = snapshot.Position;
-
-            if (momentum == Vector.Zero)
-            {
-                yield break;
-            }
-
-            var positionChange = momentum * elapsed.TotalSeconds * InverseMass;
-
-            var newPosition = position + positionChange;
-
-            newPosition = world.AdjustPosition(newPosition, BoundingCircleRaius);
-
-            yield return new PlayerMoved(Id, newPosition);
-        }
-
-        private static Vector ApplyMovementForce(TimeSpan elapsed, PlayerSnapshot snapshot, World world)
-        {
-            var momentum = snapshot.Momentum;
-            var position = snapshot.Position;
-
             var force = GetMovementForce(snapshot.MovementForce);
 
-            if (world.IsInTheAir(position, BoundingCircleRaius))
+            if (rigidBody.IsInTheAir())
             {
                 force *= 0.5d;
             }
+            else if (rigidBody.MomentumHasDifferentHorizontalDirectionFrom(force))
+            {
+                force *= 2d;
+            }
 
-            force *= elapsed.TotalSeconds;
-
-            return momentum + force;
+            return force;
         }
 
         private static Vector GetMovementForce(MovementForce desiredMovementForce)
@@ -147,29 +116,6 @@ namespace DarkDefenders.Domain.Players
                 default:
                     throw new ArgumentOutOfRangeException("desiredMovementForce");
             }
-        }
-
-        private static Vector LimitMomentum(Vector momentum)
-        {
-            var vx = momentum.X;
-            var vy = momentum.Y;
-
-            return Math.Abs(vx) > TopHorizontalMomentum 
-                   ? Vector.XY(Math.Sign(vx) * TopHorizontalMomentum, vy) 
-                   : momentum;
-        }
-
-        private IEnumerable<IEvent> SetMovementForce(MovementForce movementForce)
-        {
-            if (Snapshot.MovementForce != movementForce)
-            {
-                yield return new MovementForceChanged(Id, movementForce);
-            }
-        }
-
-        private static bool HasVerticalMomentum(PlayerSnapshot snapshot)
-        {
-            return Math.Abs(snapshot.Momentum.Y) > 0.01d;
         }
     }
 }

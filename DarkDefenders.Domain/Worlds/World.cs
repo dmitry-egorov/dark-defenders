@@ -56,45 +56,27 @@ namespace DarkDefenders.Domain.Worlds
 
         public bool IsInTheAir(Vector position, double radius)
         {
-            return !IsOnTheGround(position, radius);
+            return position.Y - radius > 0d;
         }
 
-        public bool IsOnTheGround(Vector position, double radius)
+        public Vector GetFrictionForce(Vector momentum, double mass, TimeSpan elapsed)
         {
-            return position.Y - radius <= 0d;
-        }
-
-        public Vector ApplyFrictionForce(Vector position, double radius, Vector momentum, double mass, TimeSpan elapsed)
-        {
-            if (IsInTheAir(position, radius))
-            {
-                return momentum;
-            }
-
             var px = momentum.X;
-            var py = momentum.Y;
-            var frictionForce = mass * Friction * elapsed.TotalSeconds;
-            if (Math.Abs(px) < frictionForce)
-            {
-                px = 0;
-            }
-            else if (px > 0)
-            {
-                px -= frictionForce;
-            }
-            else if (px < 0)
-            {
-                px += frictionForce;
-            }
 
-            return Vector.XY(px, py);
+            var sign = -Math.Sign(px);
+            var vx = Math.Abs(momentum.X);
+
+            var totalSeconds = elapsed.TotalSeconds;
+            var frictionForce = mass * Friction;
+
+            var fx = Math.Min(vx / totalSeconds, frictionForce);
+
+            return Vector.XY(sign * fx, 0);
         }
 
-        public Vector ApplyGravityForce(Vector position, double radius, Vector momentum, double mass, TimeSpan elapsed)
+        public Vector GetGravityForce(double mass)
         {
-            return IsInTheAir(position, radius) 
-                   ? Vector.XY(momentum.X, momentum.Y - mass * GravityAcceleration * elapsed.TotalSeconds) 
-                   : momentum;
+            return Vector.XY(0, -mass * GravityAcceleration);
         }
 
         public Vector ApplyInelasticTerrainImpact(Vector position, double radius, Vector momentum)

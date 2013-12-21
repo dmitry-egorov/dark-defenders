@@ -1,31 +1,32 @@
+using DarkDefenders.Domain.Players;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
 using Infrastructure.Util;
 
-namespace DarkDefenders.Domain.Players.Events
+namespace DarkDefenders.Domain.RigidBodies.Events
 {
-    public class PlayerMoved : EventBase<PlayerId, PlayerMoved>, IPlayerEvent
+    public class Moved : EventBase<RigidBodyId, Moved>, IRigidBodyEvent
     {
         public Vector NewPosition { get; private set; }
 
-        public PlayerMoved(PlayerId id, Vector newPosition): base(id)
+        public Moved(RigidBodyId id, Vector newPosition): base(id)
         {
             NewPosition = newPosition;
         }
 
-        public void ApplyTo(IPlayerEventsReciever reciever)
+        public void ApplyTo(IRigidBodyEventsReciever reciever)
         {
             reciever.Apply(this);
         }
 
         protected override string EventToString()
         {
-            return "Player moved: {0} {1}".FormatWith(RootId, NewPosition);
+            return "RigidBody moved: {0} {1}".FormatWith(RootId, NewPosition);
         }
 
-        protected override bool EventEquals(PlayerMoved other)
+        protected override bool EventEquals(Moved other)
         {
-            return NewPosition == other.NewPosition;
+            return NewPosition.Equals(other.NewPosition);
         }
 
         protected override int GetEventHashCode()

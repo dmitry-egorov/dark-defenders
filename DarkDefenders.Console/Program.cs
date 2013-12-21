@@ -1,6 +1,7 @@
 ﻿using System;
 using DarkDefenders.Domain;
 using DarkDefenders.Domain.Players;
+using DarkDefenders.Domain.RigidBodies;
 using DarkDefenders.Domain.Worlds;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations;
@@ -24,6 +25,8 @@ namespace DarkDefenders.Console
             var processor = CreateProcessor(composite);
 
             var player = InitializeDomain(processor);
+            var players = processor.Create<Player>();
+            var rigidBodies = processor.Create<RigidBody>();
 
             var fpsCounter = new PerformanceCounter();
             var eventsCounter = new PerformanceCounter();
@@ -34,7 +37,8 @@ namespace DarkDefenders.Console
             {
                 var elapsed = clock.ElapsedSinceLastCall;
 
-                processor.ProcessAllAndCommit<IUpdateable>(x => x.Update(elapsed));
+                players.DoAndCommit(x => x.ApplyMovementForce());
+                rigidBodies.DoAndCommit(x => x.UpdateKineticState(elapsed));
 
                 fpsCounter.Tick(elapsed, renderer.RenderFps);
                 eventsCounter.Tick(countingListener.EventsSinceLastCall, elapsed, renderer.RenderAverageEventsCount);
@@ -64,11 +68,13 @@ namespace DarkDefenders.Console
 
         private static void ProcessKeyboard(RootToProcessorAdapter<Player> player, IUnitOfWork unitOfWork)
         {
-            if (NativeKeyboard.IsKeyDown(KeyCode.Left))
+            var leftIsPressed  = NativeKeyboard.IsKeyDown(KeyCode.Left);
+            var rightIsPressed = NativeKeyboard.IsKeyDown(KeyCode.Right);
+            if (leftIsPressed && !rightIsPressed)
             {
                 player.Do(x => x.MoveLeft());
             }
-            else if (NativeKeyboard.IsKeyDown(KeyCode.Right))
+            else if (rightIsPressed && !leftIsPressed)
             {
                 player.Do(x => x.MoveRight());
             }

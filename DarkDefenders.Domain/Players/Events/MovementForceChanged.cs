@@ -4,23 +4,23 @@ using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.Players.Events
 {
-    public class MovementForceChanged : EventBase<PlayerId, MovementForceChanged>, IPlayerEvent
+    public class MovementForceChanged: EventBase<PlayerId, MovementForceChanged>, IPlayerEvent
     {
         public MovementForce MovementForce { get; private set; }
 
-        public MovementForceChanged(PlayerId playerId, MovementForce movementForce) : base(playerId)
+        public MovementForceChanged(PlayerId rootId, MovementForce movementForce) : base(rootId)
         {
             MovementForce = movementForce;
         }
 
         protected override string EventToString()
         {
-            return "Players movement force changed: {0}, {1}".FormatWith(RootId, MovementForce);
+            return "Movement force changed: {0}, {1}".FormatWith(RootId, MovementForce);
         }
 
         protected override bool EventEquals(MovementForceChanged other)
         {
-            return MovementForce == other.MovementForce;
+            return MovementForce.Equals(other.MovementForce);
         }
 
         protected override int GetEventHashCode()

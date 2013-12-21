@@ -54,10 +54,6 @@
       <Project>{27F91716-3957-49C9-94BB-8AA160BF96AA}</Project>
       <Name>DarkDefenders.Domain</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.Concurrent\Infrastructure.Concurrent.csproj">
-      <Project>{CB8FB90D-74E6-4E06-9870-6CEDF49A2E64}</Project>
-      <Name>Infrastructure.Concurrent</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Infrastructure.DDDES.Implementations\Infrastructure.DDDES.Implementations.csproj">
       <Project>{5E4CA423-37F5-4B6A-B00C-0ADC06EC0378}</Project>
       <Name>Infrastructure.DDDES.Implementations</Name>

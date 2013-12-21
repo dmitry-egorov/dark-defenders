@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Infrastructure.DDDES
 {
-    public static class BusExtensions
+    public static class CommandProcessorExtensions
     {
         public static void ProcessAllAndCommit<T>(this ICommandProcessor commandProcessor, Func<T, IEnumerable<IEvent>> command)
         {
@@ -18,7 +18,7 @@ namespace Infrastructure.DDDES
                 throw;
             }
         }
-        public static void ProcessAndCommit<TRoot>(this ICommandProcessor commandProcessor,Identity id, Func<TRoot, IEnumerable<IEvent>> command)
+        public static void ProcessAndCommit<TRoot>(this ICommandProcessor commandProcessor, Identity id, Func<TRoot, IEnumerable<IEvent>> command)
         {
             try
             {
@@ -51,6 +51,11 @@ namespace Infrastructure.DDDES
         {
             commandProcessor.Process(id, command);
             return new RootToProcessorAdapter<TRoot>(commandProcessor, id);
+        }
+
+        public static RootsToProcessorAdapter<TInterface> Create<TInterface>(this ICommandProcessor commandProcessor)
+        {
+            return new RootsToProcessorAdapter<TInterface>(commandProcessor);
         }
     }
 }

@@ -4,6 +4,8 @@ using System.Globalization;
 using System.Linq;
 using DarkDefenders.Domain.Players;
 using DarkDefenders.Domain.Players.Events;
+using DarkDefenders.Domain.RigidBodies;
+using DarkDefenders.Domain.RigidBodies.Events;
 using DarkDefenders.Domain.Worlds;
 using DarkDefenders.Domain.Worlds.Events;
 using Infrastructure.DDDES;
@@ -11,7 +13,7 @@ using Infrastructure.Math;
 
 namespace DarkDefenders.Console
 {
-    internal class ConsoleRenderer: IPlayerEventsReciever, IWorldEventsReciever, IEventsLinstener
+    internal class ConsoleRenderer: IPlayerEventsReciever, IRigidBodyEventsReciever, IWorldEventsReciever, IEventsLinstener
     {
         private readonly int _width;
         private readonly int _height;
@@ -48,22 +50,31 @@ namespace DarkDefenders.Console
             }
         }
 
+        public void Apply(WorldCreated worldCreated)
+        {
+            RenderWorld();
+        }
+
         public void Apply(PlayerCreated playerCreated)
         {
-            var position = Transform(playerCreated.SpawnPosition);
+            
+        }
+
+        public void Apply(MovementForceChanged movementForceChanged)
+        {
+            RenderMovementForce(movementForceChanged);
+        }
+
+        public void Apply(RigidBodyCreated rigidBodyCreated)
+        {
+            var position = Transform(rigidBodyCreated.SpawnPosition);
 
             Render(position, '@');
 
             _lastPlayerPosition = position;
         }
 
-        public void Apply(MovementForceChanged movementForceChanged)
-        {
-            var text = "d: " + movementForceChanged.MovementForce;
-            RenderFloatRight(text, 3, 30);
-        }
-
-        public void Apply(PlayerMoved playerMoved)
+        public void Apply(Moved playerMoved)
         {
             RenderPosition(playerMoved.NewPosition);
 
@@ -81,14 +92,13 @@ namespace DarkDefenders.Console
             _lastPlayerPosition = position;
         }
 
-        public void Apply(PlayerAccelerated playerAccelerated)
+        public void Apply(Accelerated playerAccelerated)
         {
             RenderVelocity(playerAccelerated.NewMomentum);
         }
 
-        public void Apply(WorldCreated worldCreated)
+        public void Apply(ExternalForceChanged externalForceChanged)
         {
-            RenderWorld();
         }
 
         public void RenderFps(double fps)
@@ -106,6 +116,12 @@ namespace DarkDefenders.Console
         public void RenderEventsCount(long eventsCount)
         {
             Render(0, 0, eventsCount.ToString(CultureInfo.InvariantCulture));
+        }
+
+        private void RenderMovementForce(MovementForceChanged movementForceChanged)
+        {
+            var text = "d: " + movementForceChanged.MovementForce;
+            RenderFloatRight(text, 3, 30);
         }
 
         private void Apply(IEvent @event)

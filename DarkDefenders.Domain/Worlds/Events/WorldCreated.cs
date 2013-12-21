@@ -26,7 +26,7 @@ namespace DarkDefenders.Domain.Worlds.Events
 
         protected override bool EventEquals(WorldCreated other)
         {
-            return SpawnPosition == other.SpawnPosition;
+            return SpawnPosition.Equals(other.SpawnPosition);
         }
 
         protected override int GetEventHashCode()

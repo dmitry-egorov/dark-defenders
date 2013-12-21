@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using DarkDefenders.Domain;
 using DarkDefenders.Domain.Other;
 using DarkDefenders.Domain.Players;
 using DarkDefenders.Domain.Players.Events;
+using DarkDefenders.Domain.RigidBodies;
+using DarkDefenders.Domain.RigidBodies.Events;
 using DarkDefenders.Domain.Worlds;
 using DarkDefenders.Domain.Worlds.Events;
 using Infrastructure.DDDES;
@@ -35,14 +38,16 @@ namespace DarkDefenders.IntegrationTests
 
             var worldId = CreateWorld(spawnPosition);
             var playerId = CreatePlayer(worldId);
+            var rigidBodyId = FindRigidBodyId();
 
             var expectedEvents = new IEvent[]
             {
                 new WorldCreated(worldId, spawnPosition), 
-                new PlayerCreated(playerId, worldId, spawnPosition)
+                new RigidBodyCreated(rigidBodyId, worldId, spawnPosition),
+                new PlayerCreated(playerId, worldId, rigidBodyId)
             };
 
-            AssertEvents(expectedEvents);
+            _eventStore.AssertEvents(expectedEvents);
         }
 
         [Test]
@@ -53,17 +58,23 @@ namespace DarkDefenders.IntegrationTests
 
             var worldId = CreateWorld(spawnPosition);
             var playerId = CreatePlayer(worldId);
+            var rigidBodyId = FindRigidBodyId();
 
             MovePlayerLeft(playerId);
 
             var expectedEvents = new IEvent[]
             {
                 new WorldCreated(worldId, spawnPosition), 
-                new PlayerCreated(playerId, worldId, spawnPosition),
+                new RigidBodyCreated(rigidBodyId, worldId, spawnPosition),
+                new PlayerCreated(playerId, worldId, rigidBodyId),
                 new MovementForceChanged(playerId, desiredOrientation), 
             };
+            _eventStore.AssertEvents(expectedEvents);
+        }
 
-            AssertEvents(expectedEvents);
+        private RigidBodyId FindRigidBodyId()
+        {
+            return _eventStore.FindEvents<RigidBodyCreated>().Single().RootId;
         }
 
         [Test]
@@ -71,11 +82,13 @@ namespace DarkDefenders.IntegrationTests
         {
             var spawnPosition = new Vector(0, 0);
             var desiredOrientation = MovementForce.Left;
+            var externalForce = Vector.XY(-8.0, 0);
             var elapsed = TimeSpan.FromMilliseconds(20);
-            var newPosition = new Vector(-0.08, 0);
+            var newMomentum = new Vector(-0.16, 0);
 
             var worldId = CreateWorld(spawnPosition);
             var playerId = CreatePlayer(worldId);
+            var rigidBodyId = FindRigidBodyId();
 
             MovePlayerLeft(playerId);
             UpdateAll(elapsed);
@@ -83,12 +96,14 @@ namespace DarkDefenders.IntegrationTests
             var expectedEvents = new IEvent[]
             {
                 new WorldCreated(worldId, spawnPosition), 
-                new PlayerCreated(playerId, worldId, spawnPosition),
+                new RigidBodyCreated(rigidBodyId, worldId, spawnPosition),
+                new PlayerCreated(playerId, worldId, rigidBodyId),
                 new MovementForceChanged(playerId, desiredOrientation), 
-                new PlayerMoved(playerId, newPosition)
+                new ExternalForceChanged(rigidBodyId, externalForce), 
+                new Accelerated(rigidBodyId, newMomentum)
             };
 
-            AssertEvents(expectedEvents);
+            _eventStore.AssertEvents(expectedEvents);
         }
 
         [Test]
@@ -111,7 +126,8 @@ namespace DarkDefenders.IntegrationTests
 
         private void UpdateAll(TimeSpan elapsed)
         {
-            _bus.ProcessAllAndCommit<IUpdateable>(root => root.Update(elapsed));
+            _bus.ProcessAllAndCommit<Player>(root => root.ApplyMovementForce());
+            _bus.ProcessAllAndCommit<RigidBody>(root => root.UpdateKineticState(elapsed));
         }
 
         private PlayerId CreatePlayer(WorldId worldId)
@@ -147,13 +163,6 @@ namespace DarkDefenders.IntegrationTests
             _bus.ProcessAndCommit<Player>(playerId, player => player.MoveLeft());
         }
 
-        private void AssertEvents(IEnumerable<IEvent> expectedEvents)
-        {
-            var actualEvents = _eventStore.GetAll().AsReadOnly();
-
-            CollectionAssert.AreEqual(expectedEvents.AsReadOnly(), actualEvents);
-        }
-
         private static ICommandProcessor CreateBus(EventStore eventStore)
         {
             var processor = new CommandProcessor(eventStore);
@@ -167,9 +176,9 @@ namespace DarkDefenders.IntegrationTests
         {
             private readonly List<IEvent> _allEvents = new List<IEvent>();
 
-            public IEnumerable<IEvent> GetAll()
+            public void AssertEvents(IEnumerable<IEvent> expectedEvents)
             {
-                return _allEvents;
+                CollectionAssert.AreEqual(expectedEvents.AsReadOnly(), _allEvents.AsReadOnly());
             }
 
             public void Apply(IEnumerable<IEvent> events)
@@ -177,6 +186,11 @@ namespace DarkDefenders.IntegrationTests
                 var readOnly = events.AsReadOnly();
 
                 _allEvents.AddRange(readOnly);
+            }
+
+            public IEnumerable<TEvent> FindEvents<TEvent>()
+            {
+                return _allEvents.OfType<TEvent>();
             }
         }
     }

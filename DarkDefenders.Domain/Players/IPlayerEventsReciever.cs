@@ -1,4 +1,5 @@
 using DarkDefenders.Domain.Players.Events;
+using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.Players
 {
@@ -6,7 +7,5 @@ namespace DarkDefenders.Domain.Players
     {
         void Apply(PlayerCreated playerCreated);
         void Apply(MovementForceChanged movementForceChanged);
-        void Apply(PlayerMoved playerMoved);
-        void Apply(PlayerAccelerated playerAccelerated);
     }
 }
