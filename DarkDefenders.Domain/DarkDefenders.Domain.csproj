@@ -36,7 +36,7 @@
   <ItemGroup>
     <Compile Include="Configurator.cs" />
     <Compile Include="Other\Direction.cs" />
-    <Compile Include="Other\MovementForce.cs" />
+    <Compile Include="Other\MovementForceDirection.cs" />
     <Compile Include="Players\IPlayerEvent.cs" />
     <Compile Include="Players\IPlayerEventsReciever.cs" />
     <Compile Include="Players\Events\PlayerCreated.cs" />
@@ -52,6 +52,7 @@
     <Compile Include="RigidBodies\IRigidBodyEventsReciever.cs" />
     <Compile Include="RigidBodies\Events\ExternalForceChanged.cs" />
     <Compile Include="RigidBodies\RigidBody.cs" />
+    <Compile Include="RigidBodies\RigidBodyFactory.cs" />
     <Compile Include="RigidBodies\RigidBodyId.cs" />
     <Compile Include="RigidBodies\RigidBodySnapshot.cs" />
     <Compile Include="Worlds\Events\WorldCreated.cs" />

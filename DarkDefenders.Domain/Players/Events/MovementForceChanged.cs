@@ -6,26 +6,26 @@ namespace DarkDefenders.Domain.Players.Events
 {
     public class MovementForceChanged: EventBase<PlayerId, MovementForceChanged>, IPlayerEvent
     {
-        public MovementForce MovementForce { get; private set; }
+        public MovementForceDirection MovementForceDirection { get; private set; }
 
-        public MovementForceChanged(PlayerId rootId, MovementForce movementForce) : base(rootId)
+        public MovementForceChanged(PlayerId rootId, MovementForceDirection movementForceDirection) : base(rootId)
         {
-            MovementForce = movementForce;
+            MovementForceDirection = movementForceDirection;
         }
 
         protected override string ToStringInternal()
         {
-            return "Movement force changed: {0}, {1}".FormatWith(RootId, MovementForce);
+            return "Movement force changed: {0}, {1}".FormatWith(RootId, MovementForceDirection);
         }
 
         protected override bool EventEquals(MovementForceChanged other)
         {
-            return MovementForce.Equals(other.MovementForce);
+            return MovementForceDirection.Equals(other.MovementForceDirection);
         }
 
         protected override int GetEventHashCode()
         {
-            return MovementForce.GetHashCode();
+            return MovementForceDirection.GetHashCode();
         }
 
         public void ApplyTo(IPlayerEventsReciever reciever)

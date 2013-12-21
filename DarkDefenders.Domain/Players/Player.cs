@@ -12,7 +12,7 @@ namespace DarkDefenders.Domain.Players
 {
     public class Player : RootBase<PlayerId, PlayerSnapshot, IPlayerEventsReciever, IPlayerEvent>
     {
-        public const double BoundingCircleRaius = 1d / 40d;
+        public const double BoundingCircleRadius = 1d / 40d;
 
         public IEnumerable<IEvent> Create(WorldId worldId)
         {
@@ -21,23 +21,22 @@ namespace DarkDefenders.Domain.Players
             var world = _worldRepository.GetById(worldId);
 
             var spawnPosition = world.GetSpawnPosition();
-            var boundingCircle = new Circle(spawnPosition, BoundingCircleRaius);
 
-            var rigidBody = _rigidBodyRepository.GetNew();
+            var rigidBodyId = new RigidBodyId();
+            var boundingCircle = new Circle(spawnPosition, BoundingCircleRadius);
+            foreach (var e in _rigidBodyFactory.Create(worldId, rigidBodyId, boundingCircle)) { yield return e; }
 
-            foreach (var e in rigidBody.Create(worldId, boundingCircle)) { yield return e; }
-
-            yield return new PlayerCreated(Id, worldId, rigidBody.Id);
+            yield return new PlayerCreated(Id, worldId, rigidBodyId);
         }
 
         public IEnumerable<IEvent> MoveLeft()
         {
-            return SetMovementForce(Other.MovementForce.Left);
+            return SetMovementForce(MovementForceDirection.Left);
         }
 
         public IEnumerable<IEvent> MoveRight()
         {
-            return SetMovementForce(Other.MovementForce.Right);
+            return SetMovementForce(MovementForceDirection.Right);
         }
 
         public IEnumerable<IEvent> TryJump()
@@ -55,7 +54,7 @@ namespace DarkDefenders.Domain.Players
 
         public IEnumerable<IEvent> Stop()
         {
-            return SetMovementForce(Other.MovementForce.Stop);
+            return SetMovementForce(MovementForceDirection.Stop);
         }
 
         public IEnumerable<IEvent> Fire()
@@ -81,23 +80,24 @@ namespace DarkDefenders.Domain.Players
             foreach (var e in rigidBody.SetExternalForce(force)) { yield return e; }
         }
 
-        internal Player(PlayerId id, IRepository<WorldId, World> worldRepository, IRepository<RigidBodyId, RigidBody> rigidBodyRepository) : base(id)
+        internal Player(PlayerId id, IRepository<WorldId, World> worldRepository, IRepository<RigidBodyId, RigidBody> rigidBodyRepository, RigidBodyFactory rigidBodyFactory) : base(id)
         {
             _worldRepository = worldRepository;
             _rigidBodyRepository = rigidBodyRepository;
+            _rigidBodyFactory = rigidBodyFactory;
         }
 
-        private IEnumerable<IEvent> SetMovementForce(MovementForce movementForce)
+        private IEnumerable<IEvent> SetMovementForce(MovementForceDirection movementForceDirection)
         {
-            if (Snapshot.MovementForce != movementForce)
+            if (Snapshot.MovementForceDirection != movementForceDirection)
             {
-                yield return new MovementForceChanged(Id, movementForce);
+                yield return new MovementForceChanged(Id, movementForceDirection);
             }
         }
 
         private static Vector GetMovementForce(PlayerSnapshot snapshot, RigidBody rigidBody)
         {
-            var force = GetMovementForce(snapshot.MovementForce);
+            var force = GetMovementForce(snapshot.MovementForceDirection);
 
             if (rigidBody.IsInTheAir())
             {
@@ -111,18 +111,18 @@ namespace DarkDefenders.Domain.Players
             return force;
         }
 
-        private static Vector GetMovementForce(MovementForce desiredMovementForce)
+        private static Vector GetMovementForce(MovementForceDirection desiredMovementForceDirection)
         {
-            switch (desiredMovementForce)
+            switch (desiredMovementForceDirection)
             {
-                case Other.MovementForce.Stop:
+                case MovementForceDirection.Stop:
                     return Vector.Zero;
-                case Other.MovementForce.Left:
+                case MovementForceDirection.Left:
                     return Vector.Left * MovementForce;
-                case Other.MovementForce.Right:
+                case MovementForceDirection.Right:
                     return Vector.Right * MovementForce;
                 default:
-                    throw new ArgumentOutOfRangeException("desiredMovementForce");
+                    throw new ArgumentOutOfRangeException("desiredMovementForceDirection");
             }
         }
 
@@ -131,5 +131,6 @@ namespace DarkDefenders.Domain.Players
 
         private readonly IRepository<WorldId, World> _worldRepository;
         private readonly IRepository<RigidBodyId, RigidBody> _rigidBodyRepository;
+        private readonly RigidBodyFactory _rigidBodyFactory;
     }
 }

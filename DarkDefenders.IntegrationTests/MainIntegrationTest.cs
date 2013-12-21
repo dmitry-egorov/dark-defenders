@@ -35,7 +35,7 @@ namespace DarkDefenders.IntegrationTests
         public void Should_create_player()
         {
             var spawnPosition = new Vector(0, 0);
-            var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRaius);
+            var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRadius);
 
             var worldId = CreateWorld(spawnPosition);
             var playerId = CreatePlayer(worldId);
@@ -55,8 +55,8 @@ namespace DarkDefenders.IntegrationTests
         public void Should_create_and_set_desired_orientation_to_player()
         {
             var spawnPosition = new Vector(0, 0);
-            var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRaius);
-            var desiredOrientation = MovementForce.Left;
+            var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRadius);
+            var desiredOrientation = MovementForceDirection.Left;
 
             var worldId = CreateWorld(spawnPosition);
             var playerId = CreatePlayer(worldId);
@@ -83,8 +83,8 @@ namespace DarkDefenders.IntegrationTests
         public void Should_create_and_set_desired_orientation_to_player_and_move_player_on_update()
         {
             var spawnPosition = new Vector(0, 0.025);
-            var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRaius);
-            var desiredOrientation = MovementForce.Left;
+            var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRadius);
+            var desiredOrientation = MovementForceDirection.Left;
             var externalForce = Vector.XY(-4.0, 0);
             var elapsed = TimeSpan.FromMilliseconds(20);
             var newMomentum = Vector.XY(-0.08, 0);

@@ -8,7 +8,7 @@ namespace DarkDefenders.Domain.Players
     public class PlayerSnapshot : IPlayerEventsReciever
     {
         public WorldId WorldId { get; private set; }
-        public MovementForce MovementForce { get; private set; }
+        public MovementForceDirection MovementForceDirection { get; private set; }
         public Direction Direction { get; private set; }
         public RigidBodyId RigidBodyId { get; private set; }
 
@@ -16,24 +16,24 @@ namespace DarkDefenders.Domain.Players
         {
             WorldId = playerCreated.WorldId;
             RigidBodyId = playerCreated.RigidBodyId;
-            MovementForce = MovementForce.Stop;
+            MovementForceDirection = MovementForceDirection.Stop;
             Direction = Direction.Right;
         }
 
         public void Apply(MovementForceChanged movementForceChanged)
         {
-            var movementForce = movementForceChanged.MovementForce;
-            MovementForce = movementForce;
+            var movementForce = movementForceChanged.MovementForceDirection;
+            MovementForceDirection = movementForce;
             Direction = GetDirectionFrom(movementForce);
         }
 
-        private Direction GetDirectionFrom(MovementForce movementForce)
+        private Direction GetDirectionFrom(MovementForceDirection movementForceDirection)
         {
-            switch (movementForce)
+            switch (movementForceDirection)
             {
-                case MovementForce.Left:
+                case MovementForceDirection.Left:
                     return Direction.Left;
-                case MovementForce.Right:
+                case MovementForceDirection.Right:
                     return Direction.Right;
                 default:
                     return Direction;

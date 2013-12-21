@@ -1,6 +1,6 @@
 ﻿namespace DarkDefenders.Domain.Other
 {
-    public enum MovementForce
+    public enum MovementForceDirection
     {
         Stop = 0,
         Left = 1,
