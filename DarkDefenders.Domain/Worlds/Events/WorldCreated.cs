@@ -8,8 +8,8 @@ namespace DarkDefenders.Domain.Worlds.Events
     {
         public Vector SpawnPosition { get; private set; }
 
-        public WorldCreated(WorldId playerId, Vector spawnPosition)
-            : base(playerId)
+        public WorldCreated(WorldId worldId, Vector spawnPosition)
+            : base(worldId)
         {
             SpawnPosition = spawnPosition;
         }

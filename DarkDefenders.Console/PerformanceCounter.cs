@@ -6,6 +6,7 @@ namespace DarkDefenders.Console
     {
         private readonly TimeSpan _updatePeriod;
 
+        private long _totalTicksCount;
         private int _ticksCount;
         private TimeSpan _totalElapsed;
         private double _currentAverage;
@@ -32,6 +33,7 @@ namespace DarkDefenders.Console
             }
             else
             {
+                _totalTicksCount += count;
                 _ticksCount += count;
                 _totalElapsed += elapsed;
             }
@@ -40,25 +42,18 @@ namespace DarkDefenders.Console
             return changed;
         }
 
-        public void Tick(TimeSpan elapsed, Action<double> averageCountPerSecondChanged)
+        public void Tick(TimeSpan elapsed, Action<double, long> averageCountPerSecondChanged)
         {
             Tick(1, elapsed, averageCountPerSecondChanged);
         }
 
-        public void Tick(int count, TimeSpan elapsed, Action<double> averageCountPerSecondChanged)
+        public void Tick(int count, TimeSpan elapsed, Action<double, long> averageCountPerSecondChanged)
         {
             double average;
             if (Tick(count, elapsed, out average))
             {
-                averageCountPerSecondChanged(average);
+                averageCountPerSecondChanged(average, _totalTicksCount);
             }
-        }
-
-        public double Tick(int count, TimeSpan elapsed)
-        {
-            double fps;
-            Tick(count, elapsed, out fps);
-            return fps;
         }
     }
 }

@@ -12,6 +12,7 @@ namespace DarkDefenders.Console
 {
     static class Program
     {
+//        private const int MaxFps = 300000000;
         private const int MaxFps = 30;
         private static readonly TimeSpan _minFrameElapsed = TimeSpan.FromSeconds(1.0 / MaxFps);
 
@@ -28,6 +29,7 @@ namespace DarkDefenders.Console
             var player = InitializeDomain(processor);
             var players = processor.Create<Player>();
             var rigidBodies = processor.Create<RigidBody>();
+            var worlds = processor.Create<World>();
 
             var fpsCounter = new PerformanceCounter();
             var eventsCounter = new PerformanceCounter();
@@ -39,15 +41,16 @@ namespace DarkDefenders.Console
                 var elapsed = clock.ElapsedSinceLastCall;
                 var elapsedSeconds = elapsed.TotalSeconds;
 
+                worlds.DoAndCommit(x => x.UpdateWorldTime(elapsedSeconds));
                 players.DoAndCommit(x => x.ApplyMovementForce());
                 rigidBodies.DoAndCommit(x => x.UpdateMomentum(elapsedSeconds));
                 rigidBodies.DoAndCommit(x => x.UpdatePosition(elapsedSeconds));
 
                 fpsCounter.Tick(elapsed, renderer.RenderFps);
                 eventsCounter.Tick(countingListener.EventsSinceLastCall, elapsed, renderer.RenderAverageEventsCount);
-                renderer.RenderEventsCount(countingListener.TotalCount);
-
-                executor.FillTimeFrame(() => ProcessKeyboard(player, processor));
+                
+                ProcessKeyboard(player, processor);
+                executor.FillTimeFrame(() => { });
             }
         }
 
@@ -88,7 +91,7 @@ namespace DarkDefenders.Console
 
             if (NativeKeyboard.IsKeyDown(KeyCode.Up))
             {
-                player.Do(x => x.TryJump());
+                player.Do(x => x.Jump());
             }
 
             if (NativeKeyboard.IsKeyDown(KeyCode.Ctrl))

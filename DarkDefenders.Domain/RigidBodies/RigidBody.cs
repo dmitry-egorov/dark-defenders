@@ -8,88 +8,131 @@ using Infrastructure.Math;
 
 namespace DarkDefenders.Domain.RigidBodies
 {
-    public class RigidBody : RootBase<RigidBodyId, RigidBodySnapshot, IRigidBodyEventsReciever, IRigidBodyEvent>
+    public class RigidBody : RootBase<RigidBodyId, IRigidBodyEventsReciever, IRigidBodyEvent>, IRigidBodyEventsReciever
     {
-        public IEnumerable<IRigidBodyEvent> Create(WorldId worldId, Circle boundingCircle)
+        public Vector Position
+        {
+            get
+            {
+                AssertExists();
+                return _boundingCircle.Position;
+            }
+        }
+
+        public double Radius
+        {
+            get
+            {
+                AssertExists();
+                return _boundingCircle.Radius;
+            }
+        }
+
+        public IEnumerable<IRigidBodyEvent> Create(WorldId worldId, Circle boundingCircle, Vector initialMomentum, double mass)
         {
             AssertDoesntExist();
 
-            yield return new RigidBodyCreated(Id, worldId, boundingCircle);
+            yield return new RigidBodyCreated(Id, worldId, boundingCircle, initialMomentum, mass);
         }
 
         public IEnumerable<IEvent> UpdateMomentum(double elapsedSeconds)
         {
-            var snapshot = Snapshot;
+            AssertExists();
 
-            var world = _worldRepository.GetById(snapshot.WorldId);
+            var newMomentum = GetNewMomentum(elapsedSeconds);
 
-            var force = GetForce(elapsedSeconds, snapshot, world);
-
-            var newMomentum = GetNewMomentum(elapsedSeconds, world, force, snapshot);
-
-            if (newMomentum != snapshot.Momentum)
+            if (newMomentum == _momentum)
             {
-                yield return new Accelerated(Id, newMomentum);
+                yield break;
             }
+
+            yield return new Accelerated(Id, newMomentum);
         }
 
         public IEnumerable<IEvent> UpdatePosition(double elapsedSeconds)
         {
-            var snapshot = Snapshot;
+            AssertExists();
 
-            var world = _worldRepository.GetById(snapshot.WorldId);
-
-            var newPosition = GetNewPosition(elapsedSeconds, snapshot, world);
-
-            if (newPosition != snapshot.BoundingCircle.Position)
+            if (_momentum == Vector.Zero)
             {
-                yield return new Moved(Id, newPosition);
+                yield break;
             }
+
+            var newPosition = GetNewPosition(elapsedSeconds);
+
+            yield return new Moved(Id, newPosition);
         }
 
         public IEnumerable<IEvent> AddMomentum(Vector additionalMomentum)
         {
+            AssertExists();
+            
             if (additionalMomentum == Vector.Zero)
             {
                 yield break;
             }
             
-            var snapshot = Snapshot;
-
-            var newMomentum = snapshot.Momentum + additionalMomentum;
+            var newMomentum = _momentum + additionalMomentum;
 
             yield return new Accelerated(Id, newMomentum);
         }
 
         public IEnumerable<IEvent> SetExternalForce(Vector force)
         {
-            var snapshot = Snapshot;
-            if (snapshot.ExternalForce != force)
+            AssertExists();
+            
+            if (_externalForce == force)
             {
-                yield return new ExternalForceChanged(Id, force);
+                yield break;
             }
+
+            yield return new ExternalForceChanged(Id, force);
         }
 
         public bool IsInTheAir()
         {
-            var snapshot = Snapshot;
-            var world = _worldRepository.GetById(snapshot.WorldId);
-
-            return world.IsInTheAir(snapshot.BoundingCircle);
+            AssertExists();
+            return _world.IsInTheAir(_boundingCircle);
         }
 
         public bool HasVerticalMomentum()
         {
-            var snapshot = Snapshot;
-            return Math.Abs(snapshot.Momentum.Y) > 0.01d;
+            AssertExists();
+            return Math.Abs(_momentum.Y) > 0.01d;
         }
 
         public bool MomentumHasDifferentHorizontalDirectionFrom(Vector vector)
         {
-            var snapshot = Snapshot;
-            var px = snapshot.Momentum.X;
+            AssertExists();
 
-            return px != 0.0 && Math.Sign(px) != Math.Sign(vector.X);
+            var momentumSign = Math.Sign(_momentum.X);
+
+            return momentumSign != 0 && momentumSign != Math.Sign(vector.X);
+        }
+
+        public void Apply(RigidBodyCreated rigidBodyCreated)
+        {
+            _world = _worldRepository.GetById(rigidBodyCreated.WorldId);
+
+            _momentum = rigidBodyCreated.InitialMomentum;
+            _mass = rigidBodyCreated.Mass;
+            _boundingCircle = rigidBodyCreated.BoundingCircle;
+            _externalForce = Vector.Zero;
+        }
+
+        public void Apply(Moved moved)
+        {
+            _boundingCircle = _boundingCircle.ChangePosition(moved.NewPosition);
+        }
+
+        public void Apply(Accelerated accelerated)
+        {
+            _momentum = accelerated.NewMomentum;
+        }
+
+        public void Apply(ExternalForceChanged externalForceChanged)
+        {
+            _externalForce = externalForceChanged.ExternalForce;
         }
 
         internal RigidBody(RigidBodyId id, IRepository<WorldId, World> worldRepository) : base(id)
@@ -97,49 +140,37 @@ namespace DarkDefenders.Domain.RigidBodies
             _worldRepository = worldRepository;
         }
 
-        private static Vector GetNewMomentum(double elapsedSeconds, World world, Vector force, RigidBodySnapshot snapshot)
+        private Vector GetNewMomentum(double elapsedSeconds)
         {
-            var momentum = snapshot.Momentum;
+            var force = GetForce(elapsedSeconds);
 
-            var newMomentum = momentum + force * elapsedSeconds;
+            var newMomentum = _momentum + force * elapsedSeconds;
 
             newMomentum = LimitMomentum(newMomentum);
 
-            return world.ApplyInelasticTerrainImpact(newMomentum, snapshot.BoundingCircle);
+            return _world.ApplyInelasticTerrainImpact(newMomentum, _boundingCircle);
         }
 
-        private static Vector GetNewPosition(double elapsedSeconds, RigidBodySnapshot snapshot, World world)
+        private Vector GetNewPosition(double elapsedSeconds)
         {
-            var momentum = snapshot.Momentum;
-            var position = snapshot.BoundingCircle.Position;
+            var positionChange = _momentum * elapsedSeconds * (1.0 / _mass);
 
-            if (momentum == Vector.Zero)
-            {
-                return position;
-            }
+            var newPosition = _boundingCircle.Position + positionChange;
 
-            var positionChange = momentum * elapsedSeconds * InverseMass;
+            var newCircle = _boundingCircle.ChangePosition(newPosition);
 
-            var newPosition = position + positionChange;
-
-            var newCircle = snapshot.BoundingCircle.ChangePosition(newPosition);
-
-            var adjustCirclePosition = world.AdjustCirclePosition(newCircle);
-
-            return adjustCirclePosition;
+            return _world.AdjustCirclePosition(newCircle);
         }
 
-        private static Vector GetForce(double elapsedSeconds, RigidBodySnapshot snapshot, World world)
+        private Vector GetForce(double elapsedSeconds)
         {
-            var momentum = snapshot.Momentum;
+            var isInTheAir = _world.IsInTheAir(_boundingCircle);
 
-            var isInTheAir = world.IsInTheAir(snapshot.BoundingCircle);
-
-            var externalForce = snapshot.ExternalForce;
+            var externalForce = _externalForce;
 
             if (isInTheAir)
             {
-                return externalForce + world.GetGravityForce(Mass);
+                return externalForce + _world.GetGravityForce(_mass);
             }
 
             if (externalForce != Vector.Zero)
@@ -147,7 +178,8 @@ namespace DarkDefenders.Domain.RigidBodies
                 return externalForce;
             }
 
-            var maxForce = -momentum.X / elapsedSeconds;
+            var maxForce = -_momentum.X / elapsedSeconds;
+
             return externalForce + GetFrictionForce(maxForce);
         }
 
@@ -161,22 +193,27 @@ namespace DarkDefenders.Domain.RigidBodies
                 : momentum;
         }
 
-        private static Vector GetFrictionForce(double maxForce)
+        private Vector GetFrictionForce(double maxForce)
         {
             var sign = Math.Sign(maxForce);
             var mfx = Math.Abs(maxForce) ;
 
-            var frictionForce = Mass * FrictionCoefficient;
+            var frictionForce = _mass * FrictionCoefficient;
 
             var fx = Math.Min(mfx, frictionForce);
 
             return Vector.XY(sign * fx, 0);
         }
 
-        private readonly IRepository<WorldId, World> _worldRepository;
         private const double TopHorizontalMomentum = 0.8d;
-        private const double Mass = 1d;
-        private const double InverseMass = 1d / Mass;
         private const double FrictionCoefficient = 2d;
+
+        private readonly IRepository<WorldId, World> _worldRepository;
+
+        private World _world;
+        private Circle _boundingCircle;
+        private Vector _momentum;
+        private Vector _externalForce;
+        private double _mass;
     }
 }

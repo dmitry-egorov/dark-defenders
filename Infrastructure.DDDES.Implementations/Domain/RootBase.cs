@@ -4,23 +4,13 @@ using Infrastructure.Util;
 
 namespace Infrastructure.DDDES.Implementations.Domain
 {
-    public abstract class RootBase<TId, TSnapshot, TRootEventReciever, TRootEvent> : IRoot<TRootEvent>
+    public abstract class RootBase<TId, TRootEventReciever, TRootEvent> : IRoot<TRootEvent>
         where TRootEvent: IRootEvent<TId, TRootEventReciever> 
-        where TSnapshot: class, TRootEventReciever, new()
         where TId: Identity
     {
-        private TSnapshot _snapshot;
         public TId Id { get; private set; }
 
-        public TSnapshot Snapshot
-        {
-            get
-            {
-                AssertExists();
-
-                return _snapshot;
-            }
-        }
+        private bool _isCreated;
 
         public void Apply(IEnumerable<TRootEvent> events)
         {
@@ -30,12 +20,9 @@ namespace Infrastructure.DDDES.Implementations.Domain
                 return;
             }
 
-            if (!IsCreated())
-            {
-                _snapshot = new TSnapshot();
-            }
+            _isCreated = true;
 
-            readOnlyEvents.ForEach(x => x.ApplyTo(_snapshot));
+            readOnlyEvents.ForEach(x => x.ApplyTo((TRootEventReciever)(object)this));
         }
 
         protected RootBase(TId id)
@@ -45,23 +32,18 @@ namespace Infrastructure.DDDES.Implementations.Domain
 
         protected void AssertDoesntExist()
         {
-            if (IsCreated())
+            if (_isCreated)
             {
                 throw new RootAlreadyExistsException(GetType().Name, Id);
             }
         }
 
-        private void AssertExists()
+        protected void AssertExists()
         {
-            if (!IsCreated())
+            if (!_isCreated)
             {
                 throw new RootDoesntExistException(GetType().Name, Id);
             }
-        }
-
-        private bool IsCreated()
-        {
-            return _snapshot != null;
         }
     }
 }

@@ -12,8 +12,7 @@ namespace DarkDefenders.Domain
         {
             var worldRepository = new Repository<WorldId, World>(id => new World(id));
             var rigidBodyRepository = new Repository<RigidBodyId, RigidBody>(id => new RigidBody(id, worldRepository));
-            var rigidBodyFactory = new RigidBodyFactory(rigidBodyRepository);
-            var playerRepository  = new Repository<PlayerId, Player> (id => new Player(id, worldRepository, rigidBodyRepository, rigidBodyFactory));
+            var playerRepository  = new Repository<PlayerId, Player> (id => new Player(id, worldRepository, rigidBodyRepository));
 
             processor.AddRepository<WorldId, World, IWorldEvent>(worldRepository);
             processor.AddRepository<RigidBodyId, RigidBody, IRigidBodyEvent>(rigidBodyRepository);

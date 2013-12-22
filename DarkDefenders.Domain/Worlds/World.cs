@@ -5,8 +5,17 @@ using Infrastructure.Math;
 
 namespace DarkDefenders.Domain.Worlds
 {
-    public class World : RootBase<WorldId, WorldSnapshot, IWorldEventsReciever, IWorldEvent>
+    public class World : RootBase<WorldId, IWorldEventsReciever, IWorldEvent>, IWorldEventsReciever
     {
+        public double WorldElapsedSeconds
+        {
+            get
+            {
+                AssertExists();
+                return _worldElapsedSeconds;
+            }
+        }
+
         public IEnumerable<IWorldEvent> Create(Vector spawnPosition)
         {
             AssertDoesntExist();
@@ -14,15 +23,23 @@ namespace DarkDefenders.Domain.Worlds
             yield return new WorldCreated(Id, spawnPosition);
         }
 
+        public IEnumerable<IWorldEvent> UpdateWorldTime(double elapsed)
+        {
+            AssertExists();
+            var newTime = WorldElapsedSeconds + elapsed;
+            yield return new WorldTimeUpdated(Id, newTime);
+        }
+
         public Vector GetSpawnPosition()
         {
-            var snapshot = Snapshot;
-
-            return snapshot.SpawnPosition;
+            AssertExists();
+            return _spawnPosition;
         }
 
         public Vector AdjustCirclePosition(Circle circle)
         {
+            AssertExists();
+
             var position = circle.Position;
             var radius = circle.Radius;
             var x = position.X;
@@ -50,16 +67,19 @@ namespace DarkDefenders.Domain.Worlds
 
         public bool IsInTheAir(Circle boundingCircle)
         {
+            AssertExists();
             return boundingCircle.IsAboveHorizontalAxis();
         }
 
         public Vector GetGravityForce(double mass)
         {
+            AssertExists();
             return Vector.XY(0, -mass * GravityAcceleration);
         }
 
         public Vector ApplyInelasticTerrainImpact(Vector momentum, Circle boundingCircle)
         {
+            AssertExists();
             var px = momentum.X;
             var py = momentum.Y;
 
@@ -100,10 +120,24 @@ namespace DarkDefenders.Domain.Worlds
             return Vector.XY(px, py);
         }
 
+        public void Apply(WorldCreated worldCreated)
+        {
+            _spawnPosition = worldCreated.SpawnPosition;
+            _worldElapsedSeconds = 0.0;
+        }
+
+        public void Apply(WorldTimeUpdated worldTimeUpdated)
+        {
+            _worldElapsedSeconds = worldTimeUpdated.NewTime;
+        }
+
         internal World(WorldId id) : base(id)
         {
         }
 
         private const double GravityAcceleration = 4d;
+
+        private Vector _spawnPosition;
+        private double _worldElapsedSeconds;
     }
 }

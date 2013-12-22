@@ -10,7 +10,8 @@ namespace DarkDefenders.Domain.Players.Events
         public WorldId WorldId { get; private set; }
         public RigidBodyId RigidBodyId { get; private set; }
 
-        public PlayerCreated(PlayerId playerId, WorldId worldId, RigidBodyId rigidBodyId) : base(playerId)
+        public PlayerCreated(PlayerId playerId, WorldId worldId, RigidBodyId rigidBodyId) 
+            : base(playerId)
         {
             WorldId = worldId;
             RigidBodyId = rigidBodyId;

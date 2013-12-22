@@ -44,7 +44,7 @@
     <Compile Include="FixedTimeFrameExecutor.cs" />
     <Compile Include="PerformanceCounter.cs" />
     <Compile Include="NativeKeyboard.cs" />
-    <Compile Include="ViewModels\PlayerViewModel.cs" />
+    <Compile Include="ViewModels\RigidBodyViewModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

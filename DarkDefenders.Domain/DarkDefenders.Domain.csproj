@@ -43,7 +43,9 @@
     <Compile Include="Players\Events\MovementForceChanged.cs" />
     <Compile Include="Players\PlayerId.cs" />
     <Compile Include="Players\Player.cs" />
-    <Compile Include="Players\PlayerSnapshot.cs" />
+    <Compile Include="Players\Entities\Projectiles\ProjectileId.cs" />
+    <Compile Include="Players\Events\ProjectileCreated.cs" />
+    <Compile Include="Players\Entities\Projectiles\Projectile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RigidBodies\Events\Accelerated.cs" />
     <Compile Include="RigidBodies\Events\RigidBodyCreated.cs" />
@@ -52,15 +54,13 @@
     <Compile Include="RigidBodies\IRigidBodyEventsReciever.cs" />
     <Compile Include="RigidBodies\Events\ExternalForceChanged.cs" />
     <Compile Include="RigidBodies\RigidBody.cs" />
-    <Compile Include="RigidBodies\RigidBodyFactory.cs" />
     <Compile Include="RigidBodies\RigidBodyId.cs" />
-    <Compile Include="RigidBodies\RigidBodySnapshot.cs" />
     <Compile Include="Worlds\Events\WorldCreated.cs" />
     <Compile Include="Worlds\IWorldEvent.cs" />
     <Compile Include="Worlds\IWorldEventsReciever.cs" />
     <Compile Include="Worlds\World.cs" />
     <Compile Include="Worlds\WorldId.cs" />
-    <Compile Include="Worlds\WorldSnapshot.cs" />
+    <Compile Include="Worlds\Events\WorldTimeUpdated.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Infrastructure.DDDES.Implementations\Infrastructure.DDDES.Implementations.csproj">

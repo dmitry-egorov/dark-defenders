@@ -8,14 +8,17 @@ namespace DarkDefenders.Domain.RigidBodies.Events
     public class RigidBodyCreated : EventBase<RigidBodyId, RigidBodyCreated>, IRigidBodyEvent
     {
         public WorldId WorldId { get; private set; }
-
         public Circle BoundingCircle { get; private set; }
+        public double Mass { get; private set; }
+        public Vector InitialMomentum { get; private set; }
 
-        public RigidBodyCreated(RigidBodyId rigidBodyId, WorldId worldId, Circle boundingCircle) : base(rigidBodyId)
+        public RigidBodyCreated(RigidBodyId rigidBodyId, WorldId worldId, Circle boundingCircle, Vector initialMomentum, double mass)
+            : base(rigidBodyId)
         {
-            WorldId = worldId;
-
-            BoundingCircle = boundingCircle;
+            WorldId = worldId.ShouldNotBeNull("worldId");
+            BoundingCircle = boundingCircle.ShouldNotBeNull("boundingCircle");
+            Mass = mass;
+            InitialMomentum = initialMomentum;
         }
 
         public void ApplyTo(IRigidBodyEventsReciever reciever)
@@ -25,17 +28,27 @@ namespace DarkDefenders.Domain.RigidBodies.Events
 
         protected override string ToStringInternal()
         {
-            return "RigidBody created {0}, {1}, {2}".FormatWith(RootId, WorldId, BoundingCircle);
+            return "RigidBody created {0}, {1}, {2}, {3}, {4}".FormatWith(RootId, WorldId, BoundingCircle, Mass, InitialMomentum);
         }
 
         protected override bool EventEquals(RigidBodyCreated other)
         {
-            return WorldId.Equals(other.WorldId) && BoundingCircle.Equals(other.BoundingCircle);
+            return WorldId.Equals(other.WorldId) 
+                && BoundingCircle.Equals(other.BoundingCircle)
+                && Mass.Equals(other.Mass)
+                && InitialMomentum.Equals(other.InitialMomentum);
         }
 
         protected override int GetEventHashCode()
         {
-            return (WorldId.GetHashCode() * 397) ^ BoundingCircle.GetHashCode();
+            unchecked
+            {
+                var hashCode = WorldId.GetHashCode();
+                hashCode = (hashCode * 397) ^ (BoundingCircle != null ? BoundingCircle.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ Mass.GetHashCode();
+                hashCode = (hashCode * 397) ^ InitialMomentum.GetHashCode();
+                return hashCode;
+            }
         }
     }
 }
