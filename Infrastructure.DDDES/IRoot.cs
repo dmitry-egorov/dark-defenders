@@ -1,9 +1,7 @@
-using System.Collections.Generic;
-
 namespace Infrastructure.DDDES
 {
-    public interface IRoot<in TRootEvent>
+    public interface IRoot<out TId, in TRootEvent> : IEntity<TId>
     {
-        void Apply(IEnumerable<TRootEvent> events);
+        void Apply(TRootEvent rootEvent);
     }
 }

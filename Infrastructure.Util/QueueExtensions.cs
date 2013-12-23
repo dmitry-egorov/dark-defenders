@@ -6,7 +6,10 @@ namespace Infrastructure.Util
     {
         public static void Enqueue<T>(this Queue<T> queue, IEnumerable<T> items)
         {
-            items.ForEach(queue.Enqueue);
+            foreach (var item in items)
+            {
+                queue.Enqueue(item);
+            }
         }
 
         public static IEnumerable<T> DequeueAll<T>(this Queue<T> queue)

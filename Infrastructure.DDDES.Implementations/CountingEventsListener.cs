@@ -21,9 +21,9 @@ namespace Infrastructure.DDDES.Implementations
             }
         }
 
-        public void Apply(IEnumerable<IEvent> events)
+        public void Recieve(IEnumerable<IEvent> events)
         {
-            _totalCount = TotalCount + events.Count();
+            _totalCount += events.Count();
         }
     }
 }

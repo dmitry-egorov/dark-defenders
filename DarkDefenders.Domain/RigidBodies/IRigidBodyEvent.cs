@@ -1,9 +1,9 @@
-using DarkDefenders.Domain.Players;
+using DarkDefenders.Domain.Events;
 using Infrastructure.DDDES;
 
 namespace DarkDefenders.Domain.RigidBodies
 {
-    public interface IRigidBodyEvent : IRootEvent<RigidBodyId, IRigidBodyEventsReciever>
+    public interface IRigidBodyEvent : IRootEvent<RigidBodyId, IRigidBodyEventsReciever>, IDomainEvent
     {
     }
 }

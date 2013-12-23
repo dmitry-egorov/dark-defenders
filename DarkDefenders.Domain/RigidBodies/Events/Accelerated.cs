@@ -1,3 +1,4 @@
+using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.Players;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
@@ -32,7 +33,12 @@ namespace DarkDefenders.Domain.RigidBodies.Events
 
         public void ApplyTo(IRigidBodyEventsReciever reciever)
         {
-            reciever.Apply(this);
+            reciever.Recieve(this);
+        }
+
+        public void Accept(IDomainEventReciever reciever)
+        {
+            reciever.Recieve(this);
         }
     }
 }

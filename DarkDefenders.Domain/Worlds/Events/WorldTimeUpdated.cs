@@ -1,15 +1,18 @@
-﻿using Infrastructure.DDDES.Implementations.Domain;
+﻿using DarkDefenders.Domain.Events;
+using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Util;
 
-namespace DarkDefenders.Domain.Worlds
+namespace DarkDefenders.Domain.Worlds.Events
 {
     public class WorldTimeUpdated : EventBase<WorldId, WorldTimeUpdated>, IWorldEvent
     {
         public double NewTime { get; private set; }
+        public double Elapsed { get; private set; }
 
-        public WorldTimeUpdated(WorldId worldId, double newTime): base(worldId)
+        public WorldTimeUpdated(WorldId worldId, double newTime, double elapsed): base(worldId)
         {
             NewTime = newTime;
+            Elapsed = elapsed;
         }
 
         protected override string ToStringInternal()
@@ -29,7 +32,12 @@ namespace DarkDefenders.Domain.Worlds
 
         public void ApplyTo(IWorldEventsReciever reciever)
         {
-            reciever.Apply(this);
+            reciever.Recieve(this);
+        }
+
+        public void Accept(IDomainEventReciever reciever)
+        {
+            reciever.Recieve(this);
         }
     }
 }

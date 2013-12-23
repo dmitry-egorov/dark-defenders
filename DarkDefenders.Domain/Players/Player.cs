@@ -16,34 +16,23 @@ namespace DarkDefenders.Domain.Players
         public const double BoundingCircleRadius = 1.0 / 40.0;
         public const double Mass = 1.0;
 
-        public IEnumerable<IEvent> Create(WorldId worldId)
-        {
-            AssertDoesntExist();
-            foreach (var e in CreatePlayer(worldId)) { yield return e; }
-        }
-
         public IEnumerable<IEvent> MoveLeft()
         {
-            AssertExists();
             foreach (var e in SetMovementForce(MovementForceDirection.Left)) { yield return e; }
         }
 
         public IEnumerable<IEvent> MoveRight()
         {
-            AssertExists();
             foreach (var e in SetMovementForce(MovementForceDirection.Right)) { yield return e; }
         }
 
         public IEnumerable<IEvent> Stop()
         {
-            AssertExists();
             foreach (var e in SetMovementForce(MovementForceDirection.Stop)) { yield return e; }
         }
 
         public IEnumerable<IEvent> Jump()
         {
-            AssertExists();
-
             if (CantJump())
             {
                 yield break;
@@ -54,8 +43,6 @@ namespace DarkDefenders.Domain.Players
 
         public IEnumerable<IEvent> Fire()
         {
-            AssertExists();
-
             if (FireDelayInEffect())
             {
                 yield break;
@@ -66,49 +53,53 @@ namespace DarkDefenders.Domain.Players
 
         public IEnumerable<IEvent> ApplyMovementForce()
         {
-            AssertExists();
             foreach (var e in SetMovementForceToRigidBody()) { yield return e; }
         }
 
-        public void Apply(PlayerCreated playerCreated)
+        public IEnumerable<IEvent> UpdateProjectiles()
         {
-            _world = _worldRepository.GetById(playerCreated.WorldId);
-            _rigidBody = _rigidBodyRepository.GetById(playerCreated.RigidBodyId);
-            _movementForceDirection = MovementForceDirection.Stop;
-            _direction = Direction.Right;
+            foreach (var projectile in _projectiles.Values)
+            {
+                foreach (var e in projectile.CheckForHit()) { yield return e; }
+            }
         }
 
-        public void Apply(MovementForceChanged movementForceChanged)
+        public void Recieve(MovementForceChanged movementForceChanged)
         {
             var movementForce = movementForceChanged.MovementForceDirection;
             _movementForceDirection = movementForce;
-            _direction = GetDirectionFrom(movementForce);
+            PrepareDirection();
+            PrepareProjectileMomentum();
         }
 
-        public void Apply(ProjectileCreated projectileCreated)
+        public void Recieve(ProjectileCreated projectileCreated)
         {
-            var projectile = new Projectile();
+            var rigidBody = _rigidBodyRepository.GetById(projectileCreated.RigidBodyId);
+            
+            var projectile = new Projectile(rigidBody, Id, projectileCreated.ProjectileId);
 
             _projectiles.Add(projectileCreated.ProjectileId, projectile);
 
             _lastFireTime = projectileCreated.Time;
         }
 
-        internal Player(PlayerId id, IRepository<WorldId, World> worldRepository, IRepository<RigidBodyId, RigidBody> rigidBodyRepository) 
-            : base(id)
+        public void Recieve(ProjectileHitSomething projectileHitSomething)
         {
-            _worldRepository = worldRepository;
-            _rigidBodyRepository = rigidBodyRepository;
+            _projectiles.Remove(projectileHitSomething.ProjectileId);
         }
 
-        private IEnumerable<IEvent> CreatePlayer(WorldId worldId)
+        internal Player(PlayerId id, RigidBodyFactory rigidBodyFactory, IRepository<RigidBodyId, RigidBody> rigidBodyRepository, World world, RigidBody rigidBody) 
+            : base(id)
         {
-            var world = _worldRepository.GetById(worldId);
+            _rigidBodyFactory = rigidBodyFactory;
+            _rigidBodyRepository = rigidBodyRepository;
 
-            RigidBodyId rigidBodyId;
-            foreach (var e in CreateOwnRigidBody(world, out rigidBodyId)) { yield return e; }
+            _world = world;
+            _rigidBody = rigidBody;
 
-            yield return new PlayerCreated(Id, worldId, rigidBodyId);
+            _movementForceDirection = MovementForceDirection.Stop;
+            _direction = InitialDirection;
+            PrepareProjectileMomentum();
         }
 
         private bool CantJump()
@@ -130,19 +121,19 @@ namespace DarkDefenders.Domain.Players
 
         private bool FireDelayInEffect()
         {
-            return _world.WorldElapsedSeconds - _lastFireTime < FireDelay;
+            return _world.TimeSeconds - _lastFireTime < FireDelay;
         }
 
-        private Direction GetDirectionFrom(MovementForceDirection movementForceDirection)
+        private void PrepareDirection()
         {
-            switch (movementForceDirection)
+            switch (_movementForceDirection)
             {
                 case MovementForceDirection.Left:
-                    return Direction.Left;
+                    _direction = Direction.Left;
+                    break;
                 case MovementForceDirection.Right:
-                    return Direction.Right;
-                default:
-                    return _direction;
+                    _direction = Direction.Right;
+                    break;
             }
         }
 
@@ -177,9 +168,9 @@ namespace DarkDefenders.Domain.Players
                 case MovementForceDirection.Stop:
                     return Vector.Zero;
                 case MovementForceDirection.Left:
-                    return Vector.Left * MovementForce;
+                    return _leftMovementForce;
                 case MovementForceDirection.Right:
-                    return Vector.Right * MovementForce;
+                    return _rightMovementForce;
                 default:
                     throw new ArgumentOutOfRangeException("desiredMovementForceDirection");
             }
@@ -192,51 +183,61 @@ namespace DarkDefenders.Domain.Players
 
             var projectileId = new ProjectileId();
 
-            yield return new ProjectileCreated(Id, projectileId, rigidBodyId, _world.WorldElapsedSeconds);
+            yield return new ProjectileCreated(Id, projectileId, rigidBodyId, _world.TimeSeconds);
         }
 
-        private IEnumerable<IRigidBodyEvent> CreateOwnRigidBody(World world, out RigidBodyId rigidBodyId)
+        private IEnumerable<IEvent> CreateProjectileRigidBody(out RigidBodyId rigidBodyId)
         {
-            var spawnPosition = world.GetSpawnPosition();
-
-            return CreateRigidBody(world.Id, spawnPosition, Vector.Zero, BoundingCircleRadius, Mass, out rigidBodyId);
-        }
-
-        private IEnumerable<IRigidBodyEvent> CreateProjectileRigidBody(out RigidBodyId rigidBodyId)
-        {
-            var momentumSign = _direction == Direction.Right ? 1.0 : -1.0;
-
-            var offset = Vector.XY(momentumSign * _rigidBody.Radius, 0.0);
-            var position = _rigidBody.Position + offset;
-            var momentum = Vector.XY(momentumSign * Projectile.Momentum, 0.0);
-
-            return CreateRigidBody(_world.Id, position, momentum, Projectile.BoundingCircleRadius, Projectile.Mass, out rigidBodyId);
-        }
-
-        private IEnumerable<IRigidBodyEvent> CreateRigidBody(WorldId worldId, Vector position, Vector momentum, double radius, double mass, out RigidBodyId rigidBodyId)
-        {
-            var boundingCircle = new Circle(position, radius);
+            var position = GetProjectilePosition();
 
             rigidBodyId = new RigidBodyId();
+            return _rigidBodyFactory.CreateRigidBody(rigidBodyId, _world.Id, position, Projectile.BoundingCircleRadius, _projectileMomentum, Projectile.Mass);
+        }
 
-            var rigidBody = _rigidBodyRepository.GetById(rigidBodyId);
+        private void PrepareProjectileMomentum()
+        {
+            _projectileMomentum = 
+                _direction == Direction.Right 
+                ? Projectile.RightMomentum 
+                : Projectile.LeftMomentum;
+        }
 
-            return rigidBody.Create(worldId, boundingCircle, momentum, mass);
+        private Vector GetProjectilePosition()
+        {
+            var position = _rigidBody.Position;
+            var x = position.X;
+            var y = position.Y;
+
+            if (_direction == Direction.Right)
+            {
+                x += _rigidBody.Radius;
+            }
+            else
+            {
+                x -= _rigidBody.Radius;
+            }
+
+            return Vector.XY(x, y);
         }
 
         private static readonly Vector _jumpMomentum = Vector.XY(0, 1.5d);
+        private static readonly Vector _leftMovementForce = Vector.Left * MovementForce;
+        private static readonly Vector _rightMovementForce = Vector.Right * MovementForce;
         private const double MovementForce = 4d;
         private const double FireDelay = 0.25;
+        private const Direction InitialDirection = Direction.Right;
 
-        private readonly IRepository<WorldId, World> _worldRepository;
+        private readonly RigidBodyFactory _rigidBodyFactory;
         private readonly IRepository<RigidBodyId, RigidBody> _rigidBodyRepository;
+
+        private readonly World _world;
+        private readonly RigidBody _rigidBody;
 
         private readonly Dictionary<ProjectileId, Projectile> _projectiles = new Dictionary<ProjectileId, Projectile>();
 
-        private World _world;
-        private RigidBody _rigidBody;
         private MovementForceDirection _movementForceDirection;
         private Direction _direction;
+        private Vector _projectileMomentum;
         private double _lastFireTime;
     }
 }

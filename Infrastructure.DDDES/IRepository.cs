@@ -6,5 +6,6 @@ namespace Infrastructure.DDDES
     {
         TRoot GetById(TRootId id);
         IEnumerable<TRoot> GetAll();
+        bool Exists(TRootId id);
     }
 }

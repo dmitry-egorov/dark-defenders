@@ -5,23 +5,18 @@ namespace Infrastructure.DDDES
 {
     public class RootToProcessorAdapter<TRoot>
     {
-        private readonly ICommandProcessor _commandProcessor;
+        private readonly IRootCommandProcessor<TRoot> _commandProcessor;
         private readonly Identity _id;
 
-        public RootToProcessorAdapter(ICommandProcessor commandProcessor, Identity id)
+        public RootToProcessorAdapter(Identity id, ICommandProcessor commandProcessor)
         {
-            _commandProcessor = commandProcessor;
+            _commandProcessor = commandProcessor.GetProcessorFor<TRoot>();
             _id = id;
         }
 
         public void Do(Func<TRoot, IEnumerable<IEvent>> command)
         {
             _commandProcessor.Process(_id, command);
-        }
-
-        public T Request<T>(Func<TRoot, T> func)
-        {
-            return _commandProcessor.Request(_id, func);
         }
     }
 }

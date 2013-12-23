@@ -1,3 +1,4 @@
+using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.Worlds;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
@@ -5,7 +6,7 @@ using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.RigidBodies.Events
 {
-    public class RigidBodyCreated : EventBase<RigidBodyId, RigidBodyCreated>, IRigidBodyEvent
+    public class RigidBodyCreated : EventBase<RigidBodyId, RigidBodyCreated>, IDomainEvent
     {
         public WorldId WorldId { get; private set; }
         public Circle BoundingCircle { get; private set; }
@@ -20,12 +21,7 @@ namespace DarkDefenders.Domain.RigidBodies.Events
             Mass = mass;
             InitialMomentum = initialMomentum;
         }
-
-        public void ApplyTo(IRigidBodyEventsReciever reciever)
-        {
-            reciever.Apply(this);
-        }
-
+        
         protected override string ToStringInternal()
         {
             return "RigidBody created {0}, {1}, {2}, {3}, {4}".FormatWith(RootId, WorldId, BoundingCircle, Mass, InitialMomentum);
@@ -49,6 +45,11 @@ namespace DarkDefenders.Domain.RigidBodies.Events
                 hashCode = (hashCode * 397) ^ InitialMomentum.GetHashCode();
                 return hashCode;
             }
+        }
+
+        public void Accept(IDomainEventReciever reciever)
+        {
+            reciever.Recieve(this);
         }
     }
 }

@@ -1,3 +1,4 @@
+using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.RigidBodies;
 using DarkDefenders.Domain.Worlds;
 using Infrastructure.DDDES.Implementations.Domain;
@@ -5,7 +6,7 @@ using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.Players.Events
 {
-    public class PlayerCreated : EventBase<PlayerId, PlayerCreated>, IPlayerEvent
+    public class PlayerCreated : EventBase<PlayerId, PlayerCreated>, IDomainEvent
     {
         public WorldId WorldId { get; private set; }
         public RigidBodyId RigidBodyId { get; private set; }
@@ -15,11 +16,6 @@ namespace DarkDefenders.Domain.Players.Events
         {
             WorldId = worldId;
             RigidBodyId = rigidBodyId;
-        }
-
-        public void ApplyTo(IPlayerEventsReciever reciever)
-        {
-            reciever.Apply(this);
         }
 
         protected override string ToStringInternal()
@@ -35,6 +31,11 @@ namespace DarkDefenders.Domain.Players.Events
         protected override int GetEventHashCode()
         {
             return (WorldId.GetHashCode() * 397) ^ RigidBodyId.GetHashCode();
+        }
+
+        public void Accept(IDomainEventReciever reciever)
+        {
+            reciever.Recieve(this);
         }
     }
 }

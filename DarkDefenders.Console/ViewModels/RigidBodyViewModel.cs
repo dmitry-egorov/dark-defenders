@@ -1,6 +1,5 @@
 using System;
 using System.Drawing;
-using DarkDefenders.Domain.Players.Events;
 using DarkDefenders.Domain.RigidBodies.Events;
 using Infrastructure.Math;
 
@@ -32,12 +31,12 @@ namespace DarkDefenders.Console.ViewModels
             ConsoleRenderer.Render(_lastPlayerPosition, _character.Value);
         }
 
-        public void Apply(RigidBodyCreated rigidBodyCreated)
+        public void Recieve(RigidBodyCreated rigidBodyCreated)
         {
             _lastPlayerPosition = Transform(rigidBodyCreated.BoundingCircle.Position);
         }
 
-        public void Apply(Moved moved)
+        public void Recieve(Moved moved)
         {
             if (!_character.HasValue)
             {
@@ -51,10 +50,15 @@ namespace DarkDefenders.Console.ViewModels
                 return;
             }
 
-            ConsoleRenderer.Render(_lastPlayerPosition, ' ');
             ConsoleRenderer.Render(position, _character.Value);
+            ConsoleRenderer.Render(_lastPlayerPosition, ' ');
 
             _lastPlayerPosition = position;
+        }
+
+        public void Remove()
+        {
+            ConsoleRenderer.Render(_lastPlayerPosition, ' ');
         }
 
         private Point Transform(Vector spawnPosition)

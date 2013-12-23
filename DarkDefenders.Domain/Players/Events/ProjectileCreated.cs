@@ -1,4 +1,5 @@
-﻿using DarkDefenders.Domain.Players.Entities.Projectiles;
+﻿using DarkDefenders.Domain.Events;
+using DarkDefenders.Domain.Players.Entities.Projectiles;
 using DarkDefenders.Domain.RigidBodies;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Util;
@@ -36,7 +37,12 @@ namespace DarkDefenders.Domain.Players.Events
 
         public void ApplyTo(IPlayerEventsReciever reciever)
         {
-            reciever.Apply(this);
+            reciever.Recieve(this);
+        }
+
+        public void Accept(IDomainEventReciever reciever)
+        {
+            reciever.Recieve(this);
         }
     }
 }

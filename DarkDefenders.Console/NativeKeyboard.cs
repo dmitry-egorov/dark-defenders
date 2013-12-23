@@ -1,15 +1,18 @@
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
+
 namespace DarkDefenders.Console
 {
     /// <summary>
     /// Provides keyboard access.
     /// </summary>
-    internal static class NativeKeyboard
+    public static class NativeKeyboard
     {
         /// <summary>
         /// A positional bit flag indicating the part of a key state denoting
         /// key pressed.
         /// </summary>
-        private const int KeyPressed = 0x8000;
+        internal const byte KeyPressed = 0x80;
 
         /// <summary>
         /// Returns a value indicating if a given key is pressed.
@@ -18,9 +21,24 @@ namespace DarkDefenders.Console
         /// <returns>
         /// <c>true</c> if the key is pressed, otherwise <c>false</c>.
         /// </returns>
-        public static bool IsKeyDown(KeyCode key)
+        public static bool IsKeyDown(Keys key)
         {
-            return (GetKeyState((int)key) & KeyPressed) != 0;
+            var code = GetVirtualKeyCode(key);
+            return (GetKeyState(code) & KeyPressed) != 0;
+        }
+
+        public static KeyboardState GetKeyboardState()
+        {
+            var bCharData = new byte[256];
+            GetKeyboardState(bCharData);
+
+            return new KeyboardState(bCharData);
+        }
+
+        internal static byte GetVirtualKeyCode(Keys key)
+        {
+            var value = (int)key;
+            return (byte)(value & 0xFF);
         }
 
         /// <summary>
@@ -28,41 +46,28 @@ namespace DarkDefenders.Console
         /// </summary>
         /// <param name="key">Virtuak-key code for key.</param>
         /// <returns>The state of the key.</returns>
-        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        [DllImport("user32.dll")]
         private static extern short GetKeyState(int key);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool GetKeyboardState(byte[] lpKeyState);
     }
 
-    /// <summary>
-    /// Codes representing keyboard keys.
-    /// </summary>
-    /// <remarks>
-    /// Key code documentation:
-    /// http://msdn.microsoft.com/en-us/library/dd375731%28v=VS.85%29.aspx
-    /// </remarks>
-    internal enum KeyCode : int
+    public class KeyboardState
     {
-        /// <summary>
-        /// The left arrow key.
-        /// </summary>
-        Left = 0x25,
+        private readonly byte[] _bCharData;
 
-        /// <summary>
-        /// The up arrow key.
-        /// </summary>
-        Up,
+        internal KeyboardState(byte[] bCharData)
+        {
+            _bCharData = bCharData;
+        }
 
-        /// <summary>
-        /// The right arrow key.
-        /// </summary>
-        Right,
-
-        /// <summary>
-        /// The down arrow key.
-        /// </summary>
-        Down,
-
-        Escape = 0x1B,
-
-        Ctrl = 0xA2
+        //NOTE: not working :(
+        public bool IsKeyDown(Keys key)
+        {
+            var code = NativeKeyboard.GetVirtualKeyCode(key);
+            return (_bCharData[code] & NativeKeyboard.KeyPressed) != 0;
+        }
     }
 }

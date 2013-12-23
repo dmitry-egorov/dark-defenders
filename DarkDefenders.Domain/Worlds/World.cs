@@ -7,57 +7,52 @@ namespace DarkDefenders.Domain.Worlds
 {
     public class World : RootBase<WorldId, IWorldEventsReciever, IWorldEvent>, IWorldEventsReciever
     {
-        public double WorldElapsedSeconds
-        {
-            get
-            {
-                AssertExists();
-                return _worldElapsedSeconds;
-            }
-        }
-
-        public IEnumerable<IWorldEvent> Create(Vector spawnPosition)
-        {
-            AssertDoesntExist();
-
-            yield return new WorldCreated(Id, spawnPosition);
-        }
+        public double TimeSeconds { get; private set; }
+        public double ElapsedSeconds { get; private set; }
 
         public IEnumerable<IWorldEvent> UpdateWorldTime(double elapsed)
         {
-            AssertExists();
-            var newTime = WorldElapsedSeconds + elapsed;
-            yield return new WorldTimeUpdated(Id, newTime);
+            var newTime = TimeSeconds + elapsed;
+
+            yield return new WorldTimeUpdated(Id, newTime, elapsed);
         }
 
         public Vector GetSpawnPosition()
         {
-            AssertExists();
             return _spawnPosition;
+        }
+
+        public bool IsInTheAir(Circle boundingCircle)
+        {
+            return boundingCircle.IsAboveHorizontalAxis();
+        }
+
+        public Vector GetGravityForce(double mass)
+        {
+            return Vector.XY(0, -mass * GravityAcceleration);
         }
 
         public Vector AdjustCirclePosition(Circle circle)
         {
-            AssertExists();
-
             var position = circle.Position;
             var radius = circle.Radius;
             var x = position.X;
             var y = position.Y;
 
-            if (x + radius > 1.0)
+            if (x > 1.0 - radius)
             {
                 x = 1.0 - radius;
             }
-            else if (x - radius < -1.0)
+            else if (x < -1.0 + radius)
             {
                 x = -1.0 + radius;
             }
-            if (y + radius > 1.0)
+
+            if (y > 1.0 - radius)
             {
                 y = 1.0 - radius;
             }
-            else if (y - radius < 0.0)
+            else if (y < radius)
             {
                 y = radius;
             }
@@ -65,21 +60,8 @@ namespace DarkDefenders.Domain.Worlds
             return Vector.XY(x, y);
         }
 
-        public bool IsInTheAir(Circle boundingCircle)
+        public Vector LimitMomentum(Vector momentum, Circle boundingCircle)
         {
-            AssertExists();
-            return boundingCircle.IsAboveHorizontalAxis();
-        }
-
-        public Vector GetGravityForce(double mass)
-        {
-            AssertExists();
-            return Vector.XY(0, -mass * GravityAcceleration);
-        }
-
-        public Vector ApplyInelasticTerrainImpact(Vector momentum, Circle boundingCircle)
-        {
-            AssertExists();
             var px = momentum.X;
             var py = momentum.Y;
 
@@ -120,24 +102,33 @@ namespace DarkDefenders.Domain.Worlds
             return Vector.XY(px, py);
         }
 
-        public void Apply(WorldCreated worldCreated)
+        public bool IsAdjacentToAWall(Circle circle)
         {
-            _spawnPosition = worldCreated.SpawnPosition;
-            _worldElapsedSeconds = 0.0;
+            var position = circle.Position;
+            var radius = circle.Radius;
+            var x = position.X;
+            var y = position.Y;
+
+            return x + radius >=  1.0 
+                || x - radius <= -1.0 
+                || y + radius >=  1.0 
+                || y - radius <=  0.0;
         }
 
-        public void Apply(WorldTimeUpdated worldTimeUpdated)
+        public void Recieve(WorldTimeUpdated worldTimeUpdated)
         {
-            _worldElapsedSeconds = worldTimeUpdated.NewTime;
+            TimeSeconds = worldTimeUpdated.NewTime;
+            ElapsedSeconds = worldTimeUpdated.Elapsed;
         }
 
-        internal World(WorldId id) : base(id)
+        internal World(WorldId id, Vector spawnPosition) : base(id)
         {
+            _spawnPosition = spawnPosition;
+            TimeSeconds = 0.0;
         }
 
         private const double GravityAcceleration = 4d;
 
-        private Vector _spawnPosition;
-        private double _worldElapsedSeconds;
+        private readonly Vector _spawnPosition;
     }
 }

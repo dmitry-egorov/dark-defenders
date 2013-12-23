@@ -3,21 +3,23 @@ using System.Collections.Generic;
 
 namespace Infrastructure.DDDES
 {
-    public class RootsToProcessorAdapter<T>
+    public class RootsToProcessorAdapter<TRoot>
     {
         private readonly ICommandProcessor _commandProcessor;
+        private readonly IRootCommandProcessor<TRoot> _rootProcessor;
 
         public RootsToProcessorAdapter(ICommandProcessor commandProcessor)
         {
             _commandProcessor = commandProcessor;
+            _rootProcessor = commandProcessor.GetProcessorFor<TRoot>();
         }
 
-        public void Do(Func<T, IEnumerable<IEvent>> command)
+        public void Do(Func<TRoot, IEnumerable<IEvent>> command)
         {
-            _commandProcessor.ProcessAllImplementing(command);
+            _rootProcessor.ProcessAll(command);
         }
 
-        public void DoAndCommit(Func<T, IEnumerable<IEvent>> command)
+        public void DoAndCommit(Func<TRoot, IEnumerable<IEvent>> command)
         {
             try
             {

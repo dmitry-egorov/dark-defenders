@@ -4,9 +4,8 @@ namespace DarkDefenders.Domain.RigidBodies
 {
     public interface IRigidBodyEventsReciever
     {
-        void Apply(RigidBodyCreated rigidBodyCreated);
-        void Apply(Moved moved);
-        void Apply(Accelerated accelerated);
-        void Apply(ExternalForceChanged externalForceChanged);
+        void Recieve(Moved moved);
+        void Recieve(Accelerated accelerated);
+        void Recieve(ExternalForceChanged externalForceChanged);
     }
 }

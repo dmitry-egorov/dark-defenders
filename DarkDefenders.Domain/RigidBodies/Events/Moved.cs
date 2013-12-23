@@ -1,4 +1,4 @@
-using DarkDefenders.Domain.Players;
+using DarkDefenders.Domain.Events;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
 using Infrastructure.Util;
@@ -16,7 +16,7 @@ namespace DarkDefenders.Domain.RigidBodies.Events
 
         public void ApplyTo(IRigidBodyEventsReciever reciever)
         {
-            reciever.Apply(this);
+            reciever.Recieve(this);
         }
 
         protected override string ToStringInternal()
@@ -32,6 +32,11 @@ namespace DarkDefenders.Domain.RigidBodies.Events
         protected override int GetEventHashCode()
         {
             return NewPosition.GetHashCode();
+        }
+
+        public void Accept(IDomainEventReciever reciever)
+        {
+            reciever.Recieve(this);
         }
     }
 }

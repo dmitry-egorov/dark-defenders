@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Forms;
 using DarkDefenders.Console.ViewModels;
 using DarkDefenders.Domain;
 using DarkDefenders.Domain.Players;
@@ -12,9 +13,10 @@ namespace DarkDefenders.Console
 {
     static class Program
     {
-//        private const int MaxFps = 300000000;
-        private const int MaxFps = 30;
+        private const int MaxFps = 300000000;
+//        private const int MaxFps = 30;
         private static readonly TimeSpan _minFrameElapsed = TimeSpan.FromSeconds(1.0 / MaxFps);
+        private static readonly TimeSpan _playerStateUpdatePeriod = TimeSpan.FromSeconds(1.0 / 30);
 
         static void Main()
         {
@@ -33,24 +35,30 @@ namespace DarkDefenders.Console
 
             var fpsCounter = new PerformanceCounter();
             var eventsCounter = new PerformanceCounter();
+            var playerStateCounter = new PerformanceCounter(_playerStateUpdatePeriod);
+
             var clock = Clock.StartNew();
             var executor = FixedTimeFrameExecutor.StartNew(_minFrameElapsed);
 
-            while (!NativeKeyboard.IsKeyDown(KeyCode.Escape))
+            var escape = false;
+            while (!escape)
             {
                 var elapsed = clock.ElapsedSinceLastCall;
                 var elapsedSeconds = elapsed.TotalSeconds;
 
                 worlds.DoAndCommit(x => x.UpdateWorldTime(elapsedSeconds));
                 players.DoAndCommit(x => x.ApplyMovementForce());
-                rigidBodies.DoAndCommit(x => x.UpdateMomentum(elapsedSeconds));
-                rigidBodies.DoAndCommit(x => x.UpdatePosition(elapsedSeconds));
+                rigidBodies.DoAndCommit(x => x.UpdateMomentum());
+                rigidBodies.DoAndCommit(x => x.UpdatePosition());
+                players.DoAndCommit(x => x.UpdateProjectiles());
 
+                var eventsCount = countingListener.EventsSinceLastCall;
                 fpsCounter.Tick(elapsed, renderer.RenderFps);
-                eventsCounter.Tick(countingListener.EventsSinceLastCall, elapsed, renderer.RenderAverageEventsCount);
-                
-                ProcessKeyboard(player, processor);
-                executor.FillTimeFrame(() => { });
+                eventsCounter.Tick(eventsCount, elapsed, renderer.RenderAverageEventsCount);
+                playerStateCounter.Tick(elapsed, (_, __) => renderer.RenderPlayerState());
+
+                escape = ProcessKeyboard(player, processor);
+                executor.FillTimeFrame();
             }
         }
 
@@ -66,16 +74,19 @@ namespace DarkDefenders.Console
         private static RootToProcessorAdapter<Player> InitializeDomain(ICommandProcessor processor)
         {
             var worldId = new WorldId();
-            var spawnPosition = new Vector(0, 0.03);
+            var spawnPosition = new Vector(0, 0.05);
+            var playerId = new PlayerId();
 
-            processor.CreateAndCommit<World>(worldId, t => t.Create(spawnPosition));
-            return processor.CreateAndCommit<Player>(new PlayerId(), p => p.Create(worldId));
+            processor.CreateAndCommit<WorldFactory>(t => t.Create(worldId, spawnPosition));
+            processor.CreateAndCommit<PlayerFactory>(p => p.Create(playerId, worldId));
+
+            return new RootToProcessorAdapter<Player>(playerId, processor);
         }
 
-        private static void ProcessKeyboard(RootToProcessorAdapter<Player> player, IUnitOfWork unitOfWork)
+        private static bool ProcessKeyboard(RootToProcessorAdapter<Player> player, IUnitOfWork unitOfWork)
         {
-            var leftIsPressed  = NativeKeyboard.IsKeyDown(KeyCode.Left);
-            var rightIsPressed = NativeKeyboard.IsKeyDown(KeyCode.Right);
+            var leftIsPressed = NativeKeyboard.IsKeyDown(Keys.Left);
+            var rightIsPressed = NativeKeyboard.IsKeyDown(Keys.Right);
             if (leftIsPressed && !rightIsPressed)
             {
                 player.Do(x => x.MoveLeft());
@@ -89,17 +100,19 @@ namespace DarkDefenders.Console
                 player.Do(x => x.Stop());
             }
 
-            if (NativeKeyboard.IsKeyDown(KeyCode.Up))
+            if (NativeKeyboard.IsKeyDown(Keys.Up))
             {
                 player.Do(x => x.Jump());
             }
 
-            if (NativeKeyboard.IsKeyDown(KeyCode.Ctrl))
+            if (NativeKeyboard.IsKeyDown(Keys.LControlKey))
             {
                 player.Do(x => x.Fire());
             }
 
             unitOfWork.Commit();
+
+            return NativeKeyboard.IsKeyDown(Keys.Escape);
         }
     }
 }

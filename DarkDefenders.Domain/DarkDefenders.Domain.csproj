@@ -35,8 +35,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configurator.cs" />
+    <Compile Include="Events\IDomainEvent.cs" />
+    <Compile Include="Events\IDomainEventReciever.cs" />
     <Compile Include="Other\Direction.cs" />
     <Compile Include="Other\MovementForceDirection.cs" />
+    <Compile Include="Players\Events\PlayerRemoved.cs" />
+    <Compile Include="Players\Events\ProjectileHitSomething.cs" />
+    <Compile Include="Players\PlayerFactory.cs" />
     <Compile Include="Players\IPlayerEvent.cs" />
     <Compile Include="Players\IPlayerEventsReciever.cs" />
     <Compile Include="Players\Events\PlayerCreated.cs" />
@@ -47,6 +52,8 @@
     <Compile Include="Players\Events\ProjectileCreated.cs" />
     <Compile Include="Players\Entities\Projectiles\Projectile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RigidBodies\Events\RigidBodyRemoved.cs" />
+    <Compile Include="RigidBodies\RigidBodyFactory.cs" />
     <Compile Include="RigidBodies\Events\Accelerated.cs" />
     <Compile Include="RigidBodies\Events\RigidBodyCreated.cs" />
     <Compile Include="RigidBodies\Events\Moved.cs" />
@@ -55,10 +62,12 @@
     <Compile Include="RigidBodies\Events\ExternalForceChanged.cs" />
     <Compile Include="RigidBodies\RigidBody.cs" />
     <Compile Include="RigidBodies\RigidBodyId.cs" />
+    <Compile Include="Worlds\Events\WorldRemoved.cs" />
     <Compile Include="Worlds\Events\WorldCreated.cs" />
     <Compile Include="Worlds\IWorldEvent.cs" />
     <Compile Include="Worlds\IWorldEventsReciever.cs" />
     <Compile Include="Worlds\World.cs" />
+    <Compile Include="Worlds\WorldFactory.cs" />
     <Compile Include="Worlds\WorldId.cs" />
     <Compile Include="Worlds\Events\WorldTimeUpdated.cs" />
   </ItemGroup>

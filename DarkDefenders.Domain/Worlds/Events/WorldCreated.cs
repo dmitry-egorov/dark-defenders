@@ -1,10 +1,11 @@
+using DarkDefenders.Domain.Events;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
 using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.Worlds.Events
 {
-    public class WorldCreated : EventBase<WorldId, WorldCreated>, IWorldEvent
+    public class WorldCreated : EventBase<WorldId, WorldCreated>, IDomainEvent
     {
         public Vector SpawnPosition { get; private set; }
 
@@ -12,11 +13,6 @@ namespace DarkDefenders.Domain.Worlds.Events
             : base(worldId)
         {
             SpawnPosition = spawnPosition;
-        }
-
-        public void ApplyTo(IWorldEventsReciever reciever)
-        {
-            reciever.Apply(this);
         }
 
         protected override string ToStringInternal()
@@ -32,6 +28,11 @@ namespace DarkDefenders.Domain.Worlds.Events
         protected override int GetEventHashCode()
         {
             return SpawnPosition.GetHashCode();
+        }
+
+        public void Accept(IDomainEventReciever reciever)
+        {
+            reciever.Recieve(this);
         }
     }
 }

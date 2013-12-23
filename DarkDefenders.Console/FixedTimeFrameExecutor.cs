@@ -27,14 +27,12 @@ namespace DarkDefenders.Console
             _started = true;
         }
 
-        public void FillTimeFrame(Action action)
+        public void FillTimeFrame()
         {
             if (!_started)
             {
                 throw new InvalidOperationException("Executor is not started.");
             }
-
-            action();
 
             var elapsed = _sw.Elapsed;
             _sw.Restart();
@@ -44,7 +42,6 @@ namespace DarkDefenders.Console
             {
                 while (_sw.Elapsed < timeLeft)
                 {
-                    action();
                 }
             }
 

@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using Infrastructure.DDDES.Implementations.Domain;
+using Infrastructure.DDDES.Implementations.Domain.Exceptions;
 using Infrastructure.Util;
 
 namespace Infrastructure.DDDES.Implementations
 {
     public class CommandProcessor : ICommandProcessor
     {
-        private readonly Dictionary<Type, IRootCommmandProcessor> _containersTypeMap = new Dictionary<Type, IRootCommmandProcessor>();
+        private readonly Dictionary<Type, object> _containersTypeMap = new Dictionary<Type, object>();
         private readonly Dictionary<Type, IRootEventsApplier> _idTypeAppliersMap = new Dictionary<Type, IRootEventsApplier>();
+        private readonly Dictionary<Type, object> _factories = new Dictionary<Type, object>();
 
         private readonly Queue<IEvent> _commitQueue = new Queue<IEvent>();
 
@@ -19,40 +21,57 @@ namespace Infrastructure.DDDES.Implementations
             _eventsLinstener = eventsLinstener;
         }
 
-        public void AddRepository<TRootId, TRoot, TRootEvent>(IRepository<TRootId, TRoot> repository)
+        public void AddRepository<TRootId, TRoot, TRootEvent, TRootFactory, TCreatedEvent, TRemovedEvent>(Repository<TRootId, TRoot> repository, TRootFactory factory)
             where TRootId : Identity
-            where TRoot: class, IRoot<TRootEvent>
+            where TRoot: class, IRoot<TRootId, TRootEvent> 
+            where TRootFactory: IFactory<TRoot, TCreatedEvent>
+            where TCreatedEvent : class 
+            where TRemovedEvent : class
         {
-            _containersTypeMap[typeof (TRoot)] = new RootCommmandProcessor<TRootId, TRoot, TRootEvent>(repository, _commitQueue);
-            _idTypeAppliersMap[typeof (TRootId)] = new RootEventsApplier<TRootId, TRoot, TRootEvent>(repository);
+            _containersTypeMap[typeof (TRoot)] = new RootCommandProcessor<TRootId, TRoot, TRootEvent>(repository, _commitQueue);
+            _idTypeAppliersMap[typeof(TRootId)] = new RootEventsApplier<TRootId, TRoot, TRootEvent, TCreatedEvent, TRemovedEvent>(repository, factory);
+            _factories[typeof (TRootFactory)] = factory;
         }
 
-        public T Request<T, TRoot>(Identity id, Func<TRoot, T> request)
+        public void Create<TRootFactory>(Func<TRootFactory, IEnumerable<IEvent>> creation)
         {
-            return _containersTypeMap[typeof(TRoot)].Request(id, request);
+            var factory = (TRootFactory)_factories[typeof (TRootFactory)];
+            var events = creation(factory);
+
+            _commitQueue.Enqueue(events);
         }
 
         public void Process<TRoot>(Identity id, Func<TRoot, IEnumerable<IEvent>> command)
         {
-            _containersTypeMap[typeof (TRoot)].Process(id, command);
+            var commmandProcessor = GetProcessorFor<TRoot>();
+
+            commmandProcessor.Process(id, command);
         }
 
-        public void ProcessAllImplementing<T>(Func<T, IEnumerable<IEvent>> command)
+        public void ProcessAll<TRoot>(Func<TRoot, IEnumerable<IEvent>> command)
         {
-            _containersTypeMap
-            .Where(x => typeof(T).IsAssignableFrom(x.Key))
-            .ForEach(x => x.Value.ProcessAllImplementing(command));
+            var commmandProcessor = GetProcessorFor<TRoot>();
+
+            commmandProcessor.ProcessAll(command);
         }
 
         public void Commit()
         {
-            var events = _commitQueue.DequeueAll().AsReadOnly();
+            if (_commitQueue.Count == 0)
+            {
+                return;
+            }
 
-            events
-            .GroupBy(x => x.RootId.GetType())
-            .ForEach(x => _idTypeAppliersMap[x.Key].Apply(x));
+            var events = _commitQueue;
 
-            _eventsLinstener.Apply(events);
+            foreach (var grouping in events.GroupAdjacentFast(x => x.RootId))
+            {
+                _idTypeAppliersMap[grouping.Key.GetType()].Apply(grouping.Key, grouping);
+            }
+
+            _eventsLinstener.Recieve(events);
+
+            _commitQueue.Clear();
         }
 
         public void Rollback()
@@ -60,88 +79,109 @@ namespace Infrastructure.DDDES.Implementations
             _commitQueue.Clear();
         }
 
-        private interface IRootCommmandProcessor
+        public IRootCommandProcessor<TRoot> GetProcessorFor<TRoot>()
         {
-            void Process<TRoot>(Identity id, Func<TRoot, IEnumerable<IEvent>> command);
-            void ProcessAllImplementing<T>(Func<T, IEnumerable<IEvent>> command);
-            T Request<T, TRoot>(Identity id, Func<TRoot, T> request);
+            return (IRootCommandProcessor<TRoot>)_containersTypeMap[typeof(TRoot)];
         }
 
         private interface IRootEventsApplier
         {
-            void Apply(IEnumerable<IEvent> events);
+            void Apply(Identity key, IEnumerable<IEvent> events);
         }
 
-        private class RootCommmandProcessor<TRootId, TRoot, TRootEvent>: IRootCommmandProcessor
+        private class RootCommandProcessor<TRootId, TRoot, TRootEvent>: IRootCommandProcessor<TRoot>
             where TRootId: Identity
-            where TRoot: IRoot<TRootEvent>
+            where TRoot: IRoot<TRootId, TRootEvent>
         {
             private readonly IRepository<TRootId, TRoot> _repository;
             private readonly Queue<IEvent> _queue;
 
-            public RootCommmandProcessor(IRepository<TRootId, TRoot> repository, Queue<IEvent> queue)
+            public RootCommandProcessor(IRepository<TRootId, TRoot> repository, Queue<IEvent> queue)
             {
                 _repository = repository;
                 _queue = queue;
             }
 
-            public void Process<TRequestedRoot>(Identity id, Func<TRequestedRoot, IEnumerable<IEvent>> command)
+            public void Process(Identity id, Func<TRoot, IEnumerable<IEvent>> command)
             {
-                var root = GetRoot<TRequestedRoot>(id);
+                var root = _repository.GetById((TRootId) id);
 
                 var events = command(root);
 
                 _queue.Enqueue(events);
             }
 
-            public void ProcessAllImplementing<T>(Func<T, IEnumerable<IEvent>> command)
+            public void ProcessAll(Func<TRoot, IEnumerable<IEvent>> command)
             {
-                var roots = _repository.GetAll().Cast<T>();
+                var roots = _repository.GetAll();
 
-                var events = roots.SelectMany(command);
-
-                _queue.Enqueue(events);
-            }
-
-            public T Request<T, TRequestedRoot>(Identity id, Func<TRequestedRoot, T> request)
-            {
-                var root = GetRoot<TRequestedRoot>(id);
-
-                return request(root);
-            }
-
-            private TRequestedRoot GetRoot<TRequestedRoot>(Identity id)
-            {
-                if (typeof (TRequestedRoot) != typeof (TRoot))
+                foreach (var root in roots)
                 {
-                    throw new InvalidOperationException("Wrong type requested");
+                    var events = command(root);
+                    _queue.Enqueue(events);
                 }
-
-                var rootOriginal = _repository.GetById((TRootId) id);
-                return (TRequestedRoot) (object) rootOriginal;
             }
         }
 
-        private class RootEventsApplier<TRootId, TRoot, TRootEvent> : IRootEventsApplier
+        private class RootEventsApplier<TRootId, TRoot, TRootEvent, TCreationEvent, TRemovedEvent> : IRootEventsApplier
             where TRootId: Identity
-            where TRoot: IRoot<TRootEvent>
+            where TRoot: IRoot<TRootId, TRootEvent> 
+            where TCreationEvent : class 
+            where TRemovedEvent : class
         {
-            private readonly IRepository<TRootId, TRoot> _repository;
+            private readonly Repository<TRootId, TRoot> _repository;
+            private readonly IFactory<TRoot, TCreationEvent> _factory;
 
-            public RootEventsApplier(IRepository<TRootId, TRoot> repository)
+            public RootEventsApplier(Repository<TRootId, TRoot> repository, IFactory<TRoot, TCreationEvent> factory)
             {
                 _repository = repository;
+                _factory = factory;
             }
 
-            public void Apply(IEnumerable<IEvent> events)
+            public void Apply(Identity key, IEnumerable<IEvent> events)
             {
-                events
-                .GroupBy(x => x.RootId)
-                .ForEach(x =>
+                Apply((TRootId)key, events);
+            }
+
+            private void Apply(TRootId rootId, IEnumerable<IEvent> events)
+            {
+                TRoot root;
+                if (!_repository.TryGetById(rootId, out root))
                 {
-                    var root = _repository.GetById((TRootId)x.Key);
-                    root.Apply(x.Cast<TRootEvent>());
-                });
+                    IEvent firstEvent;
+                    events = events.HeadAndTail(out firstEvent);
+
+                    var creationEvent = firstEvent as TCreationEvent;
+
+                    if (creationEvent == null)
+                    {
+                        throw new RootDoesntExistException(typeof(TRoot).Name, rootId);
+                    }
+
+                    root = _factory.Handle(creationEvent);
+
+                    _repository.Store(root);
+                }
+
+                var removed = false;
+
+                foreach (var rootEvent in events)
+                {
+                    var removedEvent = rootEvent as TRemovedEvent;
+                    if (removedEvent != null)
+                    {
+                        _repository.Remove(rootId);
+                        removed = true;
+                    }
+                    else if(!removed)
+                    {
+                        root.Apply((TRootEvent)rootEvent);
+                    }
+                    else
+                    {
+                        throw new RootDoesntExistException(typeof(TRoot).Name, rootId);
+                    }
+                }
             }
         }
     }

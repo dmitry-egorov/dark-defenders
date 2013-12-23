@@ -22,13 +22,13 @@ namespace DarkDefenders.IntegrationTests
     public class MainIntegrationTest
     {
         private EventStore _eventStore;
-        private ICommandProcessor _bus;
+        private ICommandProcessor _commandProcessor;
 
         [SetUp]
         public void SetUp()
         {
             _eventStore = new EventStore();
-            _bus = CreateBus(_eventStore);
+            _commandProcessor = CreateBus(_eventStore);
         }
 
         [Test]
@@ -127,16 +127,18 @@ namespace DarkDefenders.IntegrationTests
         public void Should_throw_when_world_is_created_twice()
         {
             var spawnPosition = new Vector(0, 0);
-            var worldId = CreateWorld(spawnPosition);
+            var worldId = new WorldId();
+
+            CreateWorld(worldId, spawnPosition);
 
             Assert.Throws<RootAlreadyExistsException>(() => CreateWorld(worldId, spawnPosition));
         }
 
         private void UpdateAll(TimeSpan elapsed)
         {
-            _bus.ProcessAllAndCommit<Player>(root => root.ApplyMovementForce());
-            _bus.ProcessAllAndCommit<RigidBody>(root => root.UpdateMomentum(elapsed.TotalSeconds));
-            _bus.ProcessAllAndCommit<RigidBody>(root => root.UpdatePosition(elapsed.TotalSeconds));
+            _commandProcessor.ProcessAllAndCommit<Player>(root => root.ApplyMovementForce());
+            _commandProcessor.ProcessAllAndCommit<RigidBody>(root => root.UpdateMomentum());
+            _commandProcessor.ProcessAllAndCommit<RigidBody>(root => root.UpdatePosition());
         }
 
         private PlayerId CreatePlayer(WorldId worldId)
@@ -159,17 +161,17 @@ namespace DarkDefenders.IntegrationTests
 
         private void CreateWorld(WorldId worldId, Vector spawnPosition)
         {
-            _bus.CreateAndCommit<World>(worldId, world => world.Create(spawnPosition));
+            _commandProcessor.CreateAndCommit<WorldFactory>(f => f.Create(worldId, spawnPosition));
         }
 
         private void CreatePlayer(PlayerId playerId, WorldId worldId)
         {
-            _bus.CreateAndCommit<Player>(playerId, player => player.Create(worldId));
+            _commandProcessor.CreateAndCommit<PlayerFactory>(f => f.Create(playerId, worldId));
         }
 
         private void MovePlayerLeft(PlayerId playerId)
         {
-            _bus.ProcessAndCommit<Player>(playerId, player => player.MoveLeft());
+            _commandProcessor.ProcessAndCommit<Player>(playerId, player => player.MoveLeft());
         }
 
         private static ICommandProcessor CreateBus(EventStore eventStore)
@@ -190,7 +192,7 @@ namespace DarkDefenders.IntegrationTests
                 CollectionAssert.AreEqual(expectedEvents.AsReadOnly(), _allEvents.AsReadOnly());
             }
 
-            public void Apply(IEnumerable<IEvent> events)
+            public void Recieve(IEnumerable<IEvent> events)
             {
                 var readOnly = events.AsReadOnly();
 

@@ -9,7 +9,7 @@ namespace Infrastructure.DDDES
         {
             try
             {
-                commandProcessor.ProcessAllImplementing(command);
+                commandProcessor.ProcessAll(command);
                 commandProcessor.Commit();
             }
             catch(Exception)
@@ -32,25 +32,18 @@ namespace Infrastructure.DDDES
             }
         }
 
-        public static RootToProcessorAdapter<TRoot> CreateAndCommit<TRoot>(this ICommandProcessor commandProcessor,Identity id, Func<TRoot, IEnumerable<IEvent>> command)
+        public static void CreateAndCommit<TRootFactory>(this ICommandProcessor commandProcessor, Func<TRootFactory, IEnumerable<IEvent>> command)
         {
             try
             {
-                var adapter = commandProcessor.Create(id, command);
+                commandProcessor.Create(command);
                 commandProcessor.Commit();
-                return adapter;
             }
             catch (Exception)
             {
                 commandProcessor.Rollback();
                 throw;
             }
-        }
-
-        public static RootToProcessorAdapter<TRoot> Create<TRoot>(this ICommandProcessor commandProcessor, Identity id, Func<TRoot, IEnumerable<IEvent>> command) 
-        {
-            commandProcessor.Process(id, command);
-            return new RootToProcessorAdapter<TRoot>(commandProcessor, id);
         }
 
         public static RootsToProcessorAdapter<TInterface> Create<TInterface>(this ICommandProcessor commandProcessor)

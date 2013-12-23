@@ -10,34 +10,13 @@ namespace DarkDefenders.Domain.RigidBodies
 {
     public class RigidBody : RootBase<RigidBodyId, IRigidBodyEventsReciever, IRigidBodyEvent>, IRigidBodyEventsReciever
     {
-        public Vector Position
-        {
-            get
-            {
-                AssertExists();
-                return _boundingCircle.Position;
-            }
-        }
+        public Vector Position { get { return _boundingCircle.Position; } }
 
-        public double Radius
-        {
-            get
-            {
-                AssertExists();
-                return _boundingCircle.Radius;
-            }
-        }
+        public double Radius { get { return _boundingCircle.Radius; } }
 
-        public IEnumerable<IRigidBodyEvent> Create(WorldId worldId, Circle boundingCircle, Vector initialMomentum, double mass)
+        public IEnumerable<IEvent> UpdateMomentum()
         {
-            AssertDoesntExist();
-
-            yield return new RigidBodyCreated(Id, worldId, boundingCircle, initialMomentum, mass);
-        }
-
-        public IEnumerable<IEvent> UpdateMomentum(double elapsedSeconds)
-        {
-            AssertExists();
+            var elapsedSeconds = _world.ElapsedSeconds;
 
             var newMomentum = GetNewMomentum(elapsedSeconds);
 
@@ -49,9 +28,9 @@ namespace DarkDefenders.Domain.RigidBodies
             yield return new Accelerated(Id, newMomentum);
         }
 
-        public IEnumerable<IEvent> UpdatePosition(double elapsedSeconds)
+        public IEnumerable<IEvent> UpdatePosition()
         {
-            AssertExists();
+            var elapsedSeconds = _world.ElapsedSeconds;
 
             if (_momentum == Vector.Zero)
             {
@@ -65,8 +44,6 @@ namespace DarkDefenders.Domain.RigidBodies
 
         public IEnumerable<IEvent> AddMomentum(Vector additionalMomentum)
         {
-            AssertExists();
-            
             if (additionalMomentum == Vector.Zero)
             {
                 yield break;
@@ -79,8 +56,6 @@ namespace DarkDefenders.Domain.RigidBodies
 
         public IEnumerable<IEvent> SetExternalForce(Vector force)
         {
-            AssertExists();
-            
             if (_externalForce == force)
             {
                 yield break;
@@ -91,75 +66,81 @@ namespace DarkDefenders.Domain.RigidBodies
 
         public bool IsInTheAir()
         {
-            AssertExists();
             return _world.IsInTheAir(_boundingCircle);
         }
 
         public bool HasVerticalMomentum()
         {
-            AssertExists();
             return Math.Abs(_momentum.Y) > 0.01d;
         }
 
         public bool MomentumHasDifferentHorizontalDirectionFrom(Vector vector)
         {
-            AssertExists();
-
             var momentumSign = Math.Sign(_momentum.X);
 
             return momentumSign != 0 && momentumSign != Math.Sign(vector.X);
         }
 
-        public void Apply(RigidBodyCreated rigidBodyCreated)
+        public bool IsAdjacentToAWall()
         {
-            _world = _worldRepository.GetById(rigidBodyCreated.WorldId);
-
-            _momentum = rigidBodyCreated.InitialMomentum;
-            _mass = rigidBodyCreated.Mass;
-            _boundingCircle = rigidBodyCreated.BoundingCircle;
-            _externalForce = Vector.Zero;
+            return _world.IsAdjacentToAWall(_boundingCircle);
         }
 
-        public void Apply(Moved moved)
+        public IEnumerable<IEvent> Destroy()
+        {
+            yield return new RigidBodyRemoved(Id);
+        }
+
+        public void Recieve(Moved moved)
         {
             _boundingCircle = _boundingCircle.ChangePosition(moved.NewPosition);
         }
 
-        public void Apply(Accelerated accelerated)
+        public void Recieve(Accelerated accelerated)
         {
             _momentum = accelerated.NewMomentum;
         }
 
-        public void Apply(ExternalForceChanged externalForceChanged)
+        public void Recieve(ExternalForceChanged externalForceChanged)
         {
             _externalForce = externalForceChanged.ExternalForce;
         }
 
-        internal RigidBody(RigidBodyId id, IRepository<WorldId, World> worldRepository) : base(id)
+        internal RigidBody(RigidBodyId id, World world, Vector initialMomentum, double mass, Circle boundingCircle) : base(id)
         {
-            _worldRepository = worldRepository;
-        }
+            _world = world;
 
-        private Vector GetNewMomentum(double elapsedSeconds)
-        {
-            var force = GetForce(elapsedSeconds);
-
-            var newMomentum = _momentum + force * elapsedSeconds;
-
-            newMomentum = LimitMomentum(newMomentum);
-
-            return _world.ApplyInelasticTerrainImpact(newMomentum, _boundingCircle);
+            _momentum = initialMomentum;
+            _mass = mass;
+            _boundingCircle = boundingCircle;
+            _externalForce = Vector.Zero;
         }
 
         private Vector GetNewPosition(double elapsedSeconds)
         {
-            var positionChange = _momentum * elapsedSeconds * (1.0 / _mass);
+            var positionChange = _momentum * (elapsedSeconds / _mass);
 
             var newPosition = _boundingCircle.Position + positionChange;
 
             var newCircle = _boundingCircle.ChangePosition(newPosition);
 
             return _world.AdjustCirclePosition(newCircle);
+        }
+
+        private Vector GetNewMomentum(double elapsedSeconds)
+        {
+            var force = GetForce(elapsedSeconds);
+
+            var newMomentum = _momentum;
+
+            if (force != Vector.Zero)
+            {
+                newMomentum = _momentum + force*elapsedSeconds;
+
+                newMomentum = LimitTopMomentum(newMomentum);
+            }
+
+            return _world.LimitMomentum(newMomentum, _boundingCircle);
         }
 
         private Vector GetForce(double elapsedSeconds)
@@ -183,12 +164,14 @@ namespace DarkDefenders.Domain.RigidBodies
             return externalForce + GetFrictionForce(maxForce);
         }
 
-        private static Vector LimitMomentum(Vector momentum)
+        private static Vector LimitTopMomentum(Vector momentum)
         {
             var vx = momentum.X;
             var vy = momentum.Y;
 
-            return Math.Abs(vx) > TopHorizontalMomentum 
+            var vxAbs = Math.Abs(vx);
+
+            return vxAbs > TopHorizontalMomentum 
                 ? Vector.XY(Math.Sign(vx) * TopHorizontalMomentum, vy) 
                 : momentum;
         }
@@ -208,12 +191,13 @@ namespace DarkDefenders.Domain.RigidBodies
         private const double TopHorizontalMomentum = 0.8d;
         private const double FrictionCoefficient = 2d;
 
-        private readonly IRepository<WorldId, World> _worldRepository;
+        private readonly World _world;
+        
+        private readonly double _mass;
 
-        private World _world;
         private Circle _boundingCircle;
         private Vector _momentum;
+
         private Vector _externalForce;
-        private double _mass;
     }
 }

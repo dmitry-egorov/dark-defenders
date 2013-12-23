@@ -39,6 +39,8 @@
     <Compile Include="Domain\EventBase.cs" />
     <Compile Include="Domain\Exceptions\RootAlreadyExistsException.cs" />
     <Compile Include="Domain\Exceptions\RootDoesntExistException.cs" />
+    <Compile Include="Domain\Factory.cs" />
+    <Compile Include="Domain\Removed.cs" />
     <Compile Include="Domain\Repository.cs" />
     <Compile Include="Domain\RootBase.cs" />
     <Compile Include="CountingEventsListener.cs" />
@@ -53,9 +55,6 @@
       <Project>{0B407BC3-7B5B-431A-96E7-A41F25AB27BE}</Project>
       <Name>Infrastructure.Util</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

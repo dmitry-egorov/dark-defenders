@@ -4,6 +4,6 @@ namespace Infrastructure.DDDES
 {
     public interface IEventsLinstener
     {
-        void Apply(IEnumerable<IEvent> events);
+        void Recieve(IEnumerable<IEvent> events);
     }
 }

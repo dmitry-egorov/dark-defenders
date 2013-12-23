@@ -19,9 +19,12 @@ namespace Infrastructure.DDDES.Implementations
             _listeners = linsteners.ShouldNotBeNull("listeners").AsReadOnly();
         }
 
-        public void Apply(IEnumerable<IEvent> events)
+        public void Recieve(IEnumerable<IEvent> events)
         {
-            _listeners.ForEach(x => x.Apply(events));
+            foreach (var linstener in _listeners)
+            {
+                linstener.Recieve(events);//TODO: as read only?
+            }
         }
     }
 }

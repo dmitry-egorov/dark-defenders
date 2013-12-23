@@ -36,11 +36,14 @@
   <ItemGroup>
     <Compile Include="CommandProcessorExtensions.cs" />
     <Compile Include="ICommandProcessor.cs" />
+    <Compile Include="IEntity.cs" />
+    <Compile Include="IFactory.cs" />
     <Compile Include="Identity.cs" />
     <Compile Include="IEvent.cs" />
     <Compile Include="IEventsLinstener.cs" />
     <Compile Include="IRepository.cs" />
     <Compile Include="IRoot.cs" />
+    <Compile Include="IRootCommandProcessor.cs" />
     <Compile Include="IRootEvent.cs" />
     <Compile Include="IUnitOfWork.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

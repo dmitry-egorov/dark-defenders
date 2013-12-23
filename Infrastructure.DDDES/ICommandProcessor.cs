@@ -5,10 +5,11 @@ namespace Infrastructure.DDDES
 {
     public interface ICommandProcessor : IUnitOfWork
     {
-        T Request<T, TRoot>(Identity id, Func<TRoot, T> request);
-
         void Process<TRoot>(Identity id, Func<TRoot, IEnumerable<IEvent>> command);
+        void ProcessAll<TRoot>(Func<TRoot, IEnumerable<IEvent>> command);
+        void Create<TRootFactory>(Func<TRootFactory, IEnumerable<IEvent>> creation);
 
-        void ProcessAllImplementing<T>(Func<T, IEnumerable<IEvent>> command);
+
+        IRootCommandProcessor<TRoot> GetProcessorFor<TRoot>();
     }
 }
