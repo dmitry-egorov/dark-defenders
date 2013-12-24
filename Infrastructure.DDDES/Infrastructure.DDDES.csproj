@@ -37,7 +37,7 @@
     <Compile Include="CommandProcessorExtensions.cs" />
     <Compile Include="ICommandProcessor.cs" />
     <Compile Include="IEntity.cs" />
-    <Compile Include="IFactory.cs" />
+    <Compile Include="IRootFactory.cs" />
     <Compile Include="Identity.cs" />
     <Compile Include="IEvent.cs" />
     <Compile Include="IEventsLinstener.cs" />

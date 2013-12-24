@@ -21,14 +21,14 @@ namespace DarkDefenders.IntegrationTests
     [TestFixture]
     public class MainIntegrationTest
     {
-        private EventStore _eventStore;
+        private TestEventListener _eventListener;
         private ICommandProcessor _commandProcessor;
 
         [SetUp]
         public void SetUp()
         {
-            _eventStore = new EventStore();
-            _commandProcessor = CreateBus(_eventStore);
+            _eventListener = new TestEventListener();
+            _commandProcessor = CreateBus(_eventListener);
         }
 
         [Test]
@@ -49,7 +49,7 @@ namespace DarkDefenders.IntegrationTests
                 new PlayerCreated(playerId, worldId, rigidBodyId)
             };
 
-            _eventStore.AssertEvents(expectedEvents);
+            _eventListener.AssertEvents(expectedEvents);
         }
 
         [Test]
@@ -71,14 +71,14 @@ namespace DarkDefenders.IntegrationTests
                 new WorldCreated(worldId, spawnPosition), 
                 new RigidBodyCreated(rigidBodyId, worldId, boundingCircle, Vector.Zero, mass),
                 new PlayerCreated(playerId, worldId, rigidBodyId),
-                new MovementForceChanged(playerId, desiredOrientation), 
+                new MovementForceDirectionChanged(playerId, desiredOrientation), 
             };
-            _eventStore.AssertEvents(expectedEvents);
+            _eventListener.AssertEvents(expectedEvents);
         }
 
         private RigidBodyId FindRigidBodyId()
         {
-            return _eventStore.FindEvents<RigidBodyCreated>().Single().RootId;
+            return _eventListener.FindEvents<RigidBodyCreated>().Single().RootId;
         }
 
         [Test]
@@ -88,7 +88,7 @@ namespace DarkDefenders.IntegrationTests
             var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRadius);
             var desiredOrientation = MovementForceDirection.Left;
             var externalForce = Vector.XY(-4.0, 0);
-            var elapsed = TimeSpan.FromMilliseconds(20);
+            var elapsed = TimeSpan.FromMilliseconds(20).TotalSeconds;
             var newMomentum = Vector.XY(-0.08, 0);
             var newPosition = Vector.XY(-0.0016, 0.025);
             var mass = Player.Mass;
@@ -105,13 +105,14 @@ namespace DarkDefenders.IntegrationTests
                 new WorldCreated(worldId, spawnPosition), 
                 new RigidBodyCreated(rigidBodyId, worldId, boundingCircle, Vector.Zero, mass),
                 new PlayerCreated(playerId, worldId, rigidBodyId),
-                new MovementForceChanged(playerId, desiredOrientation), 
+                new MovementForceDirectionChanged(playerId, desiredOrientation), 
+                new WorldTimeUpdated(worldId, elapsed, elapsed), 
                 new ExternalForceChanged(rigidBodyId, externalForce), 
                 new Accelerated(rigidBodyId, newMomentum),
                 new Moved(rigidBodyId, newPosition), 
             };
 
-            _eventStore.AssertEvents(expectedEvents);
+            _eventListener.AssertEvents(expectedEvents);
         }
 
         [Test]
@@ -134,8 +135,9 @@ namespace DarkDefenders.IntegrationTests
             Assert.Throws<RootAlreadyExistsException>(() => CreateWorld(worldId, spawnPosition));
         }
 
-        private void UpdateAll(TimeSpan elapsed)
+        private void UpdateAll(double elapsed)
         {
+            _commandProcessor.ProcessAllAndCommit<World>(root => root.UpdateWorldTime(elapsed));
             _commandProcessor.ProcessAllAndCommit<Player>(root => root.ApplyMovementForce());
             _commandProcessor.ProcessAllAndCommit<RigidBody>(root => root.UpdateMomentum());
             _commandProcessor.ProcessAllAndCommit<RigidBody>(root => root.UpdatePosition());
@@ -174,16 +176,16 @@ namespace DarkDefenders.IntegrationTests
             _commandProcessor.ProcessAndCommit<Player>(playerId, player => player.MoveLeft());
         }
 
-        private static ICommandProcessor CreateBus(EventStore eventStore)
+        private static ICommandProcessor CreateBus(TestEventListener testEventListener)
         {
-            var processor = new CommandProcessor(eventStore);
+            var processor = new CommandProcessor(testEventListener);
 
             processor.ConfigureDomain();
 
             return processor;
         }
 
-        public class EventStore: IEventsLinstener
+        public class TestEventListener: IEventsLinstener
         {
             private readonly List<IEvent> _allEvents = new List<IEvent>();
 

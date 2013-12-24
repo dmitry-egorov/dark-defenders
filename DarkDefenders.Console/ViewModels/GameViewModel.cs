@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
-using DarkDefenders.Domain;
 using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.Players.Events;
+using DarkDefenders.Domain.Projectiles.Events;
 using DarkDefenders.Domain.RigidBodies;
 using DarkDefenders.Domain.RigidBodies.Events;
 using DarkDefenders.Domain.Worlds.Events;
@@ -49,7 +49,7 @@ namespace DarkDefenders.Console.ViewModels
             RenderWorld(_width, _height);
         }
 
-        public void Recieve(WorldRemoved worldRemoved)
+        public void Recieve(WorldDestroyed worldDestroyed)
         {
             throw new System.NotImplementedException();
         }
@@ -66,9 +66,14 @@ namespace DarkDefenders.Console.ViewModels
             vm.SetAsPlayer();
         }
 
-        public void Recieve(MovementForceChanged movementForceChanged)
+        public void Recieve(MovementForceDirectionChanged movementForceDirectionChanged)
         {
-            RenderMovementForce(movementForceChanged);
+            RenderMovementForce(movementForceDirectionChanged);
+        }
+
+        public void Recieve(PlayerFired playerFired)
+        {
+            
         }
 
         public void Recieve(ProjectileCreated projectileCreated)
@@ -77,7 +82,7 @@ namespace DarkDefenders.Console.ViewModels
             vm.SetAsProjectile();
         }
 
-        public void Recieve(ProjectileHitSomething projectileHitSomething)
+        public void Recieve(ProjectileDestroyed projectileCreated)
         {
         }
 
@@ -89,14 +94,14 @@ namespace DarkDefenders.Console.ViewModels
             playerViewModel.Recieve(rigidBodyCreated);
         }
 
-        public void Recieve(RigidBodyRemoved rigidBodyRemoved)
+        public void Recieve(RigidBodyDestroyed rigidBodyDestroyed)
         {
-            var vm = _rigidBodyMap[rigidBodyRemoved.RootId];
+            var vm = _rigidBodyMap[rigidBodyDestroyed.RootId];
             vm.Remove();
-            _rigidBodyMap.Remove(rigidBodyRemoved.RootId);
+            _rigidBodyMap.Remove(rigidBodyDestroyed.RootId);
         }
 
-        public void Recieve(PlayerRemoved playerRemoved)
+        public void Recieve(PlayerDestroyed playerDestroyed)
         {
             throw new System.NotImplementedException();
         }
@@ -143,9 +148,9 @@ namespace DarkDefenders.Console.ViewModels
             RenderMomentum();
         }
 
-        private void RenderMovementForce(MovementForceChanged movementForceChanged)
+        private void RenderMovementForce(MovementForceDirectionChanged movementForceDirectionChanged)
         {
-            var text = "d: " + movementForceChanged.MovementForceDirection;
+            var text = "d: " + movementForceDirectionChanged.MovementForceDirection;
             ConsoleRenderer.RenderFloatRight(text, 3, 30, _width);
         }
 

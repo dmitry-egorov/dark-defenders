@@ -3,9 +3,9 @@ using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.RigidBodies.Events
 {
-    public class RigidBodyRemoved : Removed<RigidBodyId, RigidBodyRemoved>, IDomainEvent
+    public class RigidBodyDestroyed : Destroyed<RigidBodyId, RigidBody, RigidBodyDestroyed>, IDomainEvent
     {
-        public RigidBodyRemoved(RigidBodyId rootId) : base(rootId)
+        public RigidBodyDestroyed(RigidBodyId rootId) : base(rootId)
         {
         }
 

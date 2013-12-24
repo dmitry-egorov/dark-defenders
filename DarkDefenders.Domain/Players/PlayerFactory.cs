@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using DarkDefenders.Domain.Players.Events;
+using DarkDefenders.Domain.Projectiles;
 using DarkDefenders.Domain.RigidBodies;
 using DarkDefenders.Domain.Worlds;
 using Infrastructure.DDDES;
@@ -8,50 +9,50 @@ using Infrastructure.Math;
 
 namespace DarkDefenders.Domain.Players
 {
-    public class PlayerFactory: Factory<PlayerId, Player>, IFactory<Player, PlayerCreated>
+    public class PlayerFactory: RootFactory<PlayerId, Player, PlayerCreated>
     {
         private readonly IRepository<WorldId, World> _worldRepository;
         private readonly IRepository<RigidBodyId, RigidBody> _rigidBodyRepository;
         private readonly RigidBodyFactory _rigidBodyFactory;
+        private readonly ProjectileFactory _projectileFactory;
 
-        public PlayerFactory(IRepository<PlayerId, Player> playerRepository, IRepository<WorldId, World> worldRepository, IRepository<RigidBodyId, RigidBody> rigidBodyRepository, RigidBodyFactory rigidBodyFactory): base(playerRepository)
+        public PlayerFactory(IRepository<PlayerId, Player> playerRepository, IRepository<WorldId, World> worldRepository, IRepository<RigidBodyId, RigidBody> rigidBodyRepository, RigidBodyFactory rigidBodyFactory, ProjectileFactory projectileFactory): base(playerRepository)
         {
             _worldRepository = worldRepository;
             _rigidBodyFactory = rigidBodyFactory;
+            _projectileFactory = projectileFactory;
             _rigidBodyRepository = rigidBodyRepository;
-        }
-
-        Player IFactory<Player, PlayerCreated>.Handle(PlayerCreated creationEvent)
-        {
-            var world = _worldRepository.GetById(creationEvent.WorldId);
-
-            var rigidBody = _rigidBodyRepository.GetById(creationEvent.RigidBodyId);
-            
-            return new Player(creationEvent.RootId, _rigidBodyFactory, _rigidBodyRepository, world, rigidBody);
         }
 
         public IEnumerable<IEvent> Create(PlayerId playerId, WorldId worldId)
         {
             AssertDoesntExist(playerId);
-            foreach (var e in CreatePlayer(playerId, worldId)) { yield return e; }
-        }
 
-        private IEnumerable<IEvent> CreatePlayer(PlayerId playerId, WorldId worldId)
-        {
             var world = _worldRepository.GetById(worldId);
 
-            RigidBodyId rigidBodyId;
-            foreach (var e in CreateOwnRigidBody(world, out rigidBodyId)) { yield return e; }
+            var spawnPosition = world.GetSpawnPosition();
+
+            var rigidBodyId = new RigidBodyId();
+
+            var events = CreatePlayerRigidBody(rigidBodyId, worldId, spawnPosition);
+
+            foreach (var e in events) { yield return e; }
 
             yield return new PlayerCreated(playerId, worldId, rigidBodyId);
         }
 
-        private IEnumerable<IEvent> CreateOwnRigidBody(World world, out RigidBodyId rigidBodyId)
+        protected override Player Handle(PlayerCreated creationEvent)
         {
-            var spawnPosition = world.GetSpawnPosition();
+            var world = _worldRepository.GetById(creationEvent.WorldId);
+
+            var rigidBody = _rigidBodyRepository.GetById(creationEvent.RigidBodyId);
             
-            rigidBodyId = new RigidBodyId();
-            return _rigidBodyFactory.CreateRigidBody(rigidBodyId, world.Id, spawnPosition, Player.BoundingCircleRadius, Vector.Zero, Player.Mass);
+            return new Player(creationEvent.RootId, _projectileFactory, world, rigidBody);
+        }
+
+        private IEnumerable<IEvent> CreatePlayerRigidBody(RigidBodyId rigidBodyId, WorldId worldId, Vector spawnPosition)
+        {
+            return _rigidBodyFactory.CreateRigidBody(rigidBodyId, worldId, spawnPosition, Player.BoundingCircleRadius, Vector.Zero, Player.Mass);
         }
     }
 }

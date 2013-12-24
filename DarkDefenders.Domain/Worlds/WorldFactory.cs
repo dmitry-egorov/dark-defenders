@@ -7,21 +7,21 @@ using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.Worlds
 {
-    public class WorldFactory : Factory<WorldId, World>, IFactory<World, WorldCreated>
+    public class WorldFactory : RootFactory<WorldId, World, WorldCreated>
     {
         public WorldFactory(IRepository<WorldId, World> repository) : base(repository)
         {
-        }
-
-        World IFactory<World, WorldCreated>.Handle(WorldCreated creationEvent)
-        {
-            return new World(creationEvent.RootId, creationEvent.SpawnPosition);
         }
 
         public IEnumerable<IEvent> Create(WorldId worldId, Vector spawnPosition)
         {
             AssertDoesntExist(worldId);
             return new WorldCreated(worldId, spawnPosition).EnumerateOnce();
+        }
+
+        protected override World Handle(WorldCreated creationEvent)
+        {
+            return new World(creationEvent.RootId, creationEvent.SpawnPosition);
         }
     }
 }

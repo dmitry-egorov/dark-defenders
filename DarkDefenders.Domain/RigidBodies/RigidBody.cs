@@ -88,7 +88,7 @@ namespace DarkDefenders.Domain.RigidBodies
 
         public IEnumerable<IEvent> Destroy()
         {
-            yield return new RigidBodyRemoved(Id);
+            yield return new RigidBodyDestroyed(Id);
         }
 
         public void Recieve(Moved moved)

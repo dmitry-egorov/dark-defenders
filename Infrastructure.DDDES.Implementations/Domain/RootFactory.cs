@@ -2,12 +2,12 @@
 
 namespace Infrastructure.DDDES.Implementations.Domain
 {
-    public abstract class Factory<TRootId, TRoot>
+    public abstract class RootFactory<TRootId, TRoot, TCreationEvent> : IRootFactory<TRoot, TCreationEvent> 
         where TRootId: Identity
     {
         private readonly IRepository<TRootId, TRoot> _repository;
 
-        protected Factory(IRepository<TRootId, TRoot> repository)
+        protected RootFactory(IRepository<TRootId, TRoot> repository)
         {
             _repository = repository;
         }
@@ -19,5 +19,12 @@ namespace Infrastructure.DDDES.Implementations.Domain
                 throw new RootAlreadyExistsException(GetType().Name, worldId);
             }
         }
+
+        TRoot IRootFactory<TRoot, TCreationEvent>.Handle(TCreationEvent creationEvent)
+        {
+            return Handle(creationEvent);
+        }
+
+        protected abstract TRoot Handle(TCreationEvent creationEvent);
     }
 }

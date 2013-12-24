@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using DarkDefenders.Console.ViewModels;
 using DarkDefenders.Domain;
 using DarkDefenders.Domain.Players;
+using DarkDefenders.Domain.Projectiles;
 using DarkDefenders.Domain.RigidBodies;
 using DarkDefenders.Domain.Worlds;
 using Infrastructure.DDDES;
@@ -32,6 +33,7 @@ namespace DarkDefenders.Console
             var players = processor.Create<Player>();
             var rigidBodies = processor.Create<RigidBody>();
             var worlds = processor.Create<World>();
+            var projectiles = processor.Create<Projectile>();
 
             var fpsCounter = new PerformanceCounter();
             var eventsCounter = new PerformanceCounter();
@@ -50,7 +52,7 @@ namespace DarkDefenders.Console
                 players.DoAndCommit(x => x.ApplyMovementForce());
                 rigidBodies.DoAndCommit(x => x.UpdateMomentum());
                 rigidBodies.DoAndCommit(x => x.UpdatePosition());
-                players.DoAndCommit(x => x.UpdateProjectiles());
+                projectiles.DoAndCommit(x => x.CheckForHit());
 
                 var eventsCount = countingListener.EventsSinceLastCall;
                 fpsCounter.Tick(elapsed, renderer.RenderFps);

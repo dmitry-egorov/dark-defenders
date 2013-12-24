@@ -39,8 +39,8 @@
     <Compile Include="Domain\EventBase.cs" />
     <Compile Include="Domain\Exceptions\RootAlreadyExistsException.cs" />
     <Compile Include="Domain\Exceptions\RootDoesntExistException.cs" />
-    <Compile Include="Domain\Factory.cs" />
-    <Compile Include="Domain\Removed.cs" />
+    <Compile Include="Domain\RootFactory.cs" />
+    <Compile Include="Domain\Destroyed.cs" />
     <Compile Include="Domain\Repository.cs" />
     <Compile Include="Domain\RootBase.cs" />
     <Compile Include="CountingEventsListener.cs" />

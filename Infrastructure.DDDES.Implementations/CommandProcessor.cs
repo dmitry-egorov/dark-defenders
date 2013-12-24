@@ -21,15 +21,15 @@ namespace Infrastructure.DDDES.Implementations
             _eventsLinstener = eventsLinstener;
         }
 
-        public void AddRepository<TRootId, TRoot, TRootEvent, TRootFactory, TCreatedEvent, TRemovedEvent>(Repository<TRootId, TRoot> repository, TRootFactory factory)
+        public void AddRepository<TRootId, TRoot, TRootEvent, TRootFactory, TCreatedEvent, TDestoryedEvent>(Repository<TRootId, TRoot> repository, TRootFactory factory)
             where TRootId : Identity
             where TRoot: class, IRoot<TRootId, TRootEvent> 
-            where TRootFactory: IFactory<TRoot, TCreatedEvent>
+            where TRootFactory: IRootFactory<TRoot, TCreatedEvent>
             where TCreatedEvent : class 
-            where TRemovedEvent : class
+            where TDestoryedEvent : class
         {
             _containersTypeMap[typeof (TRoot)] = new RootCommandProcessor<TRootId, TRoot, TRootEvent>(repository, _commitQueue);
-            _idTypeAppliersMap[typeof(TRootId)] = new RootEventsApplier<TRootId, TRoot, TRootEvent, TCreatedEvent, TRemovedEvent>(repository, factory);
+            _idTypeAppliersMap[typeof(TRootId)] = new RootEventsApplier<TRootId, TRoot, TRootEvent, TCreatedEvent, TDestoryedEvent>(repository, factory);
             _factories[typeof (TRootFactory)] = factory;
         }
 
@@ -123,16 +123,16 @@ namespace Infrastructure.DDDES.Implementations
             }
         }
 
-        private class RootEventsApplier<TRootId, TRoot, TRootEvent, TCreationEvent, TRemovedEvent> : IRootEventsApplier
+        private class RootEventsApplier<TRootId, TRoot, TRootEvent, TCreationEvent, TDestoryedEvent> : IRootEventsApplier
             where TRootId: Identity
             where TRoot: IRoot<TRootId, TRootEvent> 
-            where TCreationEvent : class 
-            where TRemovedEvent : class
+            where TCreationEvent : class
+            where TDestoryedEvent : class
         {
             private readonly Repository<TRootId, TRoot> _repository;
-            private readonly IFactory<TRoot, TCreationEvent> _factory;
+            private readonly IRootFactory<TRoot, TCreationEvent> _factory;
 
-            public RootEventsApplier(Repository<TRootId, TRoot> repository, IFactory<TRoot, TCreationEvent> factory)
+            public RootEventsApplier(Repository<TRootId, TRoot> repository, IRootFactory<TRoot, TCreationEvent> factory)
             {
                 _repository = repository;
                 _factory = factory;
@@ -163,17 +163,17 @@ namespace Infrastructure.DDDES.Implementations
                     _repository.Store(root);
                 }
 
-                var removed = false;
+                var destroyed = false;
 
                 foreach (var rootEvent in events)
                 {
-                    var removedEvent = rootEvent as TRemovedEvent;
-                    if (removedEvent != null)
+                    var destoryedEvent = rootEvent as TDestoryedEvent;
+                    if (destoryedEvent != null)
                     {
                         _repository.Remove(rootId);
-                        removed = true;
+                        destroyed = true;
                     }
-                    else if(!removed)
+                    else if(!destroyed)
                     {
                         root.Apply((TRootEvent)rootEvent);
                     }

@@ -1,11 +1,11 @@
 ﻿using DarkDefenders.Domain.Events;
 using Infrastructure.DDDES.Implementations.Domain;
 
-namespace DarkDefenders.Domain.Worlds.Events
+namespace DarkDefenders.Domain.Players.Events
 {
-    public class WorldRemoved: Removed<WorldId, WorldRemoved>, IDomainEvent
+    public class PlayerDestroyed: Destroyed<PlayerId, Player, PlayerDestroyed>, IDomainEvent
     {
-        public WorldRemoved(WorldId rootId) : base(rootId)
+        public PlayerDestroyed(PlayerId rootId) : base(rootId)
         {
         }
 

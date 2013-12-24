@@ -8,7 +8,7 @@ using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.RigidBodies
 {
-    public class RigidBodyFactory: Factory<RigidBodyId, RigidBody>, IFactory<RigidBody, RigidBodyCreated>
+    public class RigidBodyFactory : RootFactory<RigidBodyId, RigidBody, RigidBodyCreated>
     {
         private readonly IRepository<WorldId, World> _worldRepository;
 
@@ -22,10 +22,11 @@ namespace DarkDefenders.Domain.RigidBodies
             AssertDoesntExist(id);
             
             var boundingCircle = new Circle(position, radius);
+
             return new RigidBodyCreated(id, worldId, boundingCircle, initialMomentum, mass).EnumerateOnce();
         }
 
-        RigidBody IFactory<RigidBody, RigidBodyCreated>.Handle(RigidBodyCreated created)
+        protected override RigidBody Handle(RigidBodyCreated created)
         {
             var world = _worldRepository.GetById(created.WorldId);
             return new RigidBody(created.RootId, world, created.InitialMomentum, created.Mass, created.BoundingCircle);
