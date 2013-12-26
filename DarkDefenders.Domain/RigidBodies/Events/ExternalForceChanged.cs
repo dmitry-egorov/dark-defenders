@@ -1,5 +1,4 @@
 ﻿using DarkDefenders.Domain.Events;
-using DarkDefenders.Domain.Players;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
 using Infrastructure.Util;

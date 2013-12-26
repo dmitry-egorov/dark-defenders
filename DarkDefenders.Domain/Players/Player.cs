@@ -141,11 +141,11 @@ namespace DarkDefenders.Domain.Players
 
             if (_rigidBody.IsInTheAir())
             {
-                force *= 0.5d;
+                force *= 0.5;
             }
             else if (_rigidBody.MomentumHasDifferentHorizontalDirectionFrom(force))
             {
-                force *= 2d;
+                force *= 2.0;
             }
 
             return force;
@@ -201,10 +201,10 @@ namespace DarkDefenders.Domain.Players
             return Vector.XY(x, y);
         }
 
-        private static readonly Vector _jumpMomentum = Vector.XY(0, 1.5d);
+        private static readonly Vector _jumpMomentum = Vector.XY(0, 1.5f);
         private static readonly Vector _leftMovementForce = Vector.Left * MovementForce;
         private static readonly Vector _rightMovementForce = Vector.Right * MovementForce;
-        private const double MovementForce = 4d;
+        private const double MovementForce = 4.0;
         private const double FireDelay = 0.25;
         private const Direction InitialDirection = Direction.Right;
 

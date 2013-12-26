@@ -6,11 +6,6 @@ namespace Infrastructure.DDDES
     {
         private readonly Guid _value;
 
-        protected Identity(Guid value)
-        {
-            _value = value;
-        }
-
         protected Identity()
         {
             _value = Guid.NewGuid();

@@ -1,16 +1,21 @@
-﻿using Infrastructure.Util;
+﻿using System.Runtime.CompilerServices;
+using Infrastructure.Util;
 
 namespace Infrastructure.Math
 {
-    public class Circle: ValueObject<Circle>
+    public struct Circle
     {
-        public Vector Position { get; private set; }
-        public double Radius { get; private set; }
+        private readonly Vector _position;
+        private readonly double _radius;
+
+        public Vector Position { get { return _position; } }
+
+        public double Radius { get { return _radius; } }
 
         public Circle(Vector position, double radius)
         {
-            Position = position;
-            Radius = radius;
+            _position = position;
+            _radius = radius;
         }
 
         public Circle ChangePosition(Vector newPosition)
@@ -18,26 +23,33 @@ namespace Infrastructure.Math
             return new Circle(newPosition, Radius);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsAboveHorizontalAxis()
         {
-            return Position.Y - Radius > 0d;
+            return _position.Y - _radius > 0d;
         }
 
-        protected override string ToStringInternal()
+        public override string ToString()
         {
-            return "[{0}], {1}".FormatWith(Position, Radius);
+            return "[{0}], {1}".FormatWith(_position, _radius);
         }
 
-        protected override bool EqualsInternal(Circle other)
+        public bool Equals(Circle other)
         {
-            return Position.Equals(other.Position) && Radius.Equals(other.Radius);
+            return _position.Equals(other._position) && _radius.Equals(other._radius);
         }
 
-        protected override int GetHashCodeInternal()
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            return obj is Circle && Equals((Circle) obj);
+        }
+
+        public override int GetHashCode()
         {
             unchecked
             {
-                return (Position.GetHashCode() * 397) ^ Radius.GetHashCode();
+                return (_position.GetHashCode()*397) ^ _radius.GetHashCode();
             }
         }
     }

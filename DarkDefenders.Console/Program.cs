@@ -107,7 +107,7 @@ namespace DarkDefenders.Console
                 player.Do(x => x.Jump());
             }
 
-            if (NativeKeyboard.IsKeyDown(Keys.LControlKey))
+            if (NativeKeyboard.IsKeyDown(Keys.LControlKey) || NativeKeyboard.IsKeyDown(Keys.RControlKey))
             {
                 player.Do(x => x.Fire());
             }

@@ -17,7 +17,7 @@ namespace DarkDefenders.Domain.RigidBodies.Events
             : base(rigidBodyId)
         {
             WorldId = worldId.ShouldNotBeNull("worldId");
-            BoundingCircle = boundingCircle.ShouldNotBeNull("boundingCircle");
+            BoundingCircle = boundingCircle;
             Mass = mass;
             InitialMomentum = initialMomentum;
         }
@@ -40,7 +40,7 @@ namespace DarkDefenders.Domain.RigidBodies.Events
             unchecked
             {
                 var hashCode = WorldId.GetHashCode();
-                hashCode = (hashCode * 397) ^ (BoundingCircle != null ? BoundingCircle.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ BoundingCircle.GetHashCode();
                 hashCode = (hashCode * 397) ^ Mass.GetHashCode();
                 hashCode = (hashCode * 397) ^ InitialMomentum.GetHashCode();
                 return hashCode;

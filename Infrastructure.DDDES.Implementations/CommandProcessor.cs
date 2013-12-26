@@ -21,21 +21,21 @@ namespace Infrastructure.DDDES.Implementations
             _eventsLinstener = eventsLinstener;
         }
 
-        public void AddRepository<TRootId, TRoot, TRootEvent, TRootFactory, TCreatedEvent, TDestoryedEvent>(Repository<TRootId, TRoot> repository, TRootFactory factory)
+        public void AddRepository<TRootId, TRoot, TRootEvent, TRootFactory, TCreatedEvent>(Repository<TRootId, TRoot> repository, TRootFactory factory)
             where TRootId : Identity
             where TRoot: class, IRoot<TRootId, TRootEvent> 
             where TRootFactory: IRootFactory<TRoot, TCreatedEvent>
-            where TCreatedEvent : class 
-            where TDestoryedEvent : class
+            where TCreatedEvent : class where TRootEvent : class
         {
             _containersTypeMap[typeof (TRoot)] = new RootCommandProcessor<TRootId, TRoot, TRootEvent>(repository, _commitQueue);
-            _idTypeAppliersMap[typeof(TRootId)] = new RootEventsApplier<TRootId, TRoot, TRootEvent, TCreatedEvent, TDestoryedEvent>(repository, factory);
+            _idTypeAppliersMap[typeof(TRootId)] = new RootEventsApplier<TRootId, TRoot, TRootEvent, TCreatedEvent>(repository, factory);
             _factories[typeof (TRootFactory)] = factory;
         }
 
         public void Create<TRootFactory>(Func<TRootFactory, IEnumerable<IEvent>> creation)
         {
             var factory = (TRootFactory)_factories[typeof (TRootFactory)];
+
             var events = creation(factory);
 
             _commitQueue.Enqueue(events);
@@ -66,7 +66,11 @@ namespace Infrastructure.DDDES.Implementations
 
             foreach (var grouping in events.GroupAdjacentFast(x => x.RootId))
             {
-                _idTypeAppliersMap[grouping.Key.GetType()].Apply(grouping.Key, grouping);
+                var id = grouping.Key;
+
+                var applier = _idTypeAppliersMap[id.GetType()];
+
+                applier.Apply(id, grouping);
             }
 
             _eventsLinstener.Recieve(events);
@@ -123,11 +127,10 @@ namespace Infrastructure.DDDES.Implementations
             }
         }
 
-        private class RootEventsApplier<TRootId, TRoot, TRootEvent, TCreationEvent, TDestoryedEvent> : IRootEventsApplier
+        private class RootEventsApplier<TRootId, TRoot, TRootEvent, TCreationEvent> : IRootEventsApplier
             where TRootId: Identity
             where TRoot: IRoot<TRootId, TRootEvent> 
-            where TCreationEvent : class
-            where TDestoryedEvent : class
+            where TCreationEvent : class where TRootEvent : class
         {
             private readonly Repository<TRootId, TRoot> _repository;
             private readonly IRootFactory<TRoot, TCreationEvent> _factory;
@@ -163,23 +166,23 @@ namespace Infrastructure.DDDES.Implementations
                     _repository.Store(root);
                 }
 
-                var destroyed = false;
-
-                foreach (var rootEvent in events)
+                using (var enumerator = events.GetEnumerator())
+                while (enumerator.MoveNext())
                 {
-                    var destoryedEvent = rootEvent as TDestoryedEvent;
-                    if (destoryedEvent != null)
+                    var @event = enumerator.Current as TRootEvent;
+                    if (@event != null)
                     {
-                        _repository.Remove(rootId);
-                        destroyed = true;
-                    }
-                    else if(!destroyed)
-                    {
-                        root.Apply((TRootEvent)rootEvent);
+                        root.Apply(@event);
                     }
                     else
                     {
-                        throw new RootDoesntExistException(typeof(TRoot).Name, rootId);
+                        _repository.Remove(rootId);
+                        if (enumerator.MoveNext())
+                        {
+                            throw new RootDoesntExistException(typeof(TRoot).Name, rootId);
+                        }
+
+                        break;
                     }
                 }
             }

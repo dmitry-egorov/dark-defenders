@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using DarkDefenders.Domain.Worlds.Events;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
@@ -22,11 +23,13 @@ namespace DarkDefenders.Domain.Worlds
             return _spawnPosition;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsInTheAir(Circle boundingCircle)
         {
             return boundingCircle.IsAboveHorizontalAxis();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector GetGravityForce(double mass)
         {
             return Vector.XY(0, -mass * GravityAcceleration);
@@ -39,18 +42,20 @@ namespace DarkDefenders.Domain.Worlds
             var x = position.X;
             var y = position.Y;
 
-            if (x > 1.0 - radius)
+            var dr = 1.0 - radius;
+
+            if (x > dr)
             {
-                x = 1.0 - radius;
+                x = dr;
             }
-            else if (x < -1.0 + radius)
+            else if (x < -dr)
             {
-                x = -1.0 + radius;
+                x = -dr;
             }
 
-            if (y > 1.0 - radius)
+            if (y > dr)
             {
-                y = 1.0 - radius;
+                y = dr;
             }
             else if (y < radius)
             {
@@ -69,16 +74,17 @@ namespace DarkDefenders.Domain.Worlds
             var y = boundingCircle.Position.Y;
             var radius = boundingCircle.Radius;
 
+            var dr = 1.0 - radius;
             if (px >= 0)
             {
-                if (x + radius >= 1.0)
+                if (x >= dr)
                 {
                     px = 0;
                 }
             }
             else
             {
-                if (x - radius <= -1.0)
+                if (x <= -dr)
                 {
                     px = 0;
                 }
@@ -86,14 +92,14 @@ namespace DarkDefenders.Domain.Worlds
 
             if (py >= 0)
             {
-                if (y + radius >= 1.0)
+                if (y >= dr)
                 {
                     py = 0;
                 }
             }
             else
             {
-                if (y - radius <= 0.0)
+                if (y <= radius)
                 {
                     py = 0;
                 }
@@ -109,10 +115,11 @@ namespace DarkDefenders.Domain.Worlds
             var x = position.X;
             var y = position.Y;
 
-            return x + radius >=  1.0 
-                || x - radius <= -1.0 
-                || y + radius >=  1.0 
-                || y - radius <=  0.0;
+            var dr = 1.0 - radius;
+            return x >=  dr 
+                || x <= -dr 
+                || y >=  dr 
+                || y <=  radius;
         }
 
         public void Recieve(WorldTimeUpdated worldTimeUpdated)

@@ -20,7 +20,7 @@ namespace DarkDefenders.Domain.RigidBodies
 
             var newMomentum = GetNewMomentum(elapsedSeconds);
 
-            if (newMomentum == _momentum)
+            if (newMomentum.Equals(_momentum))
             {
                 yield break;
             }
@@ -32,7 +32,7 @@ namespace DarkDefenders.Domain.RigidBodies
         {
             var elapsedSeconds = _world.ElapsedSeconds;
 
-            if (_momentum == Vector.Zero)
+            if (_momentum.EqualsZero())
             {
                 yield break;
             }
@@ -44,7 +44,7 @@ namespace DarkDefenders.Domain.RigidBodies
 
         public IEnumerable<IEvent> AddMomentum(Vector additionalMomentum)
         {
-            if (additionalMomentum == Vector.Zero)
+            if (additionalMomentum.EqualsZero())
             {
                 yield break;
             }
@@ -56,7 +56,7 @@ namespace DarkDefenders.Domain.RigidBodies
 
         public IEnumerable<IEvent> SetExternalForce(Vector force)
         {
-            if (_externalForce == force)
+            if (_externalForce.Equals(force))
             {
                 yield break;
             }
@@ -133,9 +133,9 @@ namespace DarkDefenders.Domain.RigidBodies
 
             var newMomentum = _momentum;
 
-            if (force != Vector.Zero)
+            if (force.NotEqualsZero())
             {
-                newMomentum = _momentum + force*elapsedSeconds;
+                newMomentum += force * elapsedSeconds;
 
                 newMomentum = LimitTopMomentum(newMomentum);
             }
@@ -154,14 +154,14 @@ namespace DarkDefenders.Domain.RigidBodies
                 return externalForce + _world.GetGravityForce(_mass);
             }
 
-            if (externalForce != Vector.Zero)
+            if (externalForce.EqualsZero())
             {
-                return externalForce;
+                var maxForce = -_momentum.X/elapsedSeconds;
+
+                return externalForce + GetFrictionForce(maxForce);
             }
 
-            var maxForce = -_momentum.X / elapsedSeconds;
-
-            return externalForce + GetFrictionForce(maxForce);
+            return externalForce;
         }
 
         private static Vector LimitTopMomentum(Vector momentum)

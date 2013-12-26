@@ -9,7 +9,6 @@ namespace Infrastructure.DDDES
         void ProcessAll<TRoot>(Func<TRoot, IEnumerable<IEvent>> command);
         void Create<TRootFactory>(Func<TRootFactory, IEnumerable<IEvent>> creation);
 
-
         IRootCommandProcessor<TRoot> GetProcessorFor<TRoot>();
     }
 }

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Infrastructure.Util
 {
@@ -85,44 +87,78 @@ namespace Infrastructure.Util
         /// </summary>
         public static IEnumerable<IGrouping<TKey, TElement>> GroupAdjacentFast<TKey, TElement>(this IEnumerable<TElement> enumerable, Func<TElement, TKey> keySelector)
         {
-            using (var iterator = enumerable.GetIterator())
+            using (var enumerator = enumerable.GetEnumerator())
             {
-                iterator.MoveNext();
-                while (iterator.IsNotFinished)
+                if (!enumerator.MoveNext())
                 {
-                    var key = keySelector(iterator.Current);
-                    var grouping = new FastGrouping<TKey, TElement>(key, iterator, keySelector);
+                    yield break;
+                }
+
+                var value = enumerator.Current;
+                var key = keySelector(value);
+
+                while (true)
+                {
+                    var grouping = new FastGrouping<TKey, TElement>(value, key, enumerator, keySelector);
 
                     yield return grouping;
 
-                    grouping.AssertFinished();
+                    if (grouping.IsEnumeratorFinished())
+                    {
+                        yield break;
+                    }
+
+                    grouping.AssertGroupFinished();
+
+                    key = grouping.GetNextKey();
+                    value = grouping.GetNextValue();
                 }
             }
         }
 
         private class FastGrouping<TKey, TElement> : IGrouping<TKey, TElement>
         {
-            private readonly Iterator<TElement> _iterator;
+            private readonly TElement _firstValue;
+            private readonly IEnumerator<TElement> _enumerator;
             private readonly Func<TElement, TKey> _keySelector;
-            private bool _isFinished;
+            private bool _groupFinished;
+            private bool _enumeratorFinished;
+            private TKey _nextKey;
+            private TElement _nextValue;
 
-            public FastGrouping(TKey key, Iterator<TElement> iterator, Func<TElement, TKey> keySelector)
+            public FastGrouping(TElement firstValue, TKey key, IEnumerator<TElement> enumerator, Func<TElement, TKey> keySelector)
             {
                 Key = key;
-                _iterator = iterator;
+                _firstValue = firstValue;
+                _enumerator = enumerator;
                 _keySelector = keySelector;
             }
 
             public IEnumerator<TElement> GetEnumerator()
             {
-                yield return _iterator.Current;
+                yield return _firstValue;
 
-                while (_iterator.MoveNext() && _keySelector(_iterator.Current).Equals(Key))
+                while (true)
                 {
-                    yield return _iterator.Current;
+                    if (!_enumerator.MoveNext())
+                    {
+                        _enumeratorFinished = true;
+                        yield break;
+                    }
+
+                    var nextValue = _enumerator.Current;
+                    var newKey = _keySelector(nextValue);
+                    if (!newKey.Equals(Key))
+                    {
+                        _nextKey = newKey;
+                        _nextValue = nextValue;
+                        _groupFinished = true;
+                        yield break;
+                    }
+
+                    yield return nextValue;
                 }
 
-                _isFinished = true;
             }
 
             IEnumerator IEnumerable.GetEnumerator()
@@ -132,12 +168,31 @@ namespace Infrastructure.Util
 
             public TKey Key { get; private set; }
 
-            public void AssertFinished()
+            [Conditional("DEBUG")]
+            public void AssertGroupFinished()
             {
-                if (!_isFinished)
+                if (!_groupFinished)
                 {
                     throw new InvalidOperationException("Immediate enumeration of groups is required");
                 }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public bool IsEnumeratorFinished()
+            {
+                return _enumeratorFinished;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public TKey GetNextKey()
+            {
+                return _nextKey;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public TElement GetNextValue()
+            {
+                return _nextValue;
             }
         }
     }
