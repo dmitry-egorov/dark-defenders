@@ -1,9 +1,11 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using Infrastructure.Util;
 
 namespace Infrastructure.Math
 {
-    public struct Map
+    public struct Map<T>
+        where T: struct 
     {
         public Dimensions Dimensions
         {
@@ -13,10 +15,10 @@ namespace Infrastructure.Math
         public Map(Dimensions dimensions)
         {
             _dimensions = dimensions;
-            _data = new byte[dimensions.Width * dimensions.Height];
+            _data = new T[dimensions.Width * dimensions.Height];
         }
 
-        public byte this[Point p]
+        public T this[Point p]
         {
             get
             {
@@ -28,19 +30,34 @@ namespace Infrastructure.Math
             }
         }
 
-        public byte this[int x, int y]
+        public T this[int x, int y]
         {
             get
             {
+                if (IsNotWithinDimensions(x, y))
+                {
+                    return default(T);
+                }
+
                 return _data[y*_dimensions.Width + x];
             }
             set
             {
+                if (IsNotWithinDimensions(x, y))
+                {
+                    throw new IndexOutOfRangeException();
+                }
+
                 _data[y*_dimensions.Width + x] = value;
             }
         }
 
-        public bool Equals(Map other)
+        private bool IsNotWithinDimensions(int x, int y)
+        {
+            return x >= _dimensions.Width || x < 0 || y >= _dimensions.Height || y < 0;
+        }
+
+        public bool Equals(Map<T> other)
         {
             return _dimensions.Equals(other._dimensions) && _data.AllEquals(other._data);
         }
@@ -48,7 +65,7 @@ namespace Infrastructure.Math
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
-            return obj is Map && Equals((Map) obj);
+            return obj is Map<T> && Equals((Map<T>) obj);
         }
 
         public override int GetHashCode()
@@ -60,6 +77,6 @@ namespace Infrastructure.Math
         }
 
         private readonly Dimensions _dimensions;
-        private readonly byte[] _data;
+        private readonly T[] _data;
     }
 }

@@ -37,7 +37,7 @@ namespace DarkDefenders.IntegrationTests
         {
             var spawnPosition = new Vector(0, 0);
             var dimensions = new Dimensions(10, 10);
-            var map = new Map(dimensions);
+            var map = new Map<Tile>(dimensions);
 
             var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRadius);
             var mass = Player.Mass;
@@ -62,7 +62,7 @@ namespace DarkDefenders.IntegrationTests
         {
             var spawnPosition = new Vector(0, 0);
             var dimensions = new Dimensions(10, 10);
-            var map = new Map(dimensions);
+            var map = new Map<Tile>(dimensions);
             var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRadius);
             var desiredOrientation = MovementForceDirection.Left;
             var mass = Player.Mass;
@@ -89,7 +89,7 @@ namespace DarkDefenders.IntegrationTests
         {
             var spawnPosition = new Vector(50, 0.5);
             var dimensions = new Dimensions(100, 100);
-            var map = new Map(dimensions);
+            var map = new Map<Tile>(dimensions);
             var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRadius);
             var desiredOrientation = MovementForceDirection.Left;
             var elapsed = TimeSpan.FromMilliseconds(20).TotalSeconds;
@@ -137,7 +137,7 @@ namespace DarkDefenders.IntegrationTests
             var spawnPosition = new Vector(0, 0);
             var worldId = new WorldId();
             var dimensions = new Dimensions(10, 10);
-            var map = new Map(dimensions);
+            var map = new Map<Tile>(dimensions);
 
             CreateWorld(worldId, map, spawnPosition);
 
@@ -166,7 +166,7 @@ namespace DarkDefenders.IntegrationTests
             return playerId;
         }
 
-        private WorldId CreateWorld(Map map, Vector spawnPosition)
+        private WorldId CreateWorld(Map<Tile> map, Vector spawnPosition)
         {
             var worldId = new WorldId();
 
@@ -175,7 +175,7 @@ namespace DarkDefenders.IntegrationTests
             return worldId;
         }
 
-        private void CreateWorld(WorldId worldId, Map map, Vector spawnPosition)
+        private void CreateWorld(WorldId worldId, Map<Tile> map, Vector spawnPosition)
         {
             _commandProcessor.CreateAndCommit<WorldFactory>(f => f.Create(worldId, map, spawnPosition));
         }

@@ -5,6 +5,7 @@ using DarkDefenders.Console.ViewModels;
 using DarkDefenders.Domain;
 using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.Files;
+using DarkDefenders.Domain.Other;
 using DarkDefenders.Domain.Players;
 using DarkDefenders.Domain.Projectiles;
 using DarkDefenders.Domain.RigidBodies;
@@ -21,7 +22,9 @@ namespace DarkDefenders.Console
 //        private const int MaxFps = 30;
         private static readonly TimeSpan _minFrameElapsed = TimeSpan.FromSeconds(1.0 / MaxFps);
         private static readonly TimeSpan _playerStateUpdatePeriod = TimeSpan.FromSeconds(1.0 / 30);
-        private const string WorldFileName = "simpleWorld.txt";
+
+        private static readonly Vector _spawnPosition = new Vector(35, 5);
+        private const string WorldFileName = "world1.bmp";
 
         static void Main()
         {
@@ -83,22 +86,21 @@ namespace DarkDefenders.Console
         private static IRootAdapter<Player, IDomainEvent> InitializeDomain(ICommandProcessor<IDomainEvent> processor)
         {
             var worldId = new WorldId();
-            var spawnPosition = new Vector(50, 0.5);
             var playerId = new PlayerId();
             var map = LoadTerrain();
 
-            processor.CreateAndCommit<WorldFactory>(t => t.Create(worldId, map, spawnPosition));
+            processor.CreateAndCommit<WorldFactory>(t => t.Create(worldId, map, _spawnPosition));
             processor.CreateAndCommit<PlayerFactory>(p => p.Create(playerId, worldId));
 
             return processor.CreateRootAdapter<Player>(playerId);
         }
 
-        private static Map LoadTerrain()
+        private static Map<Tile> LoadTerrain()
         {
             var pathToFiles = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "WorldsData");
             var path = Path.Combine(pathToFiles, WorldFileName);
 
-            return TerrainLoader.LoadFromTextFile(path);
+            return TerrainLoader.LoadFromMonochromeBmp(path);
         }
 
         private static bool ProcessKeyboard(IRootAdapter<Player, IDomainEvent> player, IUnitOfWork unitOfWork)

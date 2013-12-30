@@ -1,4 +1,5 @@
 using DarkDefenders.Domain.Events;
+using DarkDefenders.Domain.Other;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
 using Infrastructure.Util;
@@ -7,10 +8,10 @@ namespace DarkDefenders.Domain.Worlds.Events
 {
     public class WorldCreated : EventBase<WorldId, WorldCreated>, IDomainEvent
     {
-        public Map Map { get; private set; }
+        public Map<Tile> Map { get; private set; }
         public Vector SpawnPosition { get; private set; }
 
-        public WorldCreated(WorldId worldId, Map map, Vector spawnPosition)
+        public WorldCreated(WorldId worldId, Map<Tile> map, Vector spawnPosition)
             : base(worldId)
         {
             Map = map;

@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using DarkDefenders.Domain.Other;
 using DarkDefenders.Domain.RigidBodies.Events;
 using Infrastructure.Math;
 
@@ -9,10 +10,10 @@ namespace DarkDefenders.Console.ViewModels
     {
         private Point _transformedLastPosition;
         private char? _character;
-        private readonly Map _map;
+        private readonly Map<Tile> _map;
         private Point _lastPosition;
 
-        public RigidBodyViewModel(Map map)
+        public RigidBodyViewModel(Map<Tile> map)
         {
             _map = map;
         }
@@ -33,6 +34,7 @@ namespace DarkDefenders.Console.ViewModels
         {
             var position = rigidBodyCreated.BoundingCircle.Position;
             var point = position.ToPoint();
+
             _lastPosition = point;
             _transformedLastPosition = Transform(point);
         }
@@ -61,7 +63,7 @@ namespace DarkDefenders.Console.ViewModels
 
         public void Remove()
         {
-            var c = _map[_lastPosition] == 1 ? '+' : ' ';
+            var c = _map[_lastPosition] == Tile.Solid ? '?' : ' ';
 
             ConsoleRenderer.Render(_transformedLastPosition, c);
         }

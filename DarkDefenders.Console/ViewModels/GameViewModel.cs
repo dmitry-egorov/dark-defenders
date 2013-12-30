@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Globalization;
 using DarkDefenders.Domain.Events;
+using DarkDefenders.Domain.Other;
 using DarkDefenders.Domain.Players.Events;
 using DarkDefenders.Domain.Projectiles.Events;
 using DarkDefenders.Domain.RigidBodies;
@@ -161,7 +162,7 @@ namespace DarkDefenders.Console.ViewModels
             {
                 for (var j = 0; j < height; j++)
                 {
-                    if (_map[i, j] == 1)
+                    if (_map[i, j] == Tile.Solid)
                     {
                         ConsoleRenderer.Render(new Point(i + 1, height - j), '+');
                     }
@@ -174,6 +175,6 @@ namespace DarkDefenders.Console.ViewModels
         private Vector _lastPlayerMomentum = Vector.Zero;
         private Vector _lastPlayerPosition = Vector.Zero;
         private RigidBodyId _playerRigidBodyId;
-        private Map _map;
+        private Map<Tile> _map;
     }
 }

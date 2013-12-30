@@ -42,6 +42,7 @@
     <Compile Include="ArgumentAssertionExtensions.cs" />
     <Compile Include="DecimalExtensions.cs" />
     <Compile Include="DictionaryExtensions.cs" />
+    <Compile Include="DoubleExtensions.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="Iterator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

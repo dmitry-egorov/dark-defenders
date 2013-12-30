@@ -16,8 +16,6 @@ namespace DarkDefenders.Domain.RigidBodies
 
         public Vector Position { get { return _boundingCircle.Position; } }
 
-        public double Radius { get { return _boundingCircle.Radius; } }
-
         public IEnumerable<IDomainEvent> UpdateMomentum()
         {
             var elapsedSeconds = _world.ElapsedSeconds;
@@ -137,7 +135,7 @@ namespace DarkDefenders.Domain.RigidBodies
 
             var newCircle = _boundingCircle.ChangePosition(newPosition);
 
-            return _world.AdjustCirclePosition(newCircle);
+            return _world.LimitPosition(newCircle);
         }
 
         private Vector GetNewMomentum(double elapsedSeconds)

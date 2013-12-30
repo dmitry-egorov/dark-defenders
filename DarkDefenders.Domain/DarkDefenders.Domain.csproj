@@ -37,6 +37,7 @@
     <Compile Include="Configurator.cs" />
     <Compile Include="Events\IDomainEvent.cs" />
     <Compile Include="Events\IDomainEventReciever.cs" />
+    <Compile Include="Other\Tile.cs" />
     <Compile Include="Players\Events\PlayerFired.cs" />
     <Compile Include="Projectiles\Events\ProjectileDestroyed.cs" />
     <Compile Include="Other\Direction.cs" />

@@ -24,14 +24,14 @@ namespace DarkDefenders.Domain.Worlds
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsInTheAir(Circle boundingCircle)
+        public bool IsInTheAir(Circle circle)
         {
-            return boundingCircle.IsAboveHorizontalAxis();
+            return _terrain.IsInTheAir(circle);
         }
 
-        public Vector AdjustCirclePosition(Circle circle)
+        public Vector LimitPosition(Circle circle)
         {
-            return _terrain.AdjustCirclePosition(circle);
+            return _terrain.LimitPosition(circle);
         }
 
         public Vector LimitMomentum(Vector momentum, Circle boundingCircle)

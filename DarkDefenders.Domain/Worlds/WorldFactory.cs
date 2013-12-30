@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using DarkDefenders.Domain.Events;
+using DarkDefenders.Domain.Other;
 using DarkDefenders.Domain.Worlds.Events;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
@@ -14,7 +15,7 @@ namespace DarkDefenders.Domain.Worlds
         {
         }
 
-        public IEnumerable<IDomainEvent> Create(WorldId worldId, Map map, Vector spawnPosition)
+        public IEnumerable<IDomainEvent> Create(WorldId worldId, Map<Tile> map, Vector spawnPosition)
         {
             AssertDoesntExist(worldId);
             return new WorldCreated(worldId, map, spawnPosition).EnumerateOnce();

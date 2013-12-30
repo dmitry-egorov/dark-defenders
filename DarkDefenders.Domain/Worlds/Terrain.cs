@@ -1,12 +1,14 @@
-﻿using Infrastructure.Math;
+﻿using DarkDefenders.Domain.Other;
+using Infrastructure.Math;
+using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.Worlds
 {
     internal class Terrain
     {
-        private readonly Map _map;
+        private readonly Map<Tile> _map;
 
-        public Terrain(Map map)
+        public Terrain(Map<Tile> map)
         {
             _map = map;
         }
@@ -16,43 +18,31 @@ namespace DarkDefenders.Domain.Worlds
             var px = momentum.X;
             var py = momentum.Y;
 
-            var position = boundingCircle.Position;
-            var x = position.X;
-            var y = position.Y;
-
-            var radius = boundingCircle.Radius;
-
-            var dimensions = _map.Dimensions;
-            var lx = dimensions.Width;
-            var ly = dimensions.Height;
-
-            var dx = lx - radius;
-            if (px >= 0)
+            if (px > 0)
             {
-                if (x >= dx)
+                if (IsFacingAWallToTheRight(boundingCircle))
                 {
                     px = 0;
                 }
             }
-            else
+            else if (px < 0)
             {
-                if (x <= radius)
+                if (IsFacingAWallToTheLeft(boundingCircle))
                 {
                     px = 0;
                 }
             }
 
-            var dy = ly - radius;
-            if (py >= 0)
+            if (py > 0)
             {
-                if (y >= dy)
+                if (IsAbutingTheCeiling(boundingCircle))
                 {
                     py = 0;
                 }
             }
-            else
+            else if (py < 0)
             {
-                if (y <= radius)
+                if (IsStandingOnTheGround(boundingCircle))
                 {
                     py = 0;
                 }
@@ -63,54 +53,83 @@ namespace DarkDefenders.Domain.Worlds
 
         public bool IsAdjacentToAWall(Circle circle)
         {
-            var position = circle.Position;
-            var radius = circle.Radius;
-            var x = position.X;
-            var y = position.Y;
-
-            var dimensions = _map.Dimensions;
-
-            var dx = dimensions.Width - radius;
-            var dy = dimensions.Height - radius;
-            return x >= dx
-                || x <= radius
-                || y >= dy
-                || y <= radius;
+            return IsFacingAWallToTheRight(circle)
+                || IsFacingAWallToTheLeft(circle)
+                || IsAbutingTheCeiling(circle)
+                || IsStandingOnTheGround(circle);
         }
 
-        public Vector AdjustCirclePosition(Circle circle)
+        public Vector LimitPosition(Circle circle)
         {
             var position = circle.Position;
             var radius = circle.Radius;
             var x = position.X;
             var y = position.Y;
             
-            var dimensions = _map.Dimensions;
-            var lx = dimensions.Width;
-            var ly = dimensions.Height;
-
-            var dx = lx - radius;
-
-            if (x > dx)
+            if (IsFacingAWallToTheRight(circle))
             {
-                x = dx;
+                x = ((x + radius).Floor() - radius);
             }
-            else if (x < radius)
+            if (IsFacingAWallToTheLeft(circle))
             {
-                x = radius;
+                x = ((x - radius).PrevInteger() + 1.0 + radius);
             }
 
-            var dy = ly - radius;
-            if (y > dy)
+            if (IsAbutingTheCeiling(circle))
             {
-                y = dy;
+                y = ((y + radius).Floor() - radius);
             }
-            else if (y < radius)
+            if (IsStandingOnTheGround(circle))
             {
-                y = radius;
+                y = ((y - radius).PrevInteger() + 1.0 + radius);
             }
 
             return Vector.XY(x, y);
+        }
+
+        public bool IsInTheAir(Circle circle)
+        {
+            return !IsStandingOnTheGround(circle);
+        }
+
+        private bool IsStandingOnTheGround(Circle circle)
+        {
+            var bottom = circle.Position.Y - circle.Radius;
+
+            var x = circle.Position.X.ToInt();
+            var y = bottom.PrevInteger().ToInt();
+
+            return bottom <= 0.0 || _map[x, y] == Tile.Solid;
+        }
+
+        private bool IsAbutingTheCeiling(Circle circle)
+        {
+            var top = circle.Position.Y + circle.Radius;
+
+            var x = circle.Position.X.ToInt();
+            var y = top.Floor().ToInt();
+
+            return _map[x, y] == Tile.Solid;
+        }
+
+        private bool IsFacingAWallToTheLeft(Circle circle)
+        {
+            var left = circle.Position.X - circle.Radius;
+
+            var x = left.PrevInteger().ToInt();
+            var y = circle.Position.Y.ToInt();
+
+            return _map[x, y] == Tile.Solid;
+        }
+
+        private bool IsFacingAWallToTheRight(Circle circle)
+        {
+            var right = circle.Position.X + circle.Radius;
+
+            var x = right.Floor().ToInt();
+            var y = circle.Position.Y.ToInt();
+
+            return _map[x, y] == Tile.Solid;
         }
     }
 }
