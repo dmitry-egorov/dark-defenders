@@ -1,6 +1,4 @@
-using DarkDefenders.Domain.RigidBodies.Events;
-
-namespace DarkDefenders.Domain.RigidBodies
+namespace DarkDefenders.Domain.RigidBodies.Events
 {
     public interface IRigidBodyEventsReciever
     {

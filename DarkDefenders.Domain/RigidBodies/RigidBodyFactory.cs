@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.RigidBodies.Events;
 using DarkDefenders.Domain.Worlds;
 using Infrastructure.DDDES;
@@ -17,7 +18,7 @@ namespace DarkDefenders.Domain.RigidBodies
             _worldRepository = worldRepository;
         }
 
-        public IEnumerable<IEvent> CreateRigidBody(RigidBodyId id, WorldId worldId, Vector position, double radius, Vector initialMomentum, double mass)
+        public IEnumerable<IDomainEvent> CreateRigidBody(RigidBodyId id, WorldId worldId, Vector position, double radius, Vector initialMomentum, double mass)
         {
             AssertDoesntExist(id);
             

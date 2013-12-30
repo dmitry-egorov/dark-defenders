@@ -2,8 +2,8 @@ using System.Collections.Generic;
 
 namespace Infrastructure.DDDES
 {
-    public interface IEventsLinstener
+    public interface IEventsLinstener<in TDomainEvent>
     {
-        void Recieve(IEnumerable<IEvent> events);
+        void Recieve(IEnumerable<TDomainEvent> events);
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using DarkDefenders.Domain;
+using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.Other;
 using DarkDefenders.Domain.Players;
 using DarkDefenders.Domain.Players.Events;
@@ -22,7 +23,7 @@ namespace DarkDefenders.IntegrationTests
     public class MainIntegrationTest
     {
         private TestEventListener _eventListener;
-        private ICommandProcessor _commandProcessor;
+        private ICommandProcessor<IDomainEvent> _commandProcessor;
 
         [SetUp]
         public void SetUp()
@@ -43,7 +44,7 @@ namespace DarkDefenders.IntegrationTests
             var playerId = CreatePlayer(worldId);
             var rigidBodyId = FindRigidBodyId();
 
-            var expectedEvents = new IEvent[]
+            var expectedEvents = new IDomainEvent[]
             {
                 new WorldCreated(worldId, dimensions, spawnPosition), 
                 new RigidBodyCreated(rigidBodyId, worldId, boundingCircle, Vector.Zero, mass),
@@ -68,7 +69,7 @@ namespace DarkDefenders.IntegrationTests
 
             MovePlayerLeft(playerId);
 
-            var expectedEvents = new IEvent[]
+            var expectedEvents = new IDomainEvent[]
             {
                 new WorldCreated(worldId, dimensions, spawnPosition), 
                 new RigidBodyCreated(rigidBodyId, worldId, boundingCircle, Vector.Zero, mass),
@@ -98,7 +99,7 @@ namespace DarkDefenders.IntegrationTests
             MovePlayerLeft(playerId);
             UpdateAll(elapsed);
 
-            var expectedEvents = new IEvent[]
+            var expectedEvents = new IDomainEvent[]
             {
                 new WorldCreated(worldId, dimensions, spawnPosition), 
                 new RigidBodyCreated(rigidBodyId, worldId, boundingCircle, Vector.Zero, mass),
@@ -180,25 +181,25 @@ namespace DarkDefenders.IntegrationTests
             _commandProcessor.ProcessAndCommit<Player>(playerId, player => player.MoveLeft());
         }
 
-        private static ICommandProcessor CreateBus(TestEventListener testEventListener)
+        private static ICommandProcessor<IDomainEvent> CreateBus(TestEventListener testEventListener)
         {
-            var processor = new CommandProcessor(testEventListener);
+            var processor = new CommandProcessor<IDomainEvent>(testEventListener);
 
             processor.ConfigureDomain();
 
             return processor;
         }
 
-        public class TestEventListener: IEventsLinstener
+        private class TestEventListener : IEventsLinstener<IDomainEvent>
         {
-            private readonly List<IEvent> _allEvents = new List<IEvent>();
+            private readonly List<IDomainEvent> _allEvents = new List<IDomainEvent>();
 
-            public void AssertEvents(IEnumerable<IEvent> expectedEvents)
+            public void AssertEvents(IEnumerable<IDomainEvent> expectedEvents)
             {
                 CollectionAssert.AreEqual(expectedEvents.AsReadOnly(), _allEvents.AsReadOnly());
             }
 
-            public void Recieve(IEnumerable<IEvent> events)
+            public void Recieve(IEnumerable<IDomainEvent> events)
             {
                 var readOnly = events.AsReadOnly();
 

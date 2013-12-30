@@ -1,6 +1,4 @@
-using DarkDefenders.Domain.Worlds.Events;
-
-namespace DarkDefenders.Domain.Worlds
+namespace DarkDefenders.Domain.Worlds.Events
 {
     public interface IWorldEventsReciever
     {

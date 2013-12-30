@@ -11,7 +11,7 @@ using Infrastructure.Math;
 
 namespace DarkDefenders.Console.ViewModels
 {
-    internal class GameViewModel : IEventsLinstener, IDomainEventReciever
+    internal class GameViewModel : IEventsLinstener<IDomainEvent>, IDomainEventReciever
     {
         public static GameViewModel InitializeNew()
         {
@@ -36,11 +36,11 @@ namespace DarkDefenders.Console.ViewModels
             System.Console.CursorVisible = false;
         }
 
-        public void Recieve(IEnumerable<IEvent> events)
+        public void Recieve(IEnumerable<IDomainEvent> events)
         {
             foreach (var domainEvent in events)
             {
-                ((IDomainEvent)domainEvent).Accept(this);
+                domainEvent.Accept(this);
             }
         }
 

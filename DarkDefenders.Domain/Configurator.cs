@@ -1,4 +1,5 @@
-﻿using DarkDefenders.Domain.Players;
+﻿using DarkDefenders.Domain.Events;
+using DarkDefenders.Domain.Players;
 using DarkDefenders.Domain.Players.Events;
 using DarkDefenders.Domain.Projectiles;
 using DarkDefenders.Domain.Projectiles.Events;
@@ -13,7 +14,7 @@ namespace DarkDefenders.Domain
 {
     public static class Configurator
     {
-        public static void ConfigureDomain(this CommandProcessor processor)
+        public static void ConfigureDomain(this CommandProcessor<IDomainEvent> processor)
         {
             var worldRepository = new Repository<WorldId, World>();
             var rigidBodyRepository = new Repository<RigidBodyId, RigidBody>();

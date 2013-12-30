@@ -44,7 +44,10 @@
     <Compile Include="Domain\Repository.cs" />
     <Compile Include="Domain\RootBase.cs" />
     <Compile Include="CountingEventsListener.cs" />
+    <Compile Include="Internal\IRootCommandProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Internal\AllRootsToProcessorAdapter.cs" />
+    <Compile Include="Internal\RootToProcessorAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Infrastructure.DDDES\Infrastructure.DDDES.csproj">

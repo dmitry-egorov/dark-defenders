@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 using DarkDefenders.Console.ViewModels;
 using DarkDefenders.Domain;
+using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.Players;
 using DarkDefenders.Domain.Projectiles;
 using DarkDefenders.Domain.RigidBodies;
@@ -23,17 +24,17 @@ namespace DarkDefenders.Console
         {
             var renderer = GameViewModel.InitializeNew();
 
-            var countingListener = new CountingEventsListener();
+            var countingListener = new CountingEventsListener<IDomainEvent>();
 
-            var composite = new CompositeEventsListener(renderer, countingListener);
+            var composite = new CompositeEventsListener<IDomainEvent>(renderer, countingListener);
 
             var processor = CreateProcessor(composite);
 
             var player = InitializeDomain(processor);
-            var players = processor.Create<Player>();
-            var rigidBodies = processor.Create<RigidBody>();
-            var worlds = processor.Create<World>();
-            var projectiles = processor.Create<Projectile>();
+            var players = processor.CreateRootsAdapter<Player>();
+            var rigidBodies = processor.CreateRootsAdapter<RigidBody>();
+            var worlds = processor.CreateRootsAdapter<World>();
+            var projectiles = processor.CreateRootsAdapter<Projectile>();
 
             var fpsCounter = new PerformanceCounter();
             var eventsCounter = new PerformanceCounter();
@@ -64,16 +65,16 @@ namespace DarkDefenders.Console
             }
         }
 
-        private static ICommandProcessor CreateProcessor(IEventsLinstener eventsLinstener)
+        private static ICommandProcessor<IDomainEvent> CreateProcessor(IEventsLinstener<IDomainEvent> eventsLinstener)
         {
-            var processor = new CommandProcessor(eventsLinstener);
+            var processor = new CommandProcessor<IDomainEvent>(eventsLinstener);
 
             processor.ConfigureDomain();
 
             return processor;
         }
 
-        private static RootToProcessorAdapter<Player> InitializeDomain(ICommandProcessor processor)
+        private static IRootAdapter<Player, IDomainEvent> InitializeDomain(ICommandProcessor<IDomainEvent> processor)
         {
             var worldId = new WorldId();
             var spawnPosition = new Vector(0, 0.05);
@@ -83,10 +84,10 @@ namespace DarkDefenders.Console
             processor.CreateAndCommit<WorldFactory>(t => t.Create(worldId, dimensions, spawnPosition));
             processor.CreateAndCommit<PlayerFactory>(p => p.Create(playerId, worldId));
 
-            return new RootToProcessorAdapter<Player>(playerId, processor);
+            return processor.CreateRootAdapter<Player>(playerId);
         }
 
-        private static bool ProcessKeyboard(RootToProcessorAdapter<Player> player, IUnitOfWork unitOfWork)
+        private static bool ProcessKeyboard(IRootAdapter<Player, IDomainEvent> player, IUnitOfWork unitOfWork)
         {
             var leftIsPressed = NativeKeyboard.IsKeyDown(Keys.Left);
             var rightIsPressed = NativeKeyboard.IsKeyDown(Keys.Right);

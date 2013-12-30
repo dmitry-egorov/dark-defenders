@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Infrastructure.DDDES.Implementations
 {
-    public class CountingEventsListener: IEventsLinstener
+    public class CountingEventsListener<TDomainEvent> : IEventsLinstener<TDomainEvent>
     {
         private long _totalCount;
         private long _lastCount;
@@ -21,7 +21,7 @@ namespace Infrastructure.DDDES.Implementations
             }
         }
 
-        public void Recieve(IEnumerable<IEvent> events)
+        public void Recieve(IEnumerable<TDomainEvent> events)
         {
             _totalCount += events.Count();
         }

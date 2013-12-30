@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.Other;
 using DarkDefenders.Domain.Players.Events;
 using DarkDefenders.Domain.Projectiles;
@@ -16,28 +17,28 @@ namespace DarkDefenders.Domain.Players
         public const double BoundingCircleRadius = 1.0 / 40.0;
         public const double Mass = 1.0;
 
-        public IEnumerable<IEvent> MoveLeft()
+        public IEnumerable<IDomainEvent> MoveLeft()
         {
             var events = SetMovementForce(MovementForceDirection.Left);
 
             foreach (var e in events) { yield return e; }
         }
 
-        public IEnumerable<IEvent> MoveRight()
+        public IEnumerable<IDomainEvent> MoveRight()
         {
             var events = SetMovementForce(MovementForceDirection.Right);
 
             foreach (var e in events) { yield return e; }
         }
 
-        public IEnumerable<IEvent> Stop()
+        public IEnumerable<IDomainEvent> Stop()
         {
             var events = SetMovementForce(MovementForceDirection.Stop);
 
             foreach (var e in events) { yield return e; }
         }
 
-        public IEnumerable<IEvent> Jump()
+        public IEnumerable<IDomainEvent> Jump()
         {
             if (CantJump())
             {
@@ -47,7 +48,7 @@ namespace DarkDefenders.Domain.Players
             foreach (var e in AddJumpMomentum()) { yield return e; }
         }
 
-        public IEnumerable<IEvent> Fire()
+        public IEnumerable<IDomainEvent> Fire()
         {
             if (FireDelayInEffect())
             {
@@ -61,7 +62,7 @@ namespace DarkDefenders.Domain.Players
             yield return new PlayerFired(Id, _world.TimeSeconds);
         }
 
-        public IEnumerable<IEvent> ApplyMovementForce()
+        public IEnumerable<IDomainEvent> ApplyMovementForce()
         {
             var events = SetMovementForceToRigidBody();
 
@@ -97,12 +98,12 @@ namespace DarkDefenders.Domain.Players
             return _rigidBody.IsInTheAir() || _rigidBody.HasVerticalMomentum();
         }
 
-        private IEnumerable<IEvent> AddJumpMomentum()
+        private IEnumerable<IDomainEvent> AddJumpMomentum()
         {
             return _rigidBody.AddMomentum(_jumpMomentum);
         }
 
-        private IEnumerable<IEvent> SetMovementForceToRigidBody()
+        private IEnumerable<IDomainEvent> SetMovementForceToRigidBody()
         {
             var force = GetMovementForce();
 
@@ -127,7 +128,7 @@ namespace DarkDefenders.Domain.Players
             }
         }
 
-        private IEnumerable<IEvent> SetMovementForce(MovementForceDirection movementForceDirection)
+        private IEnumerable<IDomainEvent> SetMovementForce(MovementForceDirection movementForceDirection)
         {
             if (_movementForceDirection != movementForceDirection)
             {
@@ -166,7 +167,7 @@ namespace DarkDefenders.Domain.Players
             }
         }
 
-        private IEnumerable<IEvent> CreateProjectile()
+        private IEnumerable<IDomainEvent> CreateProjectile()
         {
             var projectilePosition = GetProjectilePosition();
 

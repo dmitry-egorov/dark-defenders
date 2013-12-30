@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.Projectiles.Events;
 using DarkDefenders.Domain.RigidBodies;
-using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
 
@@ -15,7 +15,7 @@ namespace DarkDefenders.Domain.Projectiles
         public static readonly Vector LeftMomentum = Vector.XY(-Momentum, 0);
         public static readonly Vector RightMomentum = Vector.XY(Momentum, 0);
 
-        public IEnumerable<IEvent> CheckForHit()
+        public IEnumerable<IDomainEvent> CheckForHit()
         {
             if (!IsHit())
             {

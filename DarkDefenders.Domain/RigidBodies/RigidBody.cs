@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.RigidBodies.Events;
 using DarkDefenders.Domain.Worlds;
-using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
 
@@ -14,7 +14,7 @@ namespace DarkDefenders.Domain.RigidBodies
 
         public double Radius { get { return _boundingCircle.Radius; } }
 
-        public IEnumerable<IEvent> UpdateMomentum()
+        public IEnumerable<IDomainEvent> UpdateMomentum()
         {
             var elapsedSeconds = _world.ElapsedSeconds;
 
@@ -28,7 +28,7 @@ namespace DarkDefenders.Domain.RigidBodies
             yield return new Accelerated(Id, newMomentum);
         }
 
-        public IEnumerable<IEvent> UpdatePosition()
+        public IEnumerable<IDomainEvent> UpdatePosition()
         {
             var elapsedSeconds = _world.ElapsedSeconds;
 
@@ -42,7 +42,7 @@ namespace DarkDefenders.Domain.RigidBodies
             yield return new Moved(Id, newPosition);
         }
 
-        public IEnumerable<IEvent> AddMomentum(Vector additionalMomentum)
+        public IEnumerable<IDomainEvent> AddMomentum(Vector additionalMomentum)
         {
             if (additionalMomentum.EqualsZero())
             {
@@ -54,7 +54,7 @@ namespace DarkDefenders.Domain.RigidBodies
             yield return new Accelerated(Id, newMomentum);
         }
 
-        public IEnumerable<IEvent> SetExternalForce(Vector force)
+        public IEnumerable<IDomainEvent> SetExternalForce(Vector force)
         {
             if (_externalForce.Equals(force))
             {
@@ -86,7 +86,7 @@ namespace DarkDefenders.Domain.RigidBodies
             return _world.IsAdjacentToAWall(_boundingCircle);
         }
 
-        public IEnumerable<IEvent> Destroy()
+        public IEnumerable<IDomainEvent> Destroy()
         {
             yield return new RigidBodyDestroyed(Id);
         }
