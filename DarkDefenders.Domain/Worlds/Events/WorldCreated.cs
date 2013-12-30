@@ -7,13 +7,13 @@ namespace DarkDefenders.Domain.Worlds.Events
 {
     public class WorldCreated : EventBase<WorldId, WorldCreated>, IDomainEvent
     {
-        public Dimensions Dimensions { get; private set; }
+        public Map Map { get; private set; }
         public Vector SpawnPosition { get; private set; }
 
-        public WorldCreated(WorldId worldId, Dimensions dimensions, Vector spawnPosition)
+        public WorldCreated(WorldId worldId, Map map, Vector spawnPosition)
             : base(worldId)
         {
-            Dimensions = dimensions;
+            Map = map;
             SpawnPosition = spawnPosition;
         }
 
@@ -24,12 +24,13 @@ namespace DarkDefenders.Domain.Worlds.Events
 
         protected override bool EventEquals(WorldCreated other)
         {
-            return Dimensions.Equals(other.Dimensions) && SpawnPosition.Equals(other.SpawnPosition);
+            return Map.Equals(other.Map)
+                && SpawnPosition.Equals(other.SpawnPosition);
         }
 
         protected override int GetEventHashCode()
         {
-            return (Dimensions.GetHashCode() * 397) ^ SpawnPosition.GetHashCode();
+            return (Map.GetHashCode() * 397) ^ SpawnPosition.GetHashCode();
         }
 
         public void Accept(IDomainEventReciever reciever)

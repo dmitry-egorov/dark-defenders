@@ -16,11 +16,11 @@ namespace Infrastructure.DDDES.Implementations
 
         private readonly Queue<TDomainEvent> _commitQueue = new Queue<TDomainEvent>();
 
-        private readonly IEventsLinstener<TDomainEvent> _eventsLinstener;
+        private readonly IEventsListener<TDomainEvent> _eventsListener;
 
-        public CommandProcessor(IEventsLinstener<TDomainEvent> eventsLinstener)
+        public CommandProcessor(IEventsListener<TDomainEvent> eventsListener)
         {
-            _eventsLinstener = eventsLinstener;
+            _eventsListener = eventsListener;
         }
 
         public void RegisterRoot<TRootId, TRoot, TRootEvent, TRootFactory, TCreatedEvent>(Repository<TRootId, TRoot> repository, TRootFactory factory)
@@ -117,7 +117,7 @@ namespace Infrastructure.DDDES.Implementations
                 applier.Apply(id, grouping);
             }
 
-            _eventsLinstener.Recieve(events);
+            _eventsListener.Recieve(events);
 
             _commitQueue.Clear();
         }

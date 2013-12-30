@@ -32,10 +32,12 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Circle.cs" />
     <Compile Include="Dimensions.cs" />
+    <Compile Include="Map.cs" />
     <Compile Include="Round.cs" />
     <Compile Include="Vector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

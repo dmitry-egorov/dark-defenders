@@ -195,6 +195,16 @@ namespace Infrastructure.Util
                 return _nextValue;
             }
         }
+
+        public static bool AllEquals<T>(this IEnumerable<T> enumerable, IEnumerable<T> other)
+        {
+            return enumerable.Zip(other, (x, y) => x.Equals(y)).All(x => x);
+        }
+
+        public static int AllHashCode<T>(this IEnumerable<T> enumerable)
+        {
+            return enumerable.Aggregate(0, (hash, item) => (hash * 397) ^ item.GetHashCode());
+        }
     }
 
     

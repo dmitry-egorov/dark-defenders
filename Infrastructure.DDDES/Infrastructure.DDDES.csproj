@@ -34,13 +34,14 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EventsListenerExtensions.cs" />
     <Compile Include="ICommandProcessor.cs" />
     <Compile Include="IEntity.cs" />
     <Compile Include="IRootAdapter.cs" />
     <Compile Include="IRootFactory.cs" />
     <Compile Include="Identity.cs" />
     <Compile Include="IEvent.cs" />
-    <Compile Include="IEventsLinstener.cs" />
+    <Compile Include="IEventsListener.cs" />
     <Compile Include="IRepository.cs" />
     <Compile Include="IRoot.cs" />
     <Compile Include="IRootEvent.cs" />

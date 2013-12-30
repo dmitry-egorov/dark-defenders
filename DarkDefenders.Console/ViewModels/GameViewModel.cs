@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.Players.Events;
@@ -11,23 +12,16 @@ using Infrastructure.Math;
 
 namespace DarkDefenders.Console.ViewModels
 {
-    internal class GameViewModel : IEventsLinstener<IDomainEvent>, IDomainEventReciever
+    internal class GameViewModel : IEventsListener<IDomainEvent>, IDomainEventReciever
     {
-        public void Recieve(IEnumerable<IDomainEvent> events)
+        public void Recieve(IDomainEvent domainEvent)
         {
-            foreach (var domainEvent in events)
-            {
-                domainEvent.Accept(this);
-            }
+            domainEvent.Accept(this);
         }
 
         public void Recieve(WorldCreated worldCreated)
         {
-            var width = (int)worldCreated.Dimensions.Width;
-            var height = (int)worldCreated.Dimensions.Height;
-
-            _width = width;
-            _height = height;
+            _map = worldCreated.Map;
 
             SetViewPort();
             RenderWorld();
@@ -72,7 +66,7 @@ namespace DarkDefenders.Console.ViewModels
 
         public void Recieve(RigidBodyCreated rigidBodyCreated)
         {
-            var playerViewModel = new RigidBodyViewModel(_width, _height);
+            var playerViewModel = new RigidBodyViewModel(_map);
             _rigidBodyMap.Add(rigidBodyCreated.RootId, playerViewModel);
 
             playerViewModel.Recieve(rigidBodyCreated);
@@ -94,7 +88,7 @@ namespace DarkDefenders.Console.ViewModels
         {
             if (moved.RootId == _playerRigidBodyId)
             {
-                _lastPosition = moved.NewPosition;
+                _lastPlayerPosition = moved.NewPosition;
             }
 
             var viewModel = _rigidBodyMap[moved.RootId];
@@ -105,7 +99,7 @@ namespace DarkDefenders.Console.ViewModels
         {
             if (playerAccelerated.RootId == _playerRigidBodyId)
             {
-                _lastMomentum = playerAccelerated.NewMomentum;
+                _lastPlayerMomentum = playerAccelerated.NewMomentum;
             }
         }
 
@@ -116,7 +110,7 @@ namespace DarkDefenders.Console.ViewModels
         public void RenderFps(double fps, long totalFrames)
         {
             var fpsString = fps.ToString(CultureInfo.InvariantCulture);
-            ConsoleRenderer.RenderFloatRight(fpsString, 0, 8, _width + 2);
+            ConsoleRenderer.RenderFloatRight(fpsString, 0, 8, _map.Dimensions.Width + 2);
         }
 
         public void RenderAverageEventsCount(double averageEventsCount, long totalEvents)
@@ -134,42 +128,52 @@ namespace DarkDefenders.Console.ViewModels
 
         private void SetViewPort()
         {
-            ConsoleRenderer.SetViewPort(_width + 2, _height + 2);
+            ConsoleRenderer.SetViewPort(_map.Dimensions.Width + 2, _map.Dimensions.Height + 2);
         }
 
         private void RenderMovementForce(MovementForceDirectionChanged movementForceDirectionChanged)
         {
             var text = "d: " + movementForceDirectionChanged.MovementForceDirection;
-            ConsoleRenderer.RenderFloatRight(text, 3, 30, _width + 2);
+            ConsoleRenderer.RenderFloatRight(text, 3, 30, _map.Dimensions.Width + 2);
         }
 
         private void RenderPosition()
         {
-            ConsoleRenderer.RenderFloatRight("p: " + _lastPosition.ToString("0.0"), 1, 30, _width + 2);
+            ConsoleRenderer.RenderFloatRight("p: " + _lastPlayerPosition.ToString("0.0"), 1, 30, _map.Dimensions.Width + 2);
         }
 
         private void RenderMomentum()
         {
-            ConsoleRenderer.RenderFloatRight("v: " + _lastMomentum.ToString("0.0"), 2, 30, _width + 2);
+            ConsoleRenderer.RenderFloatRight("v: " + _lastPlayerMomentum.ToString("0.0"), 2, 30, _map.Dimensions.Width + 2);
         }
 
         private void RenderWorld()
         {
-            var width = _width;
-            var height = _height;
+            var width = _map.Dimensions.Width;
+            var height = _map.Dimensions.Height;
 
             ConsoleRenderer.RenderHorizontalLine(0, 1, width);
             ConsoleRenderer.RenderHorizontalLine(height + 1, 1, width);
             ConsoleRenderer.RenderVerticalLine(1, 0, height + 1);
             ConsoleRenderer.RenderVerticalLine(1, width + 1, height + 1);
+
+            for (var i = 0; i < width; i++)
+            {
+                for (var j = 0; j < height; j++)
+                {
+                    if (_map[i, j] == 1)
+                    {
+                        ConsoleRenderer.Render(new Point(i + 1, height - j), '+');
+                    }
+                }
+            }
         }
 
         private readonly Dictionary<RigidBodyId, RigidBodyViewModel> _rigidBodyMap = new Dictionary<RigidBodyId, RigidBodyViewModel>();
 
-        private int _width;
-        private int _height;
-        private Vector _lastMomentum = Vector.Zero;
-        private Vector _lastPosition = Vector.Zero;
+        private Vector _lastPlayerMomentum = Vector.Zero;
+        private Vector _lastPlayerPosition = Vector.Zero;
         private RigidBodyId _playerRigidBodyId;
+        private Map _map;
     }
 }

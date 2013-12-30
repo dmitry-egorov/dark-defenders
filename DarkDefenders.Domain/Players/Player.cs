@@ -23,7 +23,6 @@ namespace DarkDefenders.Domain.Players
         private const double ProjectileMomentum = 150.0 * Projectile.Mass;
 
         private const Direction InitialDirection = Direction.Right;
-
         
         public IEnumerable<IDomainEvent> MoveLeft()
         {

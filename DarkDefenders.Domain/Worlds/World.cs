@@ -31,96 +31,17 @@ namespace DarkDefenders.Domain.Worlds
 
         public Vector AdjustCirclePosition(Circle circle)
         {
-            var position = circle.Position;
-            var radius = circle.Radius;
-            var x = position.X;
-            var y = position.Y;
-            var lx = _dimensions.Width;
-            var ly = _dimensions.Height;
-
-            var dx = lx - radius;
-
-            if (x > dx)
-            {
-                x = dx;
-            }
-            else if (x < radius)
-            {
-                x = radius;
-            }
-
-            var dy = ly - radius;
-            if (y > dy)
-            {
-                y = dy;
-            }
-            else if (y < radius)
-            {
-                y = radius;
-            }
-
-            return Vector.XY(x, y);
+            return _terrain.AdjustCirclePosition(circle);
         }
 
         public Vector LimitMomentum(Vector momentum, Circle boundingCircle)
         {
-            var px = momentum.X;
-            var py = momentum.Y;
-
-            var x = boundingCircle.Position.X;
-            var y = boundingCircle.Position.Y;
-            var radius = boundingCircle.Radius;
-            var lx = _dimensions.Width;
-            var ly = _dimensions.Height;
-
-            var dx = lx - radius;
-            if (px >= 0)
-            {
-                if (x >= dx)
-                {
-                    px = 0;
-                }
-            }
-            else
-            {
-                if (x <= radius)
-                {
-                    px = 0;
-                }
-            }
-
-            var dy = ly - radius;
-            if (py >= 0)
-            {
-                if (y >= dy)
-                {
-                    py = 0;
-                }
-            }
-            else
-            {
-                if (y <= radius)
-                {
-                    py = 0;
-                }
-            }
-
-            return Vector.XY(px, py);
+            return _terrain.LimitMomentum(momentum, boundingCircle);
         }
 
         public bool IsAdjacentToAWall(Circle circle)
         {
-            var position = circle.Position;
-            var radius = circle.Radius;
-            var x = position.X;
-            var y = position.Y;
-
-            var dx = _dimensions.Width - radius;
-            var dy = _dimensions.Height - radius;
-            return x >= dx 
-                || x <= radius 
-                || y >= dy 
-                || y <= radius;
+            return _terrain.IsAdjacentToAWall(circle);
         }
 
         public void Recieve(WorldTimeUpdated worldTimeUpdated)
@@ -129,14 +50,15 @@ namespace DarkDefenders.Domain.Worlds
             ElapsedSeconds = worldTimeUpdated.Elapsed;
         }
 
-        internal World(WorldId id, Dimensions dimensions, Vector spawnPosition) : base(id)
+        internal World(WorldId id, Terrain terrain, Vector spawnPosition) : base(id)
         {
-            _dimensions = dimensions;
+            _terrain = terrain;
             _spawnPosition = spawnPosition;
             TimeSeconds = 0.0;
         }
 
-        private readonly Dimensions _dimensions;
+        
         private readonly Vector _spawnPosition;
+        private readonly Terrain _terrain;
     }
 }

@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D29A2BF6-40D4-4405-9E40-C1EC8BC91705}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{9660C753-8246-4AE8-84B2-6DA809FF9ACB}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DarkDefenders.Console</RootNamespace>
-    <AssemblyName>DarkDefenders.Console</AssemblyName>
+    <RootNamespace>DarkDefenders.Domain.Files</RootNamespace>
+    <AssemblyName>DarkDefenders.Domain.Files</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -34,53 +32,25 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Clock.cs" />
-    <Compile Include="ConsoleRenderer.cs" />
-    <Compile Include="ViewModels\GameViewModel.cs" />
-    <Compile Include="FixedTimeFrameExecutor.cs" />
-    <Compile Include="PerformanceCounter.cs" />
-    <Compile Include="NativeKeyboard.cs" />
-    <Compile Include="ViewModels\RigidBodyViewModel.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="TerrainLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\DarkDefenders.Domain.Files\DarkDefenders.Domain.Files.csproj">
-      <Project>{9660C753-8246-4AE8-84B2-6DA809FF9ACB}</Project>
-      <Name>DarkDefenders.Domain.Files</Name>
-    </ProjectReference>
     <ProjectReference Include="..\DarkDefenders.Domain\DarkDefenders.Domain.csproj">
       <Project>{27F91716-3957-49C9-94BB-8AA160BF96AA}</Project>
       <Name>DarkDefenders.Domain</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.DDDES.Implementations\Infrastructure.DDDES.Implementations.csproj">
-      <Project>{5E4CA423-37F5-4B6A-B00C-0ADC06EC0378}</Project>
-      <Name>Infrastructure.DDDES.Implementations</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.DDDES\Infrastructure.DDDES.csproj">
-      <Project>{457CCF4D-7E52-4A7F-867C-13BAC32E13F0}</Project>
-      <Name>Infrastructure.DDDES</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Math\Infrastructure.Math.csproj">
       <Project>{9DA761FD-492C-4BF7-A50D-10930664021D}</Project>
       <Name>Infrastructure.Math</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.Util\Infrastructure.Util.csproj">
-      <Project>{0B407BC3-7B5B-431A-96E7-A41F25AB27BE}</Project>
-      <Name>Infrastructure.Util</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="WorldsData\simpleWorld.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -7,33 +7,34 @@ namespace DarkDefenders.Console.ViewModels
 {
     internal class RigidBodyViewModel
     {
-        private readonly int _width;
-        private readonly int _height;
-
-        private Point _lastPlayerPosition;
+        private Point _transformedLastPosition;
         private char? _character;
+        private readonly Map _map;
+        private Point _lastPosition;
 
-        public RigidBodyViewModel(int width, int height)
+        public RigidBodyViewModel(Map map)
         {
-            _width = width;
-            _height = height;
+            _map = map;
         }
 
         public void SetAsPlayer()
         {
             _character = '@';
-            ConsoleRenderer.Render(_lastPlayerPosition, _character.Value);
+            ConsoleRenderer.Render(_transformedLastPosition, _character.Value);
         }
 
         public void SetAsProjectile()
         {
             _character = '*';
-            ConsoleRenderer.Render(_lastPlayerPosition, _character.Value);
+            ConsoleRenderer.Render(_transformedLastPosition, _character.Value);
         }
 
         public void Recieve(RigidBodyCreated rigidBodyCreated)
         {
-            _lastPlayerPosition = Transform(rigidBodyCreated.BoundingCircle.Position);
+            var position = rigidBodyCreated.BoundingCircle.Position;
+            var point = position.ToPoint();
+            _lastPosition = point;
+            _transformedLastPosition = Transform(point);
         }
 
         public void Recieve(Moved moved)
@@ -43,30 +44,34 @@ namespace DarkDefenders.Console.ViewModels
                 throw new InvalidOperationException("Rigid body type not set");
             }
 
-            var position = Transform(moved.NewPosition);
+            var newPosition = moved.NewPosition.ToPoint();
+            var position = Transform(newPosition);
 
-            if (position == _lastPlayerPosition)
+            if (position == _transformedLastPosition)
             {
                 return;
             }
 
             ConsoleRenderer.Render(position, _character.Value);
-            ConsoleRenderer.Render(_lastPlayerPosition, ' ');
+            Remove();
 
-            _lastPlayerPosition = position;
+            _lastPosition = newPosition;
+            _transformedLastPosition = position;
         }
 
         public void Remove()
         {
-            ConsoleRenderer.Render(_lastPlayerPosition, ' ');
+            var c = _map[_lastPosition] == 1 ? '+' : ' ';
+
+            ConsoleRenderer.Render(_transformedLastPosition, c);
         }
 
-        private Point Transform(Vector position)
+        private Point Transform(Point position)
         {
             var x = position.X;
             var y = position.Y;
-            var cx = 1 + (int)x;
-            var cy = 1 + (int)(_height - y);
+            var cx = 1 + x;
+            var cy = _map.Dimensions.Height - y;
 
             return new Point(cx, cy);
         }

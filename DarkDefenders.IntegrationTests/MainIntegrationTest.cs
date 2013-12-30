@@ -37,17 +37,19 @@ namespace DarkDefenders.IntegrationTests
         {
             var spawnPosition = new Vector(0, 0);
             var dimensions = new Dimensions(10, 10);
+            var map = new Map(dimensions);
+
             var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRadius);
             var mass = Player.Mass;
             var topHorizontalMomentum = Player.TopHorizontalMomentum;
 
-            var worldId = CreateWorld(dimensions, spawnPosition);
+            var worldId = CreateWorld(map, spawnPosition);
             var playerId = CreatePlayer(worldId);
             var rigidBodyId = FindRigidBodyId();
 
             var expectedEvents = new IDomainEvent[]
             {
-                new WorldCreated(worldId, dimensions, spawnPosition), 
+                new WorldCreated(worldId, map, spawnPosition), 
                 new RigidBodyCreated(rigidBodyId, worldId, boundingCircle, Vector.Zero, mass, topHorizontalMomentum),
                 new PlayerCreated(playerId, worldId, rigidBodyId)
             };
@@ -60,12 +62,13 @@ namespace DarkDefenders.IntegrationTests
         {
             var spawnPosition = new Vector(0, 0);
             var dimensions = new Dimensions(10, 10);
+            var map = new Map(dimensions);
             var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRadius);
             var desiredOrientation = MovementForceDirection.Left;
             var mass = Player.Mass;
             var topHorizontalMomentum = Player.TopHorizontalMomentum;
 
-            var worldId = CreateWorld(dimensions, spawnPosition);
+            var worldId = CreateWorld(map, spawnPosition);
             var playerId = CreatePlayer(worldId);
             var rigidBodyId = FindRigidBodyId();
 
@@ -73,7 +76,7 @@ namespace DarkDefenders.IntegrationTests
 
             var expectedEvents = new IDomainEvent[]
             {
-                new WorldCreated(worldId, dimensions, spawnPosition), 
+                new WorldCreated(worldId, map, spawnPosition), 
                 new RigidBodyCreated(rigidBodyId, worldId, boundingCircle, Vector.Zero, mass, topHorizontalMomentum),
                 new PlayerCreated(playerId, worldId, rigidBodyId),
                 new MovementForceDirectionChanged(playerId, desiredOrientation), 
@@ -86,6 +89,7 @@ namespace DarkDefenders.IntegrationTests
         {
             var spawnPosition = new Vector(50, 0.5);
             var dimensions = new Dimensions(100, 100);
+            var map = new Map(dimensions);
             var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRadius);
             var desiredOrientation = MovementForceDirection.Left;
             var elapsed = TimeSpan.FromMilliseconds(20).TotalSeconds;
@@ -96,7 +100,7 @@ namespace DarkDefenders.IntegrationTests
             var mass = Player.Mass;
             var topHorizontalMomentum = Player.TopHorizontalMomentum;
 
-            var worldId = CreateWorld(dimensions, spawnPosition);
+            var worldId = CreateWorld(map, spawnPosition);
             var playerId = CreatePlayer(worldId);
             var rigidBodyId = FindRigidBodyId();
 
@@ -105,7 +109,7 @@ namespace DarkDefenders.IntegrationTests
 
             var expectedEvents = new IDomainEvent[]
             {
-                new WorldCreated(worldId, dimensions, spawnPosition), 
+                new WorldCreated(worldId, map, spawnPosition), 
                 new RigidBodyCreated(rigidBodyId, worldId, boundingCircle, Vector.Zero, mass, topHorizontalMomentum),
                 new PlayerCreated(playerId, worldId, rigidBodyId),
                 new MovementForceDirectionChanged(playerId, desiredOrientation), 
@@ -133,10 +137,11 @@ namespace DarkDefenders.IntegrationTests
             var spawnPosition = new Vector(0, 0);
             var worldId = new WorldId();
             var dimensions = new Dimensions(10, 10);
+            var map = new Map(dimensions);
 
-            CreateWorld(worldId, dimensions, spawnPosition);
+            CreateWorld(worldId, map, spawnPosition);
 
-            Assert.Throws<RootAlreadyExistsException>(() => CreateWorld(worldId, dimensions, spawnPosition));
+            Assert.Throws<RootAlreadyExistsException>(() => CreateWorld(worldId, map, spawnPosition));
         }
 
         private RigidBodyId FindRigidBodyId()
@@ -161,18 +166,18 @@ namespace DarkDefenders.IntegrationTests
             return playerId;
         }
 
-        private WorldId CreateWorld(Dimensions dimensions, Vector spawnPosition)
+        private WorldId CreateWorld(Map map, Vector spawnPosition)
         {
             var worldId = new WorldId();
 
-            CreateWorld(worldId, dimensions, spawnPosition);
+            CreateWorld(worldId, map, spawnPosition);
 
             return worldId;
         }
 
-        private void CreateWorld(WorldId worldId, Dimensions dimensions, Vector spawnPosition)
+        private void CreateWorld(WorldId worldId, Map map, Vector spawnPosition)
         {
-            _commandProcessor.CreateAndCommit<WorldFactory>(f => f.Create(worldId, dimensions, spawnPosition));
+            _commandProcessor.CreateAndCommit<WorldFactory>(f => f.Create(worldId, map, spawnPosition));
         }
 
         private void CreatePlayer(PlayerId playerId, WorldId worldId)
@@ -194,7 +199,7 @@ namespace DarkDefenders.IntegrationTests
             return processor;
         }
 
-        private class TestEventListener : IEventsLinstener<IDomainEvent>
+        private class TestEventListener : IEventsListener<IDomainEvent>
         {
             private readonly List<IDomainEvent> _allEvents = new List<IDomainEvent>();
 
@@ -203,11 +208,9 @@ namespace DarkDefenders.IntegrationTests
                 CollectionAssert.AreEqual(expectedEvents.AsReadOnly(), _allEvents.AsReadOnly());
             }
 
-            public void Recieve(IEnumerable<IDomainEvent> events)
+            public void Recieve(IDomainEvent domainEvent)
             {
-                var readOnly = events.AsReadOnly();
-
-                _allEvents.AddRange(readOnly);
+                _allEvents.Add(domainEvent);
             }
 
             public IEnumerable<TEvent> FindEvents<TEvent>()

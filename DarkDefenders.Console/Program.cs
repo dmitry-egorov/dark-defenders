@@ -1,8 +1,10 @@
 ﻿using System;
+using System.IO;
 using System.Windows.Forms;
 using DarkDefenders.Console.ViewModels;
 using DarkDefenders.Domain;
 using DarkDefenders.Domain.Events;
+using DarkDefenders.Domain.Files;
 using DarkDefenders.Domain.Players;
 using DarkDefenders.Domain.Projectiles;
 using DarkDefenders.Domain.RigidBodies;
@@ -19,6 +21,7 @@ namespace DarkDefenders.Console
 //        private const int MaxFps = 30;
         private static readonly TimeSpan _minFrameElapsed = TimeSpan.FromSeconds(1.0 / MaxFps);
         private static readonly TimeSpan _playerStateUpdatePeriod = TimeSpan.FromSeconds(1.0 / 30);
+        private const string WorldFileName = "simpleWorld.txt";
 
         static void Main()
         {
@@ -68,9 +71,9 @@ namespace DarkDefenders.Console
             }
         }
 
-        private static ICommandProcessor<IDomainEvent> CreateProcessor(IEventsLinstener<IDomainEvent> eventsLinstener)
+        private static ICommandProcessor<IDomainEvent> CreateProcessor(IEventsListener<IDomainEvent> eventsListener)
         {
-            var processor = new CommandProcessor<IDomainEvent>(eventsLinstener);
+            var processor = new CommandProcessor<IDomainEvent>(eventsListener);
 
             processor.ConfigureDomain();
 
@@ -81,13 +84,21 @@ namespace DarkDefenders.Console
         {
             var worldId = new WorldId();
             var spawnPosition = new Vector(50, 0.5);
-            var dimensions = new Dimensions(100, 40);
             var playerId = new PlayerId();
+            var map = LoadTerrain();
 
-            processor.CreateAndCommit<WorldFactory>(t => t.Create(worldId, dimensions, spawnPosition));
+            processor.CreateAndCommit<WorldFactory>(t => t.Create(worldId, map, spawnPosition));
             processor.CreateAndCommit<PlayerFactory>(p => p.Create(playerId, worldId));
 
             return processor.CreateRootAdapter<Player>(playerId);
+        }
+
+        private static Map LoadTerrain()
+        {
+            var pathToFiles = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "WorldsData");
+            var path = Path.Combine(pathToFiles, WorldFileName);
+
+            return TerrainLoader.LoadFromTextFile(path);
         }
 
         private static bool ProcessKeyboard(IRootAdapter<Player, IDomainEvent> player, IUnitOfWork unitOfWork)

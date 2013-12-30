@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace Infrastructure.DDDES.Implementations
+﻿namespace Infrastructure.DDDES.Implementations
 {
-    public class CountingEventsListener<TDomainEvent> : IEventsLinstener<TDomainEvent>
+    public class CountingEventsListener<TDomainEvent> : IEventsListener<TDomainEvent>
     {
         private long _totalCount;
         private long _lastCount;
@@ -21,9 +18,9 @@ namespace Infrastructure.DDDES.Implementations
             }
         }
 
-        public void Recieve(IEnumerable<TDomainEvent> events)
+        public void Recieve(TDomainEvent domainEvent)
         {
-            _totalCount += events.Count();
+            _totalCount += 1;
         }
     }
 }

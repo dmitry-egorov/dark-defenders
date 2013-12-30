@@ -14,15 +14,19 @@ namespace DarkDefenders.Domain.Worlds
         {
         }
 
-        public IEnumerable<IDomainEvent> Create(WorldId worldId, Dimensions dimensions, Vector spawnPosition)
+        public IEnumerable<IDomainEvent> Create(WorldId worldId, Map map, Vector spawnPosition)
         {
             AssertDoesntExist(worldId);
-            return new WorldCreated(worldId, dimensions, spawnPosition).EnumerateOnce();
+            return new WorldCreated(worldId, map, spawnPosition).EnumerateOnce();
         }
 
         protected override World Handle(WorldCreated creationEvent)
         {
-            return new World(creationEvent.RootId, creationEvent.Dimensions, creationEvent.SpawnPosition);
+            var worldId = creationEvent.RootId;
+            var terrain = new Terrain(creationEvent.Map);
+            var spawnPosition = creationEvent.SpawnPosition;
+
+            return new World(worldId, terrain, spawnPosition);
         }
     }
 }

@@ -1,20 +1,18 @@
-﻿using System;
-
-namespace Infrastructure.Math
+﻿namespace Infrastructure.Math
 {
     public struct Dimensions
     {
-        public double Width
+        public int Width
         {
             get { return _width; }
         }
 
-        public double Height
+        public int Height
         {
             get { return _height; }
         }
 
-        public Dimensions(double width, double height)
+        public Dimensions(int width, int height)
         {
             _width = width;
             _height = height;
@@ -39,7 +37,7 @@ namespace Infrastructure.Math
             }
         }
 
-        private readonly Double _width;
-        private readonly Double _height;
+        private readonly int _width;
+        private readonly int _height;
     }
 }

@@ -1,3 +1,4 @@
+using System.Drawing;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using Infrastructure.Util;
@@ -29,6 +30,16 @@ namespace Infrastructure.Math
             _y = y;
         }
 
+        public double LengthSquared()
+        {
+            return _x*_x + _y*_y;
+        }
+
+        public Point ToPoint()
+        {
+            return new Point((int)_x, (int)_y);
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool NotEqualsZero()
         {
@@ -39,11 +50,6 @@ namespace Infrastructure.Math
         public bool EqualsZero()
         {
             return _x.Equals(0.0) && _y.Equals(0.0);
-        }
-
-        public double LengthSquared()
-        {
-            return _x*_x + _y*_y;
         }
 
         public override string ToString()

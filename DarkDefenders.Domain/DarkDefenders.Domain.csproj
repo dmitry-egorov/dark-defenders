@@ -70,6 +70,7 @@
     <Compile Include="Worlds\Events\WorldCreated.cs" />
     <Compile Include="Worlds\Events\IWorldEvent.cs" />
     <Compile Include="Worlds\Events\IWorldEventsReciever.cs" />
+    <Compile Include="Worlds\Terrain.cs" />
     <Compile Include="Worlds\World.cs" />
     <Compile Include="Worlds\WorldFactory.cs" />
     <Compile Include="Worlds\WorldId.cs" />
