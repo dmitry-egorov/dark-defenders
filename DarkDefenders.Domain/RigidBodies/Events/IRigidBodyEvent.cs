@@ -3,7 +3,7 @@ using Infrastructure.DDDES;
 
 namespace DarkDefenders.Domain.RigidBodies.Events
 {
-    public interface IRigidBodyEvent : IRootEvent<RigidBodyId, IRigidBodyEventsReciever>, IDomainEvent
+    public interface IRigidBodyEvent : IRootEvent<IRigidBodyEventsReciever>, IDomainEvent
     {
     }
 }

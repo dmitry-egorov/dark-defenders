@@ -3,7 +3,7 @@ using Infrastructure.DDDES;
 
 namespace DarkDefenders.Domain.Projectiles.Events
 {
-    public interface IProjectileEvent: IRootEvent<ProjectileId, IProjectileEventsReciever>, IDomainEvent
+    public interface IProjectileEvent: IRootEvent<IProjectileEventsReciever>, IDomainEvent
     {
     }
 }

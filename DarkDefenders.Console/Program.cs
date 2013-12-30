@@ -15,8 +15,8 @@ namespace DarkDefenders.Console
 {
     static class Program
     {
-//        private const int MaxFps = 300000000;
-        private const int MaxFps = 30;
+        private const int MaxFps = 300000000;
+//        private const int MaxFps = 30;
         private static readonly TimeSpan _minFrameElapsed = TimeSpan.FromSeconds(1.0 / MaxFps);
         private static readonly TimeSpan _playerStateUpdatePeriod = TimeSpan.FromSeconds(1.0 / 30);
 
@@ -58,9 +58,12 @@ namespace DarkDefenders.Console
                 var eventsCount = countingListener.EventsSinceLastCall;
                 fpsCounter.Tick(elapsed, renderer.RenderFps);
                 eventsCounter.Tick(eventsCount, elapsed, renderer.RenderAverageEventsCount);
-                playerStateCounter.Tick(elapsed, (_, __) => renderer.RenderPlayerState());
+                playerStateCounter.Tick(elapsed, (_, __) =>
+                {
+                    renderer.RenderPlayerState();
+                    escape = ProcessKeyboard(player, processor);
+                });
 
-                escape = ProcessKeyboard(player, processor);
                 executor.FillTimeFrame();
             }
         }

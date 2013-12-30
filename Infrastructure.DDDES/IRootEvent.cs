@@ -1,6 +1,6 @@
 namespace Infrastructure.DDDES
 {
-    public interface IRootEvent<out TRootId, in TEventReciever>: IEvent<TRootId>
+    public interface IRootEvent<in TEventReciever>: IEvent
     {
         void ApplyTo(TEventReciever reciever);
     }

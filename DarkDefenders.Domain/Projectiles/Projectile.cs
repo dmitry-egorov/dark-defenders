@@ -9,7 +9,7 @@ namespace DarkDefenders.Domain.Projectiles
     public class Projectile: RootBase<ProjectileId, IProjectileEventsReciever, IProjectileEvent>, IProjectileEventsReciever
     {
         public const double Mass = 0.001;
-        public const double BoundingCircleRadius = 1.0 / 100.0;
+        public const double BoundingCircleRadius = 0.5;
 
         public IEnumerable<IDomainEvent> CheckForHit()
         {

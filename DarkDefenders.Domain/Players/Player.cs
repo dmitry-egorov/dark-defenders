@@ -198,13 +198,15 @@ namespace DarkDefenders.Domain.Players
             var x = position.X;
             var y = position.Y;
 
+            const double radius = BoundingCircleRadius + Projectile.BoundingCircleRadius;
+
             if (_direction == Direction.Right)
             {
-                x += _rigidBody.Radius;
+                x += radius;
             }
             else
             {
-                x -= _rigidBody.Radius;
+                x -= radius;
             }
 
             return Vector.XY(x, y);

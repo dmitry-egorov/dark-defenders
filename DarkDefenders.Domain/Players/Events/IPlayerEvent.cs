@@ -3,7 +3,7 @@ using Infrastructure.DDDES;
 
 namespace DarkDefenders.Domain.Players.Events
 {
-    public interface IPlayerEvent : IRootEvent<PlayerId, IPlayerEventsReciever>, IDomainEvent
+    public interface IPlayerEvent : IRootEvent<IPlayerEventsReciever>, IDomainEvent
     {
     }
 }

@@ -2,7 +2,7 @@ using Infrastructure.Util;
 
 namespace Infrastructure.DDDES.Implementations.Domain
 {
-    public abstract class EventBase<TRootId, TEvent> : ValueObject<TEvent>, IEvent<TRootId>
+    public abstract class EventBase<TRootId, TEvent> : ValueObject<TEvent>, IEvent
         where TRootId: Identity
         where TEvent: EventBase<TRootId, TEvent>
     {

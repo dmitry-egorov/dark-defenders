@@ -3,7 +3,7 @@ using Infrastructure.DDDES;
 
 namespace DarkDefenders.Domain.Worlds.Events
 {
-    public interface IWorldEvent : IRootEvent<WorldId, IWorldEventsReciever>, IDomainEvent
+    public interface IWorldEvent : IRootEvent<IWorldEventsReciever>, IDomainEvent
     {
     }
 }

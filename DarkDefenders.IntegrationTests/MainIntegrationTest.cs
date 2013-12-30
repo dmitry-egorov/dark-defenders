@@ -84,15 +84,15 @@ namespace DarkDefenders.IntegrationTests
         [Test]
         public void Should_create_and_set_desired_orientation_to_player_and_move_player_on_update()
         {
-            var spawnPosition = new Vector(0, 0.025);
-            var dimensions = new Dimensions(10, 10);
+            var spawnPosition = new Vector(50, 0.5);
+            var dimensions = new Dimensions(100, 100);
             var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRadius);
             var desiredOrientation = MovementForceDirection.Left;
             var elapsed = TimeSpan.FromMilliseconds(20).TotalSeconds;
 
-            var externalForce = Vector.XY(-4.0, 0);
-            var newMomentum = Vector.XY(-0.08, 0);
-            var newPosition = Vector.XY(-0.0016, 0.025);
+            var externalForce = Vector.XY(-200, 0);
+            var newMomentum = Vector.XY(-4, 0);
+            var newPosition = Vector.XY(49.92, 0.5);
             var mass = Player.Mass;
             var topHorizontalMomentum = Player.TopHorizontalMomentum;
 
