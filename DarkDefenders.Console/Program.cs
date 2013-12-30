@@ -15,14 +15,14 @@ namespace DarkDefenders.Console
 {
     static class Program
     {
-        private const int MaxFps = 300000000;
-//        private const int MaxFps = 30;
+//        private const int MaxFps = 300000000;
+        private const int MaxFps = 30;
         private static readonly TimeSpan _minFrameElapsed = TimeSpan.FromSeconds(1.0 / MaxFps);
         private static readonly TimeSpan _playerStateUpdatePeriod = TimeSpan.FromSeconds(1.0 / 30);
 
         static void Main()
         {
-            var renderer = GameViewModel.InitializeNew();
+            var renderer = new GameViewModel();
 
             var countingListener = new CountingEventsListener<IDomainEvent>();
 
@@ -77,7 +77,7 @@ namespace DarkDefenders.Console
         private static IRootAdapter<Player, IDomainEvent> InitializeDomain(ICommandProcessor<IDomainEvent> processor)
         {
             var worldId = new WorldId();
-            var spawnPosition = new Vector(0, 0.05);
+            var spawnPosition = new Vector(50, 0.5);
             var dimensions = new Dimensions(100, 40);
             var playerId = new PlayerId();
 

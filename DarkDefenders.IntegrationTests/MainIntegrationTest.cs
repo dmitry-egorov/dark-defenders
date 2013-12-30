@@ -39,6 +39,7 @@ namespace DarkDefenders.IntegrationTests
             var dimensions = new Dimensions(10, 10);
             var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRadius);
             var mass = Player.Mass;
+            var topHorizontalMomentum = Player.TopHorizontalMomentum;
 
             var worldId = CreateWorld(dimensions, spawnPosition);
             var playerId = CreatePlayer(worldId);
@@ -47,7 +48,7 @@ namespace DarkDefenders.IntegrationTests
             var expectedEvents = new IDomainEvent[]
             {
                 new WorldCreated(worldId, dimensions, spawnPosition), 
-                new RigidBodyCreated(rigidBodyId, worldId, boundingCircle, Vector.Zero, mass),
+                new RigidBodyCreated(rigidBodyId, worldId, boundingCircle, Vector.Zero, mass, topHorizontalMomentum),
                 new PlayerCreated(playerId, worldId, rigidBodyId)
             };
 
@@ -62,6 +63,7 @@ namespace DarkDefenders.IntegrationTests
             var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRadius);
             var desiredOrientation = MovementForceDirection.Left;
             var mass = Player.Mass;
+            var topHorizontalMomentum = Player.TopHorizontalMomentum;
 
             var worldId = CreateWorld(dimensions, spawnPosition);
             var playerId = CreatePlayer(worldId);
@@ -72,7 +74,7 @@ namespace DarkDefenders.IntegrationTests
             var expectedEvents = new IDomainEvent[]
             {
                 new WorldCreated(worldId, dimensions, spawnPosition), 
-                new RigidBodyCreated(rigidBodyId, worldId, boundingCircle, Vector.Zero, mass),
+                new RigidBodyCreated(rigidBodyId, worldId, boundingCircle, Vector.Zero, mass, topHorizontalMomentum),
                 new PlayerCreated(playerId, worldId, rigidBodyId),
                 new MovementForceDirectionChanged(playerId, desiredOrientation), 
             };
@@ -86,11 +88,13 @@ namespace DarkDefenders.IntegrationTests
             var dimensions = new Dimensions(10, 10);
             var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRadius);
             var desiredOrientation = MovementForceDirection.Left;
-            var externalForce = Vector.XY(-4.0, 0);
             var elapsed = TimeSpan.FromMilliseconds(20).TotalSeconds;
+
+            var externalForce = Vector.XY(-4.0, 0);
             var newMomentum = Vector.XY(-0.08, 0);
             var newPosition = Vector.XY(-0.0016, 0.025);
             var mass = Player.Mass;
+            var topHorizontalMomentum = Player.TopHorizontalMomentum;
 
             var worldId = CreateWorld(dimensions, spawnPosition);
             var playerId = CreatePlayer(worldId);
@@ -102,7 +106,7 @@ namespace DarkDefenders.IntegrationTests
             var expectedEvents = new IDomainEvent[]
             {
                 new WorldCreated(worldId, dimensions, spawnPosition), 
-                new RigidBodyCreated(rigidBodyId, worldId, boundingCircle, Vector.Zero, mass),
+                new RigidBodyCreated(rigidBodyId, worldId, boundingCircle, Vector.Zero, mass, topHorizontalMomentum),
                 new PlayerCreated(playerId, worldId, rigidBodyId),
                 new MovementForceDirectionChanged(playerId, desiredOrientation), 
                 new WorldTimeUpdated(worldId, elapsed, elapsed), 

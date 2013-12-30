@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using DarkDefenders.Domain.Events;
-using DarkDefenders.Domain.Players;
 using DarkDefenders.Domain.Projectiles.Events;
 using DarkDefenders.Domain.RigidBodies;
 using DarkDefenders.Domain.Worlds;
@@ -21,7 +21,7 @@ namespace DarkDefenders.Domain.Projectiles
             _rigidBodyFactory = rigidBodyFactory;
         }
 
-        public IEnumerable<IDomainEvent> Create(ProjectileId projectileId, PlayerId playerId, WorldId worldId, Vector position, Vector momentum)
+        public IEnumerable<IDomainEvent> Create(ProjectileId projectileId, WorldId worldId, Vector position, Vector momentum)
         {
             var rigidBodyId = new RigidBodyId();
 
@@ -34,7 +34,11 @@ namespace DarkDefenders.Domain.Projectiles
 
         private IEnumerable<IDomainEvent> CreateProjectileRigidBody(RigidBodyId rigidBodyId, Vector position, WorldId worldId, Vector momentum)
         {
-            return _rigidBodyFactory.CreateRigidBody(rigidBodyId, worldId, position, Projectile.BoundingCircleRadius, momentum, Projectile.Mass);
+            var boundingCircleRadius = Projectile.BoundingCircleRadius;
+            var mass = Projectile.Mass;
+            var topHorizontalMomentum = Math.Abs(momentum.X);
+
+            return _rigidBodyFactory.CreateRigidBody(rigidBodyId, worldId, position, boundingCircleRadius, momentum, mass, topHorizontalMomentum);
         }
 
         protected override Projectile Handle(ProjectileCreated creationEvent)

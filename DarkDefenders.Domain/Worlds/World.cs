@@ -29,33 +29,30 @@ namespace DarkDefenders.Domain.Worlds
             return boundingCircle.IsAboveHorizontalAxis();
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Vector GetGravityForce(double mass)
-        {
-            return Vector.XY(0, -mass * GravityAcceleration);
-        }
-
         public Vector AdjustCirclePosition(Circle circle)
         {
             var position = circle.Position;
             var radius = circle.Radius;
             var x = position.X;
             var y = position.Y;
+            var lx = _dimensions.Width;
+            var ly = _dimensions.Height;
 
-            var dr = 1.0 - radius;
+            var dx = lx - radius;
 
-            if (x > dr)
+            if (x > dx)
             {
-                x = dr;
+                x = dx;
             }
-            else if (x < -dr)
+            else if (x < radius)
             {
-                x = -dr;
+                x = radius;
             }
 
-            if (y > dr)
+            var dy = ly - radius;
+            if (y > dy)
             {
-                y = dr;
+                y = dy;
             }
             else if (y < radius)
             {
@@ -73,26 +70,29 @@ namespace DarkDefenders.Domain.Worlds
             var x = boundingCircle.Position.X;
             var y = boundingCircle.Position.Y;
             var radius = boundingCircle.Radius;
+            var lx = _dimensions.Width;
+            var ly = _dimensions.Height;
 
-            var dr = 1.0 - radius;
+            var dx = lx - radius;
             if (px >= 0)
             {
-                if (x >= dr)
+                if (x >= dx)
                 {
                     px = 0;
                 }
             }
             else
             {
-                if (x <= -dr)
+                if (x <= radius)
                 {
                     px = 0;
                 }
             }
 
+            var dy = ly - radius;
             if (py >= 0)
             {
-                if (y >= dr)
+                if (y >= dy)
                 {
                     py = 0;
                 }
@@ -115,11 +115,12 @@ namespace DarkDefenders.Domain.Worlds
             var x = position.X;
             var y = position.Y;
 
-            var dr = 1.0 - radius;
-            return x >=  dr 
-                || x <= -dr 
-                || y >=  dr 
-                || y <=  radius;
+            var dx = _dimensions.Width - radius;
+            var dy = _dimensions.Height - radius;
+            return x >= dx 
+                || x <= radius 
+                || y >= dy 
+                || y <= radius;
         }
 
         public void Recieve(WorldTimeUpdated worldTimeUpdated)
@@ -134,8 +135,6 @@ namespace DarkDefenders.Domain.Worlds
             _spawnPosition = spawnPosition;
             TimeSeconds = 0.0;
         }
-
-        private const double GravityAcceleration = 4d;
 
         private readonly Dimensions _dimensions;
         private readonly Vector _spawnPosition;

@@ -26,10 +26,10 @@ namespace DarkDefenders.Domain
             var projectileFactory = new ProjectileFactory(projectileRepository, rigidBodyRepository, rigidBodyFactory);
             var playerFactory = new PlayerFactory(playerRepository, worldRepository, rigidBodyRepository, rigidBodyFactory, projectileFactory);
 
-            processor.AddRepository<WorldId, World, IWorldEvent, WorldFactory, WorldCreated>(worldRepository, worldFactory);
-            processor.AddRepository<RigidBodyId, RigidBody, IRigidBodyEvent, RigidBodyFactory, RigidBodyCreated>(rigidBodyRepository, rigidBodyFactory);
-            processor.AddRepository<PlayerId, Player, IPlayerEvent, PlayerFactory, PlayerCreated>(playerRepository, playerFactory);
-            processor.AddRepository<ProjectileId, Projectile, IProjectileEvent, ProjectileFactory, ProjectileCreated>(projectileRepository, projectileFactory);
+            processor.RegisterRoot<WorldId, World, IWorldEvent, WorldFactory, WorldCreated>(worldRepository, worldFactory);
+            processor.RegisterRoot<RigidBodyId, RigidBody, IRigidBodyEvent, RigidBodyFactory, RigidBodyCreated>(rigidBodyRepository, rigidBodyFactory);
+            processor.RegisterRoot<PlayerId, Player, IPlayerEvent, PlayerFactory, PlayerCreated>(playerRepository, playerFactory);
+            processor.RegisterRoot<ProjectileId, Projectile, IProjectileEvent, ProjectileFactory, ProjectileCreated>(projectileRepository, projectileFactory);
         }
     }
 }

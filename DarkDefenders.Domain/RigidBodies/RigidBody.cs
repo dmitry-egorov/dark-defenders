@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.RigidBodies.Events;
 using DarkDefenders.Domain.Worlds;
@@ -10,6 +11,9 @@ namespace DarkDefenders.Domain.RigidBodies
 {
     public class RigidBody : RootBase<RigidBodyId, IRigidBodyEventsReciever, IRigidBodyEvent>, IRigidBodyEventsReciever
     {
+        private const double GravityAcceleration = 200;
+        private const double FrictionCoefficient = 100.0;
+
         public Vector Position { get { return _boundingCircle.Position; } }
 
         public double Radius { get { return _boundingCircle.Radius; } }
@@ -106,12 +110,21 @@ namespace DarkDefenders.Domain.RigidBodies
             _externalForce = externalForceChanged.ExternalForce;
         }
 
-        internal RigidBody(RigidBodyId id, World world, Vector initialMomentum, double mass, Circle boundingCircle) : base(id)
+        internal RigidBody
+            (
+                RigidBodyId id, 
+                World world, 
+                Vector initialMomentum, 
+                double mass, 
+                double topHorizontalMomentum, 
+                Circle boundingCircle
+            ) : base(id)
         {
             _world = world;
 
             _momentum = initialMomentum;
             _mass = mass;
+            _topHorizontalMomentum = topHorizontalMomentum;
             _boundingCircle = boundingCircle;
             _externalForce = Vector.Zero;
         }
@@ -151,33 +164,42 @@ namespace DarkDefenders.Domain.RigidBodies
 
             if (isInTheAir)
             {
-                return externalForce + _world.GetGravityForce(_mass);
+                return externalForce + GetGravityForce();
             }
 
             if (externalForce.EqualsZero())
             {
-                var maxForce = -_momentum.X/elapsedSeconds;
 
-                return externalForce + GetFrictionForce(maxForce);
+                return externalForce + GetFrictionForce(elapsedSeconds);
             }
 
             return externalForce;
         }
 
-        private static Vector LimitTopMomentum(Vector momentum)
+        private Vector LimitTopMomentum(Vector momentum)
         {
             var vx = momentum.X;
             var vy = momentum.Y;
 
             var vxAbs = Math.Abs(vx);
 
-            return vxAbs > TopHorizontalMomentum 
-                ? Vector.XY(Math.Sign(vx) * TopHorizontalMomentum, vy) 
+            var topHorizontalMomentum = _topHorizontalMomentum;
+
+            return vxAbs > topHorizontalMomentum 
+                ? Vector.XY(Math.Sign(vx) * topHorizontalMomentum, vy) 
                 : momentum;
         }
 
-        private Vector GetFrictionForce(double maxForce)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private Vector GetGravityForce()
         {
+            return Vector.XY(0, -_mass * GravityAcceleration);
+        }
+
+        private Vector GetFrictionForce(double elapsedSeconds)
+        {
+            var maxForce = -_momentum.X / elapsedSeconds;
+
             var sign = Math.Sign(maxForce);
             var mfx = Math.Abs(maxForce) ;
 
@@ -188,16 +210,13 @@ namespace DarkDefenders.Domain.RigidBodies
             return Vector.XY(sign * fx, 0);
         }
 
-        private const double TopHorizontalMomentum = 0.8d;
-        private const double FrictionCoefficient = 2d;
-
         private readonly World _world;
         
         private readonly double _mass;
-
+        private readonly double _topHorizontalMomentum;
+        
         private Circle _boundingCircle;
         private Vector _momentum;
-
         private Vector _externalForce;
     }
 }

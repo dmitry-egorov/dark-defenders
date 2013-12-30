@@ -61,12 +61,12 @@ namespace DarkDefenders.Console.ViewModels
             ConsoleRenderer.Render(_lastPlayerPosition, ' ');
         }
 
-        private Point Transform(Vector spawnPosition)
+        private Point Transform(Vector position)
         {
-            var x = spawnPosition.X;
-            var y = spawnPosition.Y;
-            var cx = 1 + (int)((_width - 2) * (1 + x) / 2);
-            var cy = 1 + (int)((_height - 2) * (1 - y));
+            var x = position.X;
+            var y = position.Y;
+            var cx = 1 + (int)x;
+            var cy = 1 + (int)(_height - y);
 
             return new Point(cx, cy);
         }

@@ -47,5 +47,13 @@ namespace DarkDefenders.Console
             System.Console.SetCursorPosition(left, top);
             System.Console.Write(str);
         }
+
+        public static void SetViewPort(int width, int height)
+        {
+            System.Console.BufferWidth = System.Console.WindowWidth = width;
+            System.Console.BufferHeight = System.Console.WindowHeight = height;
+
+            System.Console.CursorVisible = false;
+        }
     }
 }

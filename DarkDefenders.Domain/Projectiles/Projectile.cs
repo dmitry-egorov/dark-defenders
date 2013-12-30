@@ -3,7 +3,6 @@ using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.Projectiles.Events;
 using DarkDefenders.Domain.RigidBodies;
 using Infrastructure.DDDES.Implementations.Domain;
-using Infrastructure.Math;
 
 namespace DarkDefenders.Domain.Projectiles
 {
@@ -11,9 +10,6 @@ namespace DarkDefenders.Domain.Projectiles
     {
         public const double Mass = 0.001;
         public const double BoundingCircleRadius = 1.0 / 100.0;
-
-        public static readonly Vector LeftMomentum = Vector.XY(-Momentum, 0);
-        public static readonly Vector RightMomentum = Vector.XY(Momentum, 0);
 
         public IEnumerable<IDomainEvent> CheckForHit()
         {
@@ -38,8 +34,6 @@ namespace DarkDefenders.Domain.Projectiles
         {
             return _rigidBody.IsAdjacentToAWall();
         }
-
-        private const double Momentum = 3.0 * Mass;
 
         private readonly RigidBody _rigidBody;
     }

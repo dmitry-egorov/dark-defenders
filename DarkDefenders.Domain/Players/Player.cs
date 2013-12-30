@@ -6,7 +6,6 @@ using DarkDefenders.Domain.Players.Events;
 using DarkDefenders.Domain.Projectiles;
 using DarkDefenders.Domain.RigidBodies;
 using DarkDefenders.Domain.Worlds;
-using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
 
@@ -14,9 +13,18 @@ namespace DarkDefenders.Domain.Players
 {
     public class Player : RootBase<PlayerId, IPlayerEventsReciever, IPlayerEvent>, IPlayerEventsReciever
     {
-        public const double BoundingCircleRadius = 1.0 / 40.0;
+        public const double BoundingCircleRadius = 0.5;
         public const double Mass = 1.0;
+        public const double TopHorizontalMomentum = 60.0;
 
+        private const double MovementForce = 200.0;
+        private const double FireDelay = 0.25;
+        private const double JumpMomentum = 60;
+        private const double ProjectileMomentum = 150.0 * Projectile.Mass;
+
+        private const Direction InitialDirection = Direction.Right;
+
+        
         public IEnumerable<IDomainEvent> MoveLeft()
         {
             var events = SetMovementForce(MovementForceDirection.Left);
@@ -173,15 +181,15 @@ namespace DarkDefenders.Domain.Players
 
             var projectileId = new ProjectileId();
 
-            return _projectileFactory.Create(projectileId, Id, _world.Id, projectilePosition, _projectileMomentum);
+            return _projectileFactory.Create(projectileId, _world.Id, projectilePosition, _projectileMomentum);
         }
 
         private void PrepareProjectileMomentum()
         {
             _projectileMomentum = 
                 _direction == Direction.Right 
-                ? Projectile.RightMomentum 
-                : Projectile.LeftMomentum;
+                ? _rightProjectileMomentum 
+                : _leftProjectileMomentum;
         }
 
         private Vector GetProjectilePosition()
@@ -202,12 +210,12 @@ namespace DarkDefenders.Domain.Players
             return Vector.XY(x, y);
         }
 
-        private static readonly Vector _jumpMomentum = Vector.XY(0, 1.5f);
+        private static readonly Vector _jumpMomentum = Vector.XY(0, JumpMomentum);
         private static readonly Vector _leftMovementForce = Vector.Left * MovementForce;
         private static readonly Vector _rightMovementForce = Vector.Right * MovementForce;
-        private const double MovementForce = 4.0;
-        private const double FireDelay = 0.25;
-        private const Direction InitialDirection = Direction.Right;
+
+        private static readonly Vector _leftProjectileMomentum = Vector.XY(-ProjectileMomentum, 0);
+        private static readonly Vector _rightProjectileMomentum = Vector.XY(ProjectileMomentum, 0);
 
         private readonly ProjectileFactory _projectileFactory;
 

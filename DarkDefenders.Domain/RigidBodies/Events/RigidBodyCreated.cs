@@ -12,13 +12,15 @@ namespace DarkDefenders.Domain.RigidBodies.Events
         public Circle BoundingCircle { get; private set; }
         public double Mass { get; private set; }
         public Vector InitialMomentum { get; private set; }
+        public double TopHorizontalMomentum { get; private set; }
 
-        public RigidBodyCreated(RigidBodyId rigidBodyId, WorldId worldId, Circle boundingCircle, Vector initialMomentum, double mass)
+        public RigidBodyCreated(RigidBodyId rigidBodyId, WorldId worldId, Circle boundingCircle, Vector initialMomentum, double mass, double topHorizontalMomentum)
             : base(rigidBodyId)
         {
             WorldId = worldId.ShouldNotBeNull("worldId");
             BoundingCircle = boundingCircle;
             Mass = mass;
+            TopHorizontalMomentum = topHorizontalMomentum;
             InitialMomentum = initialMomentum;
         }
         

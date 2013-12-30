@@ -23,7 +23,7 @@ namespace Infrastructure.DDDES.Implementations
             _eventsLinstener = eventsLinstener;
         }
 
-        public void AddRepository<TRootId, TRoot, TRootEvent, TRootFactory, TCreatedEvent>(Repository<TRootId, TRoot> repository, TRootFactory factory)
+        public void RegisterRoot<TRootId, TRoot, TRootEvent, TRootFactory, TCreatedEvent>(Repository<TRootId, TRoot> repository, TRootFactory factory)
             where TRootId : Identity
             where TRoot: class, IRoot<TRootId, TRootEvent> 
             where TRootFactory: IRootFactory<TRoot, TCreatedEvent>

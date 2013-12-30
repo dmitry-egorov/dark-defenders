@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using Infrastructure.Util;
 
@@ -52,7 +53,9 @@ namespace Infrastructure.Math
 
         public string ToString(string formatting)
         {
-            return "({0}, {1})".FormatWith(X.ToString(formatting), Y.ToString(formatting));
+            var x = X.ToString(formatting, CultureInfo.InvariantCulture);
+            var y = Y.ToString(formatting, CultureInfo.InvariantCulture);
+            return "({0}, {1})".FormatWith(x, y);
         }
 
         public bool Equals(Vector other)

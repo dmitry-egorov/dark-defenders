@@ -13,29 +13,6 @@ namespace DarkDefenders.Console.ViewModels
 {
     internal class GameViewModel : IEventsLinstener<IDomainEvent>, IDomainEventReciever
     {
-        public static GameViewModel InitializeNew()
-        {
-            var renderer = new GameViewModel(100, 40);
-
-            renderer.Initialize();
-
-            return renderer;
-        }
-
-        public GameViewModel(int width, int height)
-        {
-            _width = width;
-            _height = height;
-        }
-
-        public void Initialize()
-        {
-            System.Console.BufferWidth = System.Console.WindowWidth = _width;
-            System.Console.BufferHeight = System.Console.WindowHeight = _height;
-
-            System.Console.CursorVisible = false;
-        }
-
         public void Recieve(IEnumerable<IDomainEvent> events)
         {
             foreach (var domainEvent in events)
@@ -46,7 +23,14 @@ namespace DarkDefenders.Console.ViewModels
 
         public void Recieve(WorldCreated worldCreated)
         {
-            RenderWorld(_width, _height);
+            var width = (int)worldCreated.Dimensions.Width;
+            var height = (int)worldCreated.Dimensions.Height;
+
+            _width = width;
+            _height = height;
+
+            SetViewPort();
+            RenderWorld();
         }
 
         public void Recieve(WorldDestroyed worldDestroyed)
@@ -132,7 +116,7 @@ namespace DarkDefenders.Console.ViewModels
         public void RenderFps(double fps, long totalFrames)
         {
             var fpsString = fps.ToString(CultureInfo.InvariantCulture);
-            ConsoleRenderer.RenderFloatRight(fpsString, 0, 8, _width);
+            ConsoleRenderer.RenderFloatRight(fpsString, 0, 8, _width + 2);
         }
 
         public void RenderAverageEventsCount(double averageEventsCount, long totalEvents)
@@ -148,34 +132,42 @@ namespace DarkDefenders.Console.ViewModels
             RenderMomentum();
         }
 
+        private void SetViewPort()
+        {
+            ConsoleRenderer.SetViewPort(_width + 2, _height + 2);
+        }
+
         private void RenderMovementForce(MovementForceDirectionChanged movementForceDirectionChanged)
         {
             var text = "d: " + movementForceDirectionChanged.MovementForceDirection;
-            ConsoleRenderer.RenderFloatRight(text, 3, 30, _width);
+            ConsoleRenderer.RenderFloatRight(text, 3, 30, _width + 2);
         }
 
         private void RenderPosition()
         {
-            ConsoleRenderer.RenderFloatRight("p: " + _lastPosition.ToString("0.00"), 1, 30, _width);
+            ConsoleRenderer.RenderFloatRight("p: " + _lastPosition.ToString("0.0"), 1, 30, _width + 2);
         }
 
         private void RenderMomentum()
         {
-            ConsoleRenderer.RenderFloatRight("v: " + _lastMomentum.ToString("0.00"), 2, 30, _width);
+            ConsoleRenderer.RenderFloatRight("v: " + _lastMomentum.ToString("0.0"), 2, 30, _width + 2);
         }
 
-        private void RenderWorld(int width, int height)
+        private void RenderWorld()
         {
-            ConsoleRenderer.RenderHorizontalLine(0, 1, width - 2);
-            ConsoleRenderer.RenderHorizontalLine(height - 1, 1, width - 2);
-            ConsoleRenderer.RenderVerticalLine(1, 0, height - 1);
-            ConsoleRenderer.RenderVerticalLine(1, width - 1, height - 1);
+            var width = _width;
+            var height = _height;
+
+            ConsoleRenderer.RenderHorizontalLine(0, 1, width);
+            ConsoleRenderer.RenderHorizontalLine(height + 1, 1, width);
+            ConsoleRenderer.RenderVerticalLine(1, 0, height + 1);
+            ConsoleRenderer.RenderVerticalLine(1, width + 1, height + 1);
         }
 
         private readonly Dictionary<RigidBodyId, RigidBodyViewModel> _rigidBodyMap = new Dictionary<RigidBodyId, RigidBodyViewModel>();
 
-        private readonly int _width;
-        private readonly int _height;
+        private int _width;
+        private int _height;
         private Vector _lastMomentum = Vector.Zero;
         private Vector _lastPosition = Vector.Zero;
         private RigidBodyId _playerRigidBodyId;
