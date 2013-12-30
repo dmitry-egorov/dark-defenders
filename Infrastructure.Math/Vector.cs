@@ -37,7 +37,7 @@ namespace Infrastructure.Math
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool EqualsZero()
         {
-            return _x == 0.0 && _y == 0.0;
+            return _x.Equals(0.0) && _y.Equals(0.0);
         }
 
         public double LengthSquared()

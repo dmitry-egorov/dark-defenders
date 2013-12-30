@@ -35,16 +35,17 @@ namespace DarkDefenders.IntegrationTests
         public void Should_create_player()
         {
             var spawnPosition = new Vector(0, 0);
+            var dimensions = new Dimensions(10, 10);
             var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRadius);
             var mass = Player.Mass;
 
-            var worldId = CreateWorld(spawnPosition);
+            var worldId = CreateWorld(dimensions, spawnPosition);
             var playerId = CreatePlayer(worldId);
             var rigidBodyId = FindRigidBodyId();
 
             var expectedEvents = new IEvent[]
             {
-                new WorldCreated(worldId, spawnPosition), 
+                new WorldCreated(worldId, dimensions, spawnPosition), 
                 new RigidBodyCreated(rigidBodyId, worldId, boundingCircle, Vector.Zero, mass),
                 new PlayerCreated(playerId, worldId, rigidBodyId)
             };
@@ -56,11 +57,12 @@ namespace DarkDefenders.IntegrationTests
         public void Should_create_and_set_desired_orientation_to_player()
         {
             var spawnPosition = new Vector(0, 0);
+            var dimensions = new Dimensions(10, 10);
             var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRadius);
             var desiredOrientation = MovementForceDirection.Left;
             var mass = Player.Mass;
 
-            var worldId = CreateWorld(spawnPosition);
+            var worldId = CreateWorld(dimensions, spawnPosition);
             var playerId = CreatePlayer(worldId);
             var rigidBodyId = FindRigidBodyId();
 
@@ -68,7 +70,7 @@ namespace DarkDefenders.IntegrationTests
 
             var expectedEvents = new IEvent[]
             {
-                new WorldCreated(worldId, spawnPosition), 
+                new WorldCreated(worldId, dimensions, spawnPosition), 
                 new RigidBodyCreated(rigidBodyId, worldId, boundingCircle, Vector.Zero, mass),
                 new PlayerCreated(playerId, worldId, rigidBodyId),
                 new MovementForceDirectionChanged(playerId, desiredOrientation), 
@@ -76,15 +78,11 @@ namespace DarkDefenders.IntegrationTests
             _eventListener.AssertEvents(expectedEvents);
         }
 
-        private RigidBodyId FindRigidBodyId()
-        {
-            return _eventListener.FindEvents<RigidBodyCreated>().Single().RootId;
-        }
-
         [Test]
         public void Should_create_and_set_desired_orientation_to_player_and_move_player_on_update()
         {
             var spawnPosition = new Vector(0, 0.025);
+            var dimensions = new Dimensions(10, 10);
             var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRadius);
             var desiredOrientation = MovementForceDirection.Left;
             var externalForce = Vector.XY(-4.0, 0);
@@ -93,7 +91,7 @@ namespace DarkDefenders.IntegrationTests
             var newPosition = Vector.XY(-0.0016, 0.025);
             var mass = Player.Mass;
 
-            var worldId = CreateWorld(spawnPosition);
+            var worldId = CreateWorld(dimensions, spawnPosition);
             var playerId = CreatePlayer(worldId);
             var rigidBodyId = FindRigidBodyId();
 
@@ -102,7 +100,7 @@ namespace DarkDefenders.IntegrationTests
 
             var expectedEvents = new IEvent[]
             {
-                new WorldCreated(worldId, spawnPosition), 
+                new WorldCreated(worldId, dimensions, spawnPosition), 
                 new RigidBodyCreated(rigidBodyId, worldId, boundingCircle, Vector.Zero, mass),
                 new PlayerCreated(playerId, worldId, rigidBodyId),
                 new MovementForceDirectionChanged(playerId, desiredOrientation), 
@@ -129,10 +127,16 @@ namespace DarkDefenders.IntegrationTests
         {
             var spawnPosition = new Vector(0, 0);
             var worldId = new WorldId();
+            var dimensions = new Dimensions(10, 10);
 
-            CreateWorld(worldId, spawnPosition);
+            CreateWorld(worldId, dimensions, spawnPosition);
 
-            Assert.Throws<RootAlreadyExistsException>(() => CreateWorld(worldId, spawnPosition));
+            Assert.Throws<RootAlreadyExistsException>(() => CreateWorld(worldId, dimensions, spawnPosition));
+        }
+
+        private RigidBodyId FindRigidBodyId()
+        {
+            return _eventListener.FindEvents<RigidBodyCreated>().Single().RootId;
         }
 
         private void UpdateAll(double elapsed)
@@ -152,18 +156,18 @@ namespace DarkDefenders.IntegrationTests
             return playerId;
         }
 
-        private WorldId CreateWorld(Vector spawnPosition)
+        private WorldId CreateWorld(Dimensions dimensions, Vector spawnPosition)
         {
             var worldId = new WorldId();
 
-            CreateWorld(worldId, spawnPosition);
+            CreateWorld(worldId, dimensions, spawnPosition);
 
             return worldId;
         }
 
-        private void CreateWorld(WorldId worldId, Vector spawnPosition)
+        private void CreateWorld(WorldId worldId, Dimensions dimensions, Vector spawnPosition)
         {
-            _commandProcessor.CreateAndCommit<WorldFactory>(f => f.Create(worldId, spawnPosition));
+            _commandProcessor.CreateAndCommit<WorldFactory>(f => f.Create(worldId, dimensions, spawnPosition));
         }
 
         private void CreatePlayer(PlayerId playerId, WorldId worldId)

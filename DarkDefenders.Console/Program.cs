@@ -77,9 +77,10 @@ namespace DarkDefenders.Console
         {
             var worldId = new WorldId();
             var spawnPosition = new Vector(0, 0.05);
+            var dimensions = new Dimensions(100, 40);
             var playerId = new PlayerId();
 
-            processor.CreateAndCommit<WorldFactory>(t => t.Create(worldId, spawnPosition));
+            processor.CreateAndCommit<WorldFactory>(t => t.Create(worldId, dimensions, spawnPosition));
             processor.CreateAndCommit<PlayerFactory>(p => p.Create(playerId, worldId));
 
             return new RootToProcessorAdapter<Player>(playerId, processor);

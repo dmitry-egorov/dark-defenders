@@ -128,14 +128,16 @@ namespace DarkDefenders.Domain.Worlds
             ElapsedSeconds = worldTimeUpdated.Elapsed;
         }
 
-        internal World(WorldId id, Vector spawnPosition) : base(id)
+        internal World(WorldId id, Dimensions dimensions, Vector spawnPosition) : base(id)
         {
+            _dimensions = dimensions;
             _spawnPosition = spawnPosition;
             TimeSeconds = 0.0;
         }
 
         private const double GravityAcceleration = 4d;
 
+        private readonly Dimensions _dimensions;
         private readonly Vector _spawnPosition;
     }
 }
