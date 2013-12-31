@@ -18,13 +18,16 @@ namespace DarkDefenders.Console
 {
     static class Program
     {
-        private const int MaxFps = 300000000;
-//        private const int MaxFps = 30;
+//        private const int MaxFps = 300000000;
+        private const int MaxFps = 33;
+        private const int TimeSlowdown = 1;
+//        private const int TimeSlowdown = 5;
         private static readonly TimeSpan _minFrameElapsed = TimeSpan.FromSeconds(1.0 / MaxFps);
         private static readonly TimeSpan _playerStateUpdatePeriod = TimeSpan.FromSeconds(1.0 / 30);
 
         private static readonly Vector _spawnPosition = new Vector(35, 5);
-        private const string WorldFileName = "world1.bmp";
+        private const string WorldFileName = "simpleWorld2.txt";
+//        private const string WorldFileName = "world1.bmp";
 
         static void Main()
         {
@@ -53,7 +56,7 @@ namespace DarkDefenders.Console
             while (!escape)
             {
                 var elapsed = clock.ElapsedSinceLastCall;
-                var elapsedSeconds = elapsed.TotalSeconds;
+                var elapsedSeconds = elapsed.TotalSeconds / TimeSlowdown;
 
                 worlds.DoAndCommit(x => x.UpdateWorldTime(elapsedSeconds));
                 players.DoAndCommit(x => x.ApplyMovementForce());
@@ -100,7 +103,7 @@ namespace DarkDefenders.Console
             var pathToFiles = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "WorldsData");
             var path = Path.Combine(pathToFiles, WorldFileName);
 
-            return TerrainLoader.LoadFromMonochromeBmp(path);
+            return TerrainLoader.LoadFromFile(path);
         }
 
         private static bool ProcessKeyboard(IRootAdapter<Player, IDomainEvent> player, IUnitOfWork unitOfWork)

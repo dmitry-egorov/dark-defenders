@@ -1,4 +1,5 @@
-﻿using DarkDefenders.Domain.Other;
+﻿using System;
+using DarkDefenders.Domain.Other;
 using Infrastructure.Math;
 using Infrastructure.Util;
 
@@ -59,37 +60,73 @@ namespace DarkDefenders.Domain.Worlds
                 || IsStandingOnTheGround(circle);
         }
 
-        public Vector LimitPosition(Circle circle)
+        public Vector LimitPositionChange(Circle circle, Vector positionChange)
         {
-            var position = circle.Position;
             var radius = circle.Radius;
-            var x = position.X;
-            var y = position.Y;
-            
-            if (IsFacingAWallToTheRight(circle))
+
+            var lengthSquared = positionChange.LengthSquared();
+            var radiusSquared = radius * radius;
+
+            if (lengthSquared > radiusSquared)
             {
-                x = ((x + radius).Floor() - radius);
-            }
-            if (IsFacingAWallToTheLeft(circle))
-            {
-                x = ((x - radius).PrevInteger() + 1.0 + radius);
+                var length = Math.Sqrt(lengthSquared);
+                var step = positionChange * (radius / length);
+
+                var fullStepsCount = (int) (length / radius);
+
+                var nextCircle = circle;
+
+                for (var i = 0; i < fullStepsCount; i++)
+                {
+                    nextCircle = nextCircle.Move(step);
+
+                    var limitedPosition = LimitPosition(nextCircle);
+
+                    if (limitedPosition != nextCircle.Position)
+                    {
+                        return limitedPosition - circle.Position;
+                    }
+                }
             }
 
-            if (IsAbutingTheCeiling(circle))
-            {
-                y = ((y + radius).Floor() - radius);
-            }
-            if (IsStandingOnTheGround(circle))
-            {
-                y = ((y - radius).PrevInteger() + 1.0 + radius);
-            }
+            var newCircle = circle.Move(positionChange);
 
-            return Vector.XY(x, y);
+            var newPosition = LimitPosition(newCircle);
+
+            return newPosition - circle.Position;
         }
 
         public bool IsInTheAir(Circle circle)
         {
             return !IsStandingOnTheGround(circle);
+        }
+
+        private Vector LimitPosition(Circle newCircle)
+        {
+            var position = newCircle.Position;
+            var radius = newCircle.Radius;
+            var x = position.X;
+            var y = position.Y;
+
+            if (IsFacingAWallToTheRight(newCircle))
+            {
+                x = ((x + radius).Floor() - radius);
+            }
+            else if (IsFacingAWallToTheLeft(newCircle))
+            {
+                x = ((x - radius).PrevInteger() + 1.0 + radius);
+            }
+
+            if (IsAbutingTheCeiling(newCircle))
+            {
+                y = ((y + radius).Floor() - radius);
+            }
+            else if (IsStandingOnTheGround(newCircle))
+            {
+                y = ((y - radius).PrevInteger() + 1.0 + radius);
+            }
+
+            return Vector.XY(x, y);
         }
 
         private bool IsStandingOnTheGround(Circle circle)

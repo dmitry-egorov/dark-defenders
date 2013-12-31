@@ -12,10 +12,11 @@ namespace Infrastructure.Math
             get { return _dimensions; }
         }
 
-        public Map(Dimensions dimensions)
+        public Map(Dimensions dimensions, T defaultItem)
         {
             _dimensions = dimensions;
             _data = new T[dimensions.Width * dimensions.Height];
+            _defaultItem = defaultItem;
         }
 
         public T this[Point p]
@@ -36,7 +37,7 @@ namespace Infrastructure.Math
             {
                 if (IsNotWithinDimensions(x, y))
                 {
-                    return default(T);
+                    return _defaultItem;
                 }
 
                 return _data[y*_dimensions.Width + x];
@@ -78,5 +79,6 @@ namespace Infrastructure.Math
 
         private readonly Dimensions _dimensions;
         private readonly T[] _data;
+        private readonly T _defaultItem;
     }
 }

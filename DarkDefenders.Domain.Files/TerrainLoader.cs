@@ -3,11 +3,29 @@ using System.Drawing;
 using System.IO;
 using DarkDefenders.Domain.Other;
 using Infrastructure.Math;
+using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.Files
 {
     public static class TerrainLoader
     {
+        public static Map<Tile> LoadFromFile(string path)
+        {
+            var extension = Path.GetExtension(path);
+
+            if (extension == ".txt")
+            {
+                return LoadFromTextFile(path);
+            }
+            
+            if (extension == ".bmp")
+            {
+                return LoadFromMonochromeBmp(path);
+            }
+
+            throw new InvalidOperationException("Extension {0} is not supported".FormatWith(extension));
+        }
+
         public static Map<Tile> LoadFromTextFile(string path)
         {
             var lines = File.ReadAllLines(path);
@@ -21,9 +39,7 @@ namespace DarkDefenders.Domain.Files
             var width = firstLine.Length;
             var height = lines.Length;
 
-            var dimensions = new Dimensions(width, height);
-
-            var map = new Map<Tile>(dimensions);
+            var map = CreateMap(width, height);
 
             var y = 0;
             foreach (var line in lines)
@@ -51,11 +67,8 @@ namespace DarkDefenders.Domain.Files
                 var width = bitmap.Width;
                 var height = bitmap.Height;
 
-                var dimensions = new Dimensions(width, height);
+                var map = CreateMap(width, height);
 
-                var map = new Map<Tile>(dimensions);
-
-                
                 for (var y = 0; y < height; y++)
                 {
                     for (var x = 0; x < width; x++)
@@ -66,6 +79,13 @@ namespace DarkDefenders.Domain.Files
 
                 return map;
             }
+        }
+
+        private static Map<Tile> CreateMap(int width, int height)
+        {
+            var dimensions = new Dimensions(width, height);
+
+            return new Map<Tile>(dimensions, Tile.Solid);
         }
     }
 }

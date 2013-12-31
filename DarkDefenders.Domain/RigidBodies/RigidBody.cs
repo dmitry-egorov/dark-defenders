@@ -12,7 +12,7 @@ namespace DarkDefenders.Domain.RigidBodies
     public class RigidBody : RootBase<RigidBodyId, IRigidBodyEventsReciever, IRigidBodyEvent>, IRigidBodyEventsReciever
     {
         private const double GravityAcceleration = 200;
-        private const double FrictionCoefficient = 100.0;
+        private const double FrictionCoefficient = 200.0;
 
         public Vector Position { get { return _boundingCircle.Position; } }
 
@@ -131,11 +131,9 @@ namespace DarkDefenders.Domain.RigidBodies
         {
             var positionChange = _momentum * (elapsedSeconds / _mass);
 
-            var newPosition = _boundingCircle.Position + positionChange;
+            var limitedChange = _world.LimitPositionChange(_boundingCircle, positionChange);
 
-            var newCircle = _boundingCircle.ChangePosition(newPosition);
-
-            return _world.LimitPosition(newCircle);
+            return _boundingCircle.Position + limitedChange;
         }
 
         private Vector GetNewMomentum(double elapsedSeconds)
@@ -167,8 +165,7 @@ namespace DarkDefenders.Domain.RigidBodies
 
             if (externalForce.EqualsZero())
             {
-
-                return externalForce + GetFrictionForce(elapsedSeconds);
+                return GetFrictionForce(elapsedSeconds);
             }
 
             return externalForce;

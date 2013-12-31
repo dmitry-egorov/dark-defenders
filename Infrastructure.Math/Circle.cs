@@ -18,15 +18,14 @@ namespace Infrastructure.Math
             _radius = radius;
         }
 
+        public Circle Move(Vector delta)
+        {
+            return new Circle(Position + delta, Radius);
+        }
+
         public Circle ChangePosition(Vector newPosition)
         {
             return new Circle(newPosition, Radius);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsAboveHorizontalAxis()
-        {
-            return _position.Y - _radius > 0d;
         }
 
         public override string ToString()

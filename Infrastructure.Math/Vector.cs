@@ -108,5 +108,10 @@ namespace Infrastructure.Math
         {
             return new Vector(vector1._x - vector2._x, vector1._y - vector2._y);
         }
+
+        public double Length()
+        {
+            return System.Math.Sqrt(LengthSquared());
+        }
     }
 }

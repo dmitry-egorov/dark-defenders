@@ -29,9 +29,9 @@ namespace DarkDefenders.Domain.Worlds
             return _terrain.IsInTheAir(circle);
         }
 
-        public Vector LimitPosition(Circle circle)
+        public Vector LimitPositionChange(Circle circle, Vector positionChange)
         {
-            return _terrain.LimitPosition(circle);
+            return _terrain.LimitPositionChange(circle, positionChange);
         }
 
         public Vector LimitMomentum(Vector momentum, Circle boundingCircle)

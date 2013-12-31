@@ -52,6 +52,10 @@
       <Project>{9DA761FD-492C-4BF7-A50D-10930664021D}</Project>
       <Name>Infrastructure.Math</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Util\Infrastructure.Util.csproj">
+      <Project>{0B407BC3-7B5B-431A-96E7-A41F25AB27BE}</Project>
+      <Name>Infrastructure.Util</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
