@@ -39,7 +39,7 @@ namespace DarkDefenders.IntegrationTests
             var dimensions = new Dimensions(10, 10);
             var map = new Map<Tile>(dimensions, default(Tile));
 
-            var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRadius);
+            var boundingBox = CreatePlayersBoundingBox(spawnPosition);
             var mass = Player.Mass;
             var topHorizontalMomentum = Player.TopHorizontalMomentum;
 
@@ -50,11 +50,16 @@ namespace DarkDefenders.IntegrationTests
             var expectedEvents = new IDomainEvent[]
             {
                 new WorldCreated(worldId, map, spawnPosition), 
-                new RigidBodyCreated(rigidBodyId, worldId, boundingCircle, Vector.Zero, mass, topHorizontalMomentum),
+                new RigidBodyCreated(rigidBodyId, worldId, boundingBox, Vector.Zero, mass, topHorizontalMomentum),
                 new PlayerCreated(playerId, worldId, rigidBodyId)
             };
 
             _eventListener.AssertEvents(expectedEvents);
+        }
+
+        private static Box CreatePlayersBoundingBox(Vector spawnPosition)
+        {
+            return new Box(spawnPosition, Player.BoundingBoxRadius, Player.BoundingBoxRadius);
         }
 
         [Test]
@@ -63,7 +68,7 @@ namespace DarkDefenders.IntegrationTests
             var spawnPosition = new Vector(0, 0);
             var dimensions = new Dimensions(10, 10);
             var map = new Map<Tile>(dimensions, default(Tile));
-            var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRadius);
+            var boundingBox = CreatePlayersBoundingBox(spawnPosition);
             var desiredOrientation = MovementForceDirection.Left;
             var mass = Player.Mass;
             var topHorizontalMomentum = Player.TopHorizontalMomentum;
@@ -77,7 +82,7 @@ namespace DarkDefenders.IntegrationTests
             var expectedEvents = new IDomainEvent[]
             {
                 new WorldCreated(worldId, map, spawnPosition), 
-                new RigidBodyCreated(rigidBodyId, worldId, boundingCircle, Vector.Zero, mass, topHorizontalMomentum),
+                new RigidBodyCreated(rigidBodyId, worldId, boundingBox, Vector.Zero, mass, topHorizontalMomentum),
                 new PlayerCreated(playerId, worldId, rigidBodyId),
                 new MovementForceDirectionChanged(playerId, desiredOrientation), 
             };
@@ -90,7 +95,7 @@ namespace DarkDefenders.IntegrationTests
             var spawnPosition = new Vector(50, 0.5);
             var dimensions = new Dimensions(100, 100);
             var map = new Map<Tile>(dimensions, default(Tile));
-            var boundingCircle = new Circle(spawnPosition, Player.BoundingCircleRadius);
+            var boundingBox = CreatePlayersBoundingBox(spawnPosition);
             var desiredOrientation = MovementForceDirection.Left;
             var elapsed = TimeSpan.FromMilliseconds(20).TotalSeconds;
 
@@ -110,7 +115,7 @@ namespace DarkDefenders.IntegrationTests
             var expectedEvents = new IDomainEvent[]
             {
                 new WorldCreated(worldId, map, spawnPosition), 
-                new RigidBodyCreated(rigidBodyId, worldId, boundingCircle, Vector.Zero, mass, topHorizontalMomentum),
+                new RigidBodyCreated(rigidBodyId, worldId, boundingBox, Vector.Zero, mass, topHorizontalMomentum),
                 new PlayerCreated(playerId, worldId, rigidBodyId),
                 new MovementForceDirectionChanged(playerId, desiredOrientation), 
                 new WorldTimeUpdated(worldId, elapsed, elapsed), 

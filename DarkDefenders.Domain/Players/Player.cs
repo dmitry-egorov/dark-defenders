@@ -13,7 +13,7 @@ namespace DarkDefenders.Domain.Players
 {
     public class Player : RootBase<PlayerId, IPlayerEventsReciever, IPlayerEvent>, IPlayerEventsReciever
     {
-        public const double BoundingCircleRadius = 0.5;
+        public const double BoundingBoxRadius = 0.4;
         public const double Mass = 1.0;
         public const double TopHorizontalMomentum = 60.0;
 
@@ -197,7 +197,7 @@ namespace DarkDefenders.Domain.Players
             var x = position.X;
             var y = position.Y;
 
-            const double radius = BoundingCircleRadius + Projectile.BoundingCircleRadius;
+            const double radius = BoundingBoxRadius + Projectile.BoundingBoxRadius;
 
             if (_direction == Direction.Right)
             {

@@ -13,21 +13,23 @@ using DarkDefenders.Domain.Worlds;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations;
 using Infrastructure.Math;
+using Infrastructure.Util;
 
 namespace DarkDefenders.Console
 {
     static class Program
     {
 //        private const int MaxFps = 300000000;
-        private const int MaxFps = 33;
+//        private const int MaxFps = 33;
+        private const int MaxFps = 50;
         private const int TimeSlowdown = 1;
 //        private const int TimeSlowdown = 5;
         private static readonly TimeSpan _minFrameElapsed = TimeSpan.FromSeconds(1.0 / MaxFps);
         private static readonly TimeSpan _playerStateUpdatePeriod = TimeSpan.FromSeconds(1.0 / 30);
 
         private static readonly Vector _spawnPosition = new Vector(35, 5);
-        private const string WorldFileName = "simpleWorld2.txt";
-//        private const string WorldFileName = "world1.bmp";
+//        private const string WorldFileName = "simpleWorld3.txt";
+        private const string WorldFileName = "world1.bmp";
 
         static void Main()
         {
@@ -56,7 +58,7 @@ namespace DarkDefenders.Console
             while (!escape)
             {
                 var elapsed = clock.ElapsedSinceLastCall;
-                var elapsedSeconds = elapsed.TotalSeconds / TimeSlowdown;
+                var elapsedSeconds = (elapsed.TotalSeconds / TimeSlowdown).LimitTop(1.0);
 
                 worlds.DoAndCommit(x => x.UpdateWorldTime(elapsedSeconds));
                 players.DoAndCommit(x => x.ApplyMovementForce());

@@ -15,6 +15,8 @@ namespace DarkDefenders.Console.ViewModels
 {
     internal class GameViewModel : IEventsListener<IDomainEvent>, IDomainEventReciever
     {
+        private ConsoleRenderer _consoleRenderer;
+
         public void Recieve(IDomainEvent domainEvent)
         {
             domainEvent.Accept(this);
@@ -67,7 +69,7 @@ namespace DarkDefenders.Console.ViewModels
 
         public void Recieve(RigidBodyCreated rigidBodyCreated)
         {
-            var playerViewModel = new RigidBodyViewModel(_map);
+            var playerViewModel = new RigidBodyViewModel(_map, _consoleRenderer);
             _rigidBodyMap.Add(rigidBodyCreated.RootId, playerViewModel);
 
             playerViewModel.Recieve(rigidBodyCreated);
@@ -111,14 +113,14 @@ namespace DarkDefenders.Console.ViewModels
         public void RenderFps(double fps, long totalFrames)
         {
             var fpsString = fps.ToString(CultureInfo.InvariantCulture);
-            ConsoleRenderer.RenderFloatRight(fpsString, 0, 8, _map.Dimensions.Width + 2);
+            _consoleRenderer.RenderFloatRight(fpsString, 0, 8, _map.Dimensions.Width + 2);
         }
 
         public void RenderAverageEventsCount(double averageEventsCount, long totalEvents)
         {
-            ConsoleRenderer.Render(0, 1, "     ");
-            ConsoleRenderer.Render(0, 1, averageEventsCount.ToString(CultureInfo.InvariantCulture));
-            ConsoleRenderer.Render(0, 0, totalEvents.ToString(CultureInfo.InvariantCulture));
+            _consoleRenderer.Render(0, 1, "     ");
+            _consoleRenderer.Render(0, 1, averageEventsCount.ToString(CultureInfo.InvariantCulture));
+            _consoleRenderer.Render(0, 0, totalEvents.ToString(CultureInfo.InvariantCulture));
         }
 
         public void RenderPlayerState()
@@ -129,23 +131,24 @@ namespace DarkDefenders.Console.ViewModels
 
         private void SetViewPort()
         {
-            ConsoleRenderer.SetViewPort(_map.Dimensions.Width + 2, _map.Dimensions.Height + 2);
+            _consoleRenderer = new ConsoleRenderer(_map.Dimensions.Width + 2, _map.Dimensions.Height + 2);
+            _consoleRenderer.InitializeScreen();
         }
 
         private void RenderMovementForce(MovementForceDirectionChanged movementForceDirectionChanged)
         {
             var text = "d: " + movementForceDirectionChanged.MovementForceDirection;
-            ConsoleRenderer.RenderFloatRight(text, 3, 30, _map.Dimensions.Width + 2);
+            _consoleRenderer.RenderFloatRight(text, 3, 8, _map.Dimensions.Width + 2);
         }
 
         private void RenderPosition()
         {
-            ConsoleRenderer.RenderFloatRight("p: " + _lastPlayerPosition.ToString("0.0"), 1, 30, _map.Dimensions.Width + 2);
+            _consoleRenderer.RenderFloatRight("p: " + _lastPlayerPosition.ToString("0.0"), 1, 15, _map.Dimensions.Width + 2);
         }
 
         private void RenderMomentum()
         {
-            ConsoleRenderer.RenderFloatRight("v: " + _lastPlayerMomentum.ToString("0.0"), 2, 30, _map.Dimensions.Width + 2);
+            _consoleRenderer.RenderFloatRight("v: " + _lastPlayerMomentum.ToString("0.0"), 2, 18, _map.Dimensions.Width + 2);
         }
 
         private void RenderWorld()
@@ -153,10 +156,10 @@ namespace DarkDefenders.Console.ViewModels
             var width = _map.Dimensions.Width;
             var height = _map.Dimensions.Height;
 
-            ConsoleRenderer.RenderHorizontalLine(0, 1, width);
-            ConsoleRenderer.RenderHorizontalLine(height + 1, 1, width);
-            ConsoleRenderer.RenderVerticalLine(1, 0, height + 1);
-            ConsoleRenderer.RenderVerticalLine(1, width + 1, height + 1);
+            _consoleRenderer.RenderHorizontalLine(0, 1, width);
+            _consoleRenderer.RenderHorizontalLine(height + 1, 1, width);
+            _consoleRenderer.RenderVerticalLine(1, 0, height + 1);
+            _consoleRenderer.RenderVerticalLine(1, width + 1, height + 1);
 
             for (var i = 0; i < width; i++)
             {
@@ -164,7 +167,7 @@ namespace DarkDefenders.Console.ViewModels
                 {
                     if (_map[i, j] == Tile.Solid)
                     {
-                        ConsoleRenderer.Render(new Point(i + 1, height - j), '+');
+                        _consoleRenderer.Render(new Point(i + 1, height - j), '+');
                     }
                 }
             }

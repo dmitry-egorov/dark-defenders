@@ -3,9 +3,26 @@ using System.Linq;
 
 namespace DarkDefenders.Console
 {
-    public static class ConsoleRenderer
+    public class ConsoleRenderer
     {
-        public static void RenderHorizontalLine(int top, int left, int length)
+        private readonly int _width;
+        private readonly int _height;
+
+        public ConsoleRenderer(int width, int height)
+        {
+            _width = width;
+            _height = height;
+        }
+
+        public void InitializeScreen()
+        {
+            System.Console.BufferWidth = System.Console.WindowWidth = _width;
+            System.Console.BufferHeight = System.Console.WindowHeight = _height;
+
+            System.Console.CursorVisible = false;
+        }
+
+        public void RenderHorizontalLine(int top, int left, int length)
         {
             var end = left + length;
             for (var i = left; i < end; i++)
@@ -14,7 +31,7 @@ namespace DarkDefenders.Console
             }
         }
 
-        public static void RenderVerticalLine(int top, int left, int length)
+        public void RenderVerticalLine(int top, int left, int length)
         {
             for (var i = top; i < length; i++)
             {
@@ -22,7 +39,7 @@ namespace DarkDefenders.Console
             }
         }
 
-        public static void RenderFloatRight(string text, int top, int max, int width)
+        public void RenderFloatRight(string text, int top, int max, int width)
         {
             var spaces = new string(Enumerable.Repeat(' ', max).ToArray());
 
@@ -30,30 +47,31 @@ namespace DarkDefenders.Console
             Render(width - text.Length, top, text);
         }
 
-        public static void Render(int x, int y, char c)
+        public void Render(int x, int y, char c)
         {
+            if (IsOutOfScreen(x, y))
+            {
+                return;
+            }
+
             System.Console.SetCursorPosition(x, y);
             System.Console.Write(c);
         }
 
-        public static void Render(Point position, char c)
+        private bool IsOutOfScreen(int x, int y)
         {
-            System.Console.SetCursorPosition(position.X, position.Y);
-            System.Console.Write(c);
+            return x < 0 || x >= _width || y < 0 || y >= _height;
         }
 
-        public static void Render(int left, int top, string str)
+        public void Render(Point position, char c)
+        {
+            Render(position.X, position.Y, c);
+        }
+
+        public void Render(int left, int top, string str)
         {
             System.Console.SetCursorPosition(left, top);
             System.Console.Write(str);
-        }
-
-        public static void SetViewPort(int width, int height)
-        {
-            System.Console.BufferWidth = System.Console.WindowWidth = width;
-            System.Console.BufferHeight = System.Console.WindowHeight = height;
-
-            System.Console.CursorVisible = false;
         }
     }
 }

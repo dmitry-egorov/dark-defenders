@@ -35,7 +35,7 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Circle.cs" />
+    <Compile Include="Box.cs" />
     <Compile Include="Dimensions.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="Round.cs" />

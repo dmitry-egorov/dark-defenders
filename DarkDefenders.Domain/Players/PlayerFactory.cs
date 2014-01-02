@@ -53,7 +53,11 @@ namespace DarkDefenders.Domain.Players
 
         private IEnumerable<IDomainEvent> CreatePlayerRigidBody(RigidBodyId rigidBodyId, WorldId worldId, Vector spawnPosition)
         {
-            return _rigidBodyFactory.CreateRigidBody(rigidBodyId, worldId, spawnPosition, Player.BoundingCircleRadius, Vector.Zero, Player.Mass, Player.TopHorizontalMomentum);
+            double radius = Player.BoundingBoxRadius;
+
+            var boundingBox = new Box(spawnPosition, radius, radius);
+
+            return _rigidBodyFactory.CreateRigidBody(rigidBodyId, worldId, Vector.Zero, Player.Mass, Player.TopHorizontalMomentum, boundingBox);
         }
     }
 }

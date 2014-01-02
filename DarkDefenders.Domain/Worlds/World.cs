@@ -24,24 +24,24 @@ namespace DarkDefenders.Domain.Worlds
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsInTheAir(Circle circle)
+        public bool IsInTheAir(Box box)
         {
-            return _terrain.IsInTheAir(circle);
+            return _terrain.IsInTheAir(box);
         }
 
-        public Vector LimitPositionChange(Circle circle, Vector positionChange)
+        public Vector ApplyPositionChange(Box box, Vector positionChange)
         {
-            return _terrain.LimitPositionChange(circle, positionChange);
+            return _terrain.ApplyPositionChange(box, positionChange);
         }
 
-        public Vector LimitMomentum(Vector momentum, Circle boundingCircle)
+        public Vector LimitMomentum(Vector momentum, Box boundingBox)
         {
-            return _terrain.LimitMomentum(momentum, boundingCircle);
+            return _terrain.LimitMomentum(momentum, boundingBox);
         }
 
-        public bool IsAdjacentToAWall(Circle circle)
+        public bool IsAdjacentToAWall(Box box)
         {
-            return _terrain.IsAdjacentToAWall(circle);
+            return _terrain.IsAdjacentToAWall(box);
         }
 
         public void Recieve(WorldTimeUpdated worldTimeUpdated)

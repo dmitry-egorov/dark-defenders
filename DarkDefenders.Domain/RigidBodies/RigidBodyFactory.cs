@@ -18,19 +18,17 @@ namespace DarkDefenders.Domain.RigidBodies
             _worldRepository = worldRepository;
         }
 
-        public IEnumerable<IDomainEvent> CreateRigidBody(RigidBodyId id, WorldId worldId, Vector position, double radius, Vector initialMomentum, double mass, double topHorizontalMomentum)
+        public IEnumerable<IDomainEvent> CreateRigidBody(RigidBodyId id, WorldId worldId, Vector initialMomentum, double mass, double topHorizontalMomentum, Box boundingBox)
         {
             AssertDoesntExist(id);
-            
-            var boundingCircle = new Circle(position, radius);
 
-            return new RigidBodyCreated(id, worldId, boundingCircle, initialMomentum, mass, topHorizontalMomentum).EnumerateOnce();
+            return new RigidBodyCreated(id, worldId, boundingBox, initialMomentum, mass, topHorizontalMomentum).EnumerateOnce();
         }
 
         protected override RigidBody Handle(RigidBodyCreated created)
         {
             var world = _worldRepository.GetById(created.WorldId);
-            return new RigidBody(created.RootId, world, created.InitialMomentum, created.Mass, created.TopHorizontalMomentum, created.BoundingCircle);
+            return new RigidBody(created.RootId, world, created.InitialMomentum, created.Mass, created.TopHorizontalMomentum, created.BoundingBox);
         }
     }
 }

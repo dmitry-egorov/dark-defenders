@@ -34,11 +34,13 @@ namespace DarkDefenders.Domain.Projectiles
 
         private IEnumerable<IDomainEvent> CreateProjectileRigidBody(RigidBodyId rigidBodyId, Vector position, WorldId worldId, Vector momentum)
         {
-            var boundingCircleRadius = Projectile.BoundingCircleRadius;
+            var radius = Projectile.BoundingBoxRadius;
             var mass = Projectile.Mass;
             var topHorizontalMomentum = Math.Abs(momentum.X);
 
-            return _rigidBodyFactory.CreateRigidBody(rigidBodyId, worldId, position, boundingCircleRadius, momentum, mass, topHorizontalMomentum);
+            var boundingBox = new Box(position, radius, radius);
+
+            return _rigidBodyFactory.CreateRigidBody(rigidBodyId, worldId, momentum, mass, topHorizontalMomentum, boundingBox);
         }
 
         protected override Projectile Handle(ProjectileCreated creationEvent)

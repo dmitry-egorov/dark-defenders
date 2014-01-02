@@ -14,7 +14,7 @@ namespace DarkDefenders.Domain.RigidBodies
         private const double GravityAcceleration = 200;
         private const double FrictionCoefficient = 200.0;
 
-        public Vector Position { get { return _boundingCircle.Position; } }
+        public Vector Position { get { return _boundingBox.Center; } }
 
         public IEnumerable<IDomainEvent> UpdateMomentum()
         {
@@ -68,7 +68,7 @@ namespace DarkDefenders.Domain.RigidBodies
 
         public bool IsInTheAir()
         {
-            return _world.IsInTheAir(_boundingCircle);
+            return _world.IsInTheAir(_boundingBox);
         }
 
         public bool HasVerticalMomentum()
@@ -85,7 +85,7 @@ namespace DarkDefenders.Domain.RigidBodies
 
         public bool IsAdjacentToAWall()
         {
-            return _world.IsAdjacentToAWall(_boundingCircle);
+            return _world.IsAdjacentToAWall(_boundingBox);
         }
 
         public IEnumerable<IDomainEvent> Destroy()
@@ -95,7 +95,7 @@ namespace DarkDefenders.Domain.RigidBodies
 
         public void Recieve(Moved moved)
         {
-            _boundingCircle = _boundingCircle.ChangePosition(moved.NewPosition);
+            _boundingBox = _boundingBox.ChangePosition(moved.NewPosition);
         }
 
         public void Recieve(Accelerated accelerated)
@@ -115,7 +115,7 @@ namespace DarkDefenders.Domain.RigidBodies
                 Vector initialMomentum, 
                 double mass, 
                 double topHorizontalMomentum, 
-                Circle boundingCircle
+                Box boundingBox
             ) : base(id)
         {
             _world = world;
@@ -123,7 +123,7 @@ namespace DarkDefenders.Domain.RigidBodies
             _momentum = initialMomentum;
             _mass = mass;
             _topHorizontalMomentum = topHorizontalMomentum;
-            _boundingCircle = boundingCircle;
+            _boundingBox = boundingBox;
             _externalForce = Vector.Zero;
         }
 
@@ -131,9 +131,7 @@ namespace DarkDefenders.Domain.RigidBodies
         {
             var positionChange = _momentum * (elapsedSeconds / _mass);
 
-            var limitedChange = _world.LimitPositionChange(_boundingCircle, positionChange);
-
-            return _boundingCircle.Position + limitedChange;
+            return _world.ApplyPositionChange(_boundingBox, positionChange);
         }
 
         private Vector GetNewMomentum(double elapsedSeconds)
@@ -149,12 +147,12 @@ namespace DarkDefenders.Domain.RigidBodies
                 newMomentum = LimitTopMomentum(newMomentum);
             }
 
-            return _world.LimitMomentum(newMomentum, _boundingCircle);
+            return _world.LimitMomentum(newMomentum, _boundingBox);
         }
 
         private Vector GetForce(double elapsedSeconds)
         {
-            var isInTheAir = _world.IsInTheAir(_boundingCircle);
+            var isInTheAir = _world.IsInTheAir(_boundingBox);
 
             var externalForce = _externalForce;
 
@@ -210,7 +208,7 @@ namespace DarkDefenders.Domain.RigidBodies
         private readonly double _mass;
         private readonly double _topHorizontalMomentum;
         
-        private Circle _boundingCircle;
+        private Box _boundingBox;
         private Vector _momentum;
         private Vector _externalForce;
     }

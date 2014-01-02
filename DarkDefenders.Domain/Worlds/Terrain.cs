@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using DarkDefenders.Domain.Other;
 using Infrastructure.Math;
 using Infrastructure.Util;
@@ -14,37 +15,41 @@ namespace DarkDefenders.Domain.Worlds
             _map = map;
         }
 
-        public Vector LimitMomentum(Vector momentum, Circle boundingCircle)
+        public Vector LimitMomentum(Vector momentum, Box boundingBox)
         {
             var px = momentum.X;
             var py = momentum.Y;
 
             if (px > 0)
             {
-                if (IsFacingAWallToTheRight(boundingCircle))
+                if (IsTouchingAWallToTheRight(boundingBox))
                 {
+                    Debug.WriteLine("MR");
                     px = 0;
                 }
             }
             else if (px < 0)
             {
-                if (IsFacingAWallToTheLeft(boundingCircle))
+                if (IsTouchingAWallToTheLeft(boundingBox))
                 {
+                    Debug.WriteLine("ML");
                     px = 0;
                 }
             }
 
             if (py > 0)
             {
-                if (IsAbutingTheCeiling(boundingCircle))
+                if (IsTouchingTheCeiling(boundingBox))
                 {
+                    Debug.WriteLine("MC");
                     py = 0;
                 }
             }
             else if (py < 0)
             {
-                if (IsStandingOnTheGround(boundingCircle))
+                if (IsTouchingTheGround(boundingBox))
                 {
+                    Debug.WriteLine("MF");
                     py = 0;
                 }
             }
@@ -52,121 +57,193 @@ namespace DarkDefenders.Domain.Worlds
             return Vector.XY(px, py);
         }
 
-        public bool IsAdjacentToAWall(Circle circle)
+        public bool IsAdjacentToAWall(Box box)
         {
-            return IsFacingAWallToTheRight(circle)
-                || IsFacingAWallToTheLeft(circle)
-                || IsAbutingTheCeiling(circle)
-                || IsStandingOnTheGround(circle);
+            return IsTouchingAWallToTheRight(box)
+                || IsTouchingAWallToTheLeft(box)
+                || IsTouchingTheCeiling(box)
+                || IsTouchingTheGround(box);
         }
 
-        public Vector LimitPositionChange(Circle circle, Vector positionChange)
+        public bool IsInTheAir(Box box)
         {
-            var radius = circle.Radius;
+            return !IsTouchingTheGround(box);
+        }
 
-            var lengthSquared = positionChange.LengthSquared();
-            var radiusSquared = radius * radius;
+        public Vector ApplyPositionChange(Box box, Vector positionDelta)
+        {
+            Vector horizontalAdjustment;
+            var horizontalPositionAdjusted = ApplyHorizontalPositionChange(box, positionDelta, out horizontalAdjustment);
 
-            if (lengthSquared > radiusSquared)
+            Vector verticalAdjustment;
+            var verticalPositionAdjusted = ApplyVerticalPositionChange(box, positionDelta, out verticalAdjustment);
+
+            if (verticalPositionAdjusted && horizontalPositionAdjusted)
             {
-                var length = Math.Sqrt(lengthSquared);
-                var step = positionChange * (radius / length);
+                var horizontalDelta = (horizontalAdjustment - box.Center).LengthSquared();
+                var verticalDelta = (verticalAdjustment - box.Center).LengthSquared();
+                Debug.WriteLine("H: " + horizontalAdjustment + "; V: " + verticalAdjustment);
 
-                var fullStepsCount = (int) (length / radius);
+                return horizontalDelta < verticalDelta ? horizontalAdjustment : verticalAdjustment;
+            }
 
-                var nextCircle = circle;
+            if (horizontalPositionAdjusted)
+            {
+                Debug.WriteLine("H: " + horizontalAdjustment);
+                return horizontalAdjustment;
+            }
 
-                for (var i = 0; i < fullStepsCount; i++)
+            if (verticalPositionAdjusted)
+            {
+                Debug.WriteLine("V: " + verticalAdjustment);
+                return verticalAdjustment;
+            }
+
+            return box.Center + positionDelta;
+        }
+
+        private bool ApplyHorizontalPositionChange(Box box, Vector positionDelta, out Vector adjustedPosition)
+        {
+            var dx = positionDelta.X;
+            var dy = positionDelta.Y;
+
+            if (dx == 0.0)
+            {
+                adjustedPosition = Vector.Zero;
+                return false;
+            }
+
+            var sign = Math.Sign(dx);
+            var slopeY = dy / dx;
+
+            var startBoundX = box.Center.X + sign * box.WidthRadius;
+            var startBoundY = box.Center.Y;
+            var endBoundX = startBoundX + dx;
+
+            var xStart = ((sign == 1) ? startBoundX.TolerantCeiling() : startBoundX.TolerantFloor()).ToInt();
+            var xEnd = ((sign == 1) ? endBoundX.PrevInteger() : endBoundX.NextInteger()).ToInt();
+
+            for (var x = xStart; (x - xEnd) * sign <= 0; x += sign)
+            {
+                var checkX = (sign == 1) ? x : x - 1;
+                var y = slopeY * (x - startBoundX) + startBoundY;
+                if (!IsTouchingVerticalWalls(checkX, y, box.HeightRadius))
                 {
-                    nextCircle = nextCircle.Move(step);
+                    continue;
+                }
 
-                    var limitedPosition = LimitPosition(nextCircle);
+                adjustedPosition = Vector.XY(x - sign * box.WidthRadius, y);
+                return true;
+            }
 
-                    if (limitedPosition != nextCircle.Position)
-                    {
-                        return limitedPosition - circle.Position;
-                    }
+            adjustedPosition = Vector.Zero;
+            return false;
+        }
+
+        private bool ApplyVerticalPositionChange(Box box, Vector positionDelta, out Vector adjustedPosition)
+        {
+            var dx = positionDelta.X;
+            var dy = positionDelta.Y;
+
+            if (dy == 0.0)
+            {
+                adjustedPosition = Vector.Zero;
+                return false;
+            }
+
+            var sign = Math.Sign(dy);
+            var slopeX = dx / dy;
+
+            var startBoundY = box.Center.Y + sign * box.HeightRadius;
+            var startBoundX = box.Center.X;
+            var endBoundY = startBoundY + dy;
+
+            var yStart = (sign == 1 ? startBoundY.TolerantCeiling() : startBoundY.TolerantFloor()).ToInt();
+            var yEnd   = (sign == 1 ? endBoundY.PrevInteger(): endBoundY.NextInteger()).ToInt();
+
+            for (var y = yStart; (y - yEnd) * sign <= 0; y += sign)
+            {
+                var checkY = (sign == 1) ? y : y - 1;
+                var x = slopeX * (y - startBoundY) + startBoundX;
+                if (!IsTouchingHorizontalWallsAt(checkY, x, box.WidthRadius))
+                {
+                    continue;
+                }
+
+                adjustedPosition = Vector.XY(x, y - sign * box.HeightRadius);
+                return true;
+            }
+
+            adjustedPosition = Vector.Zero;
+            return false;
+        }
+
+        private bool IsTouchingTheGround(Box box)
+        {
+            var bottom = box.Center.Y - box.HeightRadius;
+
+            var y = bottom.PrevInteger().ToInt();
+
+            return IsTouchingHorizontalWallsAt(y, box.Center.X, box.WidthRadius);
+        }
+
+        private bool IsTouchingTheCeiling(Box box)
+        {
+            var top = box.Center.Y + box.HeightRadius;
+
+            var y = top.TolerantFloor().ToInt();
+
+            return IsTouchingHorizontalWallsAt(y, box.Center.X, box.WidthRadius);
+        }
+
+        private bool IsTouchingAWallToTheLeft(Box box)
+        {
+            var left = box.Center.X - box.WidthRadius;
+
+            var x = left.PrevInteger().ToInt();
+            
+            return IsTouchingVerticalWalls(x, box.Center.Y, box.HeightRadius);
+        }
+
+        private bool IsTouchingAWallToTheRight(Box box)
+        {
+            var right = box.Center.X + box.WidthRadius;
+
+            var x = right.TolerantFloor().ToInt();
+
+            return IsTouchingVerticalWalls(x, box.Center.Y, box.HeightRadius);
+        }
+
+        private bool IsTouchingHorizontalWallsAt(int y, double xCenter, double widthRadius)
+        {
+            var xStart = (xCenter - widthRadius).TolerantFloor().ToInt();
+            var xEnd = (xCenter + widthRadius).PrevInteger().ToInt();
+
+            for (var x = xStart; x <= xEnd; x++)
+            {
+                if (_map[x, y] == Tile.Solid)
+                {
+                    return true;
                 }
             }
 
-            var newCircle = circle.Move(positionChange);
-
-            var newPosition = LimitPosition(newCircle);
-
-            return newPosition - circle.Position;
+            return false;
         }
 
-        public bool IsInTheAir(Circle circle)
+        private bool IsTouchingVerticalWalls(int x, double yCenter, double heightRadius)
         {
-            return !IsStandingOnTheGround(circle);
-        }
+            var yStart = (yCenter - heightRadius).TolerantFloor().ToInt();
+            var yEnd = (yCenter + heightRadius).PrevInteger().ToInt();
 
-        private Vector LimitPosition(Circle newCircle)
-        {
-            var position = newCircle.Position;
-            var radius = newCircle.Radius;
-            var x = position.X;
-            var y = position.Y;
-
-            if (IsFacingAWallToTheRight(newCircle))
+            for (var y = yStart; y <= yEnd; y++)
             {
-                x = ((x + radius).Floor() - radius);
-            }
-            else if (IsFacingAWallToTheLeft(newCircle))
-            {
-                x = ((x - radius).PrevInteger() + 1.0 + radius);
+                if (_map[x, y] == Tile.Solid)
+                {
+                    return true;
+                }
             }
 
-            if (IsAbutingTheCeiling(newCircle))
-            {
-                y = ((y + radius).Floor() - radius);
-            }
-            else if (IsStandingOnTheGround(newCircle))
-            {
-                y = ((y - radius).PrevInteger() + 1.0 + radius);
-            }
-
-            return Vector.XY(x, y);
-        }
-
-        private bool IsStandingOnTheGround(Circle circle)
-        {
-            var bottom = circle.Position.Y - circle.Radius;
-
-            var x = circle.Position.X.ToInt();
-            var y = bottom.PrevInteger().ToInt();
-
-            return bottom <= 0.0 || _map[x, y] == Tile.Solid;
-        }
-
-        private bool IsAbutingTheCeiling(Circle circle)
-        {
-            var top = circle.Position.Y + circle.Radius;
-
-            var x = circle.Position.X.ToInt();
-            var y = top.Floor().ToInt();
-
-            return _map[x, y] == Tile.Solid;
-        }
-
-        private bool IsFacingAWallToTheLeft(Circle circle)
-        {
-            var left = circle.Position.X - circle.Radius;
-
-            var x = left.PrevInteger().ToInt();
-            var y = circle.Position.Y.ToInt();
-
-            return _map[x, y] == Tile.Solid;
-        }
-
-        private bool IsFacingAWallToTheRight(Circle circle)
-        {
-            var right = circle.Position.X + circle.Radius;
-
-            var x = right.Floor().ToInt();
-            var y = circle.Position.Y.ToInt();
-
-            return _map[x, y] == Tile.Solid;
+            return false;
         }
     }
 }

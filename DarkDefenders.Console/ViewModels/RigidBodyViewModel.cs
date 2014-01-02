@@ -11,28 +11,30 @@ namespace DarkDefenders.Console.ViewModels
         private Point _transformedLastPosition;
         private char? _character;
         private readonly Map<Tile> _map;
+        private readonly ConsoleRenderer _consoleRenderer;
         private Point _lastPosition;
 
-        public RigidBodyViewModel(Map<Tile> map)
+        public RigidBodyViewModel(Map<Tile> map, ConsoleRenderer consoleRenderer)
         {
             _map = map;
+            _consoleRenderer = consoleRenderer;
         }
 
         public void SetAsPlayer()
         {
             _character = '@';
-            ConsoleRenderer.Render(_transformedLastPosition, _character.Value);
+            _consoleRenderer.Render(_transformedLastPosition, _character.Value);
         }
 
         public void SetAsProjectile()
         {
             _character = '*';
-            ConsoleRenderer.Render(_transformedLastPosition, _character.Value);
+            _consoleRenderer.Render(_transformedLastPosition, _character.Value);
         }
 
         public void Recieve(RigidBodyCreated rigidBodyCreated)
         {
-            var position = rigidBodyCreated.BoundingCircle.Position;
+            var position = rigidBodyCreated.BoundingBox.Center;
             var point = position.ToPoint();
 
             _lastPosition = point;
@@ -54,7 +56,7 @@ namespace DarkDefenders.Console.ViewModels
                 return;
             }
 
-            ConsoleRenderer.Render(position, _character.Value);
+            _consoleRenderer.Render(position, _character.Value);
             Remove();
 
             _lastPosition = newPosition;
@@ -65,7 +67,7 @@ namespace DarkDefenders.Console.ViewModels
         {
             var c = _map[_lastPosition] == Tile.Solid ? '?' : ' ';
 
-            ConsoleRenderer.Render(_transformedLastPosition, c);
+            _consoleRenderer.Render(_transformedLastPosition, c);
         }
 
         private Point Transform(Point position)

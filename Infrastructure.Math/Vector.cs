@@ -35,6 +35,11 @@ namespace Infrastructure.Math
             return _x*_x + _y*_y;
         }
 
+        public double Length()
+        {
+            return System.Math.Sqrt(LengthSquared());
+        }
+
         public Point ToPoint()
         {
             return new Point((int)_x, (int)_y);
@@ -107,11 +112,6 @@ namespace Infrastructure.Math
         public static Vector operator -(Vector vector1, Vector vector2)
         {
             return new Vector(vector1._x - vector2._x, vector1._y - vector2._y);
-        }
-
-        public double Length()
-        {
-            return System.Math.Sqrt(LengthSquared());
         }
     }
 }
