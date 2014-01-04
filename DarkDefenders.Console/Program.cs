@@ -23,13 +23,13 @@ namespace DarkDefenders.Console
         private const int TimeSlowdown = 1;
 //        private const int TimeSlowdown = 5;
         private static readonly TimeSpan _minFrameElapsed = TimeSpan.FromSeconds(1.0 / MaxFps);
-        private static readonly TimeSpan _creatureStateUpdatePeriod = TimeSpan.FromSeconds(1.0 / 30);
-        private static readonly TimeSpan _keyboardStateUpdatePeriod = TimeSpan.FromSeconds(1.0 / 100);
+        private static readonly TimeSpan _playerStateUpdatePeriod = TimeSpan.FromSeconds(1.0 / 30);
+        private static readonly TimeSpan _keyboardUpdatePeriod = TimeSpan.FromSeconds(1.0 / 100);
 
         private static readonly Vector _spawnPosition = new Vector(35, 5);
-        private const string WorldFileName = "simpleWorld3.txt";
+//        private const string WorldFileName = "simpleWorld3.txt";
 //        private const string WorldFileName = "world1.bmp";
-//        private const string WorldFileName = "world2.bmp";
+        private const string WorldFileName = "world2.bmp";
 
         private static readonly Toggle _limitFps = new Toggle(true);
 
@@ -50,10 +50,10 @@ namespace DarkDefenders.Console
             var worlds = processor.CreateRootsAdapter<World>();
             var projectiles = processor.CreateRootsAdapter<Projectile>();
 
-            var keyBoardExecutor = new PeriodicExecutor(_keyboardStateUpdatePeriod);
+            var keyBoardExecutor = new PeriodicExecutor(_keyboardUpdatePeriod);
             var fpsCounter = new PerformanceCounter();
             var eventsCounter = new PerformanceCounter();
-            var creatureStateExecutor = new PeriodicExecutor(_creatureStateUpdatePeriod);
+            var creatureStateExecutor = new PeriodicExecutor(_playerStateUpdatePeriod);
 
             var clock = Clock.StartNew();
             var filler = TimeFiller.StartNew(_minFrameElapsed);

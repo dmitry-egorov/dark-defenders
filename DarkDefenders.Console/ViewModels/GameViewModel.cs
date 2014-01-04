@@ -165,10 +165,9 @@ namespace DarkDefenders.Console.ViewModels
             {
                 for (var j = 0; j < height; j++)
                 {
-                    if (_map[i, j] == Tile.Solid)
-                    {
-                        _consoleRenderer.Render(new Point(i + 1, height - j), '+');
-                    }
+                    var c = _map[i, j] == Tile.Solid ? 'W' : '·';
+
+                    _consoleRenderer.Render(new Point(i + 1, height - j), c);
                 }
             }
         }

@@ -65,7 +65,7 @@ namespace DarkDefenders.Console.ViewModels
 
         public void Remove()
         {
-            var c = _map[_lastPosition] == Tile.Solid ? '?' : ' ';
+            var c = _map[_lastPosition] == Tile.Solid ? '?' : '·';
 
             _consoleRenderer.Render(_transformedLastPosition, c);
         }
