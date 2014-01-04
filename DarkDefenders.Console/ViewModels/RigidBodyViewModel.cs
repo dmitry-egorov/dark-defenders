@@ -20,7 +20,7 @@ namespace DarkDefenders.Console.ViewModels
             _consoleRenderer = consoleRenderer;
         }
 
-        public void SetAsPlayer()
+        public void SetAsCreature()
         {
             _character = '@';
             _consoleRenderer.Render(_transformedLastPosition, _character.Value);

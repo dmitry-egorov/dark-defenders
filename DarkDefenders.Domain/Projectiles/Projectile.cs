@@ -9,7 +9,7 @@ namespace DarkDefenders.Domain.Projectiles
     public class Projectile: RootBase<ProjectileId, IProjectileEventsReciever, IProjectileEvent>, IProjectileEventsReciever
     {
         public const double Mass = 0.001;
-        public const double BoundingBoxRadius = 0.2;
+        public const double BoundingBoxRadius = 0.1;
 
         public IEnumerable<IDomainEvent> CheckForHit()
         {
@@ -32,7 +32,7 @@ namespace DarkDefenders.Domain.Projectiles
 
         private bool IsHit()
         {
-            return _rigidBody.IsAdjacentToAWall();
+            return _rigidBody.IsTouchingAWall();
         }
 
         private readonly RigidBody _rigidBody;

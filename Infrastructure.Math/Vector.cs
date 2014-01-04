@@ -15,6 +15,18 @@ namespace Infrastructure.Math
         private readonly double _x;
         private readonly double _y;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public double CoordinateFor(Axis axis)
+        {
+            return axis == Axis.Horizontal ? _x : _y;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector ByAxis(Axis axis, double main, double other)
+        {
+            return axis == Axis.Horizontal ? XY(main, other) : XY(other, main);
+        }
+
         public static Vector XY(double x, double y)
         {
             return new Vector(x, y);

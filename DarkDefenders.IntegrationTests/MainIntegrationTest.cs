@@ -4,8 +4,8 @@ using System.Linq;
 using DarkDefenders.Domain;
 using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.Other;
-using DarkDefenders.Domain.Players;
-using DarkDefenders.Domain.Players.Events;
+using DarkDefenders.Domain.Creatures;
+using DarkDefenders.Domain.Creatures.Events;
 using DarkDefenders.Domain.RigidBodies;
 using DarkDefenders.Domain.RigidBodies.Events;
 using DarkDefenders.Domain.Worlds;
@@ -33,91 +33,91 @@ namespace DarkDefenders.IntegrationTests
         }
 
         [Test]
-        public void Should_create_player()
+        public void Should_create_creature()
         {
             var spawnPosition = new Vector(0, 0);
             var dimensions = new Dimensions(10, 10);
             var map = new Map<Tile>(dimensions, default(Tile));
 
-            var boundingBox = CreatePlayersBoundingBox(spawnPosition);
-            var mass = Player.Mass;
-            var topHorizontalMomentum = Player.TopHorizontalMomentum;
+            var boundingBox = CreateCreaturesBoundingBox(spawnPosition);
+            var mass = Creature.Mass;
+            var topHorizontalMomentum = Creature.TopHorizontalMomentum;
 
             var worldId = CreateWorld(map, spawnPosition);
-            var playerId = CreatePlayer(worldId);
+            var avatarId = CreateAvatar(worldId);
             var rigidBodyId = FindRigidBodyId();
 
             var expectedEvents = new IDomainEvent[]
             {
                 new WorldCreated(worldId, map, spawnPosition), 
                 new RigidBodyCreated(rigidBodyId, worldId, boundingBox, Vector.Zero, mass, topHorizontalMomentum),
-                new PlayerCreated(playerId, worldId, rigidBodyId)
+                new CreatureCreated(avatarId, worldId, rigidBodyId)
             };
 
             _eventListener.AssertEvents(expectedEvents);
         }
 
-        private static Box CreatePlayersBoundingBox(Vector spawnPosition)
+        private static Box CreateCreaturesBoundingBox(Vector spawnPosition)
         {
-            return new Box(spawnPosition, Player.BoundingBoxRadius, Player.BoundingBoxRadius);
+            return new Box(spawnPosition, Creature.BoundingBoxRadius, Creature.BoundingBoxRadius);
         }
 
         [Test]
-        public void Should_create_and_set_desired_orientation_to_player()
+        public void Should_create_and_set_desired_orientation_to_creature()
         {
             var spawnPosition = new Vector(0, 0);
             var dimensions = new Dimensions(10, 10);
             var map = new Map<Tile>(dimensions, default(Tile));
-            var boundingBox = CreatePlayersBoundingBox(spawnPosition);
-            var desiredOrientation = MovementForceDirection.Left;
-            var mass = Player.Mass;
-            var topHorizontalMomentum = Player.TopHorizontalMomentum;
+            var boundingBox = CreateCreaturesBoundingBox(spawnPosition);
+            var desiredOrientation = Movement.Left;
+            var mass = Creature.Mass;
+            var topHorizontalMomentum = Creature.TopHorizontalMomentum;
 
             var worldId = CreateWorld(map, spawnPosition);
-            var playerId = CreatePlayer(worldId);
+            var creatureId = CreateAvatar(worldId);
             var rigidBodyId = FindRigidBodyId();
 
-            MovePlayerLeft(playerId);
+            MoveCreatureLeft(creatureId);
 
             var expectedEvents = new IDomainEvent[]
             {
                 new WorldCreated(worldId, map, spawnPosition), 
                 new RigidBodyCreated(rigidBodyId, worldId, boundingBox, Vector.Zero, mass, topHorizontalMomentum),
-                new PlayerCreated(playerId, worldId, rigidBodyId),
-                new MovementForceDirectionChanged(playerId, desiredOrientation), 
+                new CreatureCreated(creatureId, worldId, rigidBodyId),
+                new MovementChanged(creatureId, desiredOrientation), 
             };
             _eventListener.AssertEvents(expectedEvents);
         }
 
         [Test]
-        public void Should_create_and_set_desired_orientation_to_player_and_move_player_on_update()
+        public void Should_create_and_set_desired_orientation_to_creature_and_move_creature_on_update()
         {
             var spawnPosition = new Vector(50, 0.5);
             var dimensions = new Dimensions(100, 100);
             var map = new Map<Tile>(dimensions, default(Tile));
-            var boundingBox = CreatePlayersBoundingBox(spawnPosition);
-            var desiredOrientation = MovementForceDirection.Left;
+            var boundingBox = CreateCreaturesBoundingBox(spawnPosition);
+            var desiredOrientation = Movement.Left;
             var elapsed = TimeSpan.FromMilliseconds(20).TotalSeconds;
 
             var externalForce = Vector.XY(-200, 0);
             var newMomentum = Vector.XY(-4, 0);
             var newPosition = Vector.XY(49.92, 0.5);
-            var mass = Player.Mass;
-            var topHorizontalMomentum = Player.TopHorizontalMomentum;
+            var mass = Creature.Mass;
+            var topHorizontalMomentum = Creature.TopHorizontalMomentum;
 
             var worldId = CreateWorld(map, spawnPosition);
-            var playerId = CreatePlayer(worldId);
+            var creatureId = CreateAvatar(worldId);
             var rigidBodyId = FindRigidBodyId();
 
-            MovePlayerLeft(playerId);
+            MoveCreatureLeft(creatureId);
             UpdateAll(elapsed);
 
             var expectedEvents = new IDomainEvent[]
             {
                 new WorldCreated(worldId, map, spawnPosition), 
                 new RigidBodyCreated(rigidBodyId, worldId, boundingBox, Vector.Zero, mass, topHorizontalMomentum),
-                new PlayerCreated(playerId, worldId, rigidBodyId),
-                new MovementForceDirectionChanged(playerId, desiredOrientation), 
+                new CreatureCreated(creatureId, worldId, rigidBodyId),
+                new MovementChanged(creatureId, desiredOrientation), 
                 new WorldTimeUpdated(worldId, elapsed, elapsed), 
                 new ExternalForceChanged(rigidBodyId, externalForce), 
                 new Accelerated(rigidBodyId, newMomentum),
@@ -131,9 +131,9 @@ namespace DarkDefenders.IntegrationTests
         public void Should_throw_when_world_is_not_created()
         {
             var fakeWorldId = new WorldId();
-            var playerId = new PlayerId();
+            var creatureId = new CreatureId();
 
-            Assert.Throws<RootDoesntExistException>(() => CreatePlayer(playerId, fakeWorldId));
+            Assert.Throws<RootDoesntExistException>(() => CreateAvatar(creatureId, fakeWorldId));
         }
 
         [Test]
@@ -157,18 +157,17 @@ namespace DarkDefenders.IntegrationTests
         private void UpdateAll(double elapsed)
         {
             _commandProcessor.ProcessAllAndCommit<World>(root => root.UpdateWorldTime(elapsed));
-            _commandProcessor.ProcessAllAndCommit<Player>(root => root.ApplyMovementForce());
             _commandProcessor.ProcessAllAndCommit<RigidBody>(root => root.UpdateMomentum());
             _commandProcessor.ProcessAllAndCommit<RigidBody>(root => root.UpdatePosition());
         }
 
-        private PlayerId CreatePlayer(WorldId worldId)
+        private CreatureId CreateAvatar(WorldId worldId)
         {
-            var playerId = new PlayerId();
+            var creatureId = new CreatureId();
 
-            CreatePlayer(playerId, worldId);
+            CreateAvatar(creatureId, worldId);
 
-            return playerId;
+            return creatureId;
         }
 
         private WorldId CreateWorld(Map<Tile> map, Vector spawnPosition)
@@ -185,14 +184,14 @@ namespace DarkDefenders.IntegrationTests
             _commandProcessor.CreateAndCommit<WorldFactory>(f => f.Create(worldId, map, spawnPosition));
         }
 
-        private void CreatePlayer(PlayerId playerId, WorldId worldId)
+        private void CreateAvatar(CreatureId creatureId, WorldId worldId)
         {
-            _commandProcessor.CreateAndCommit<PlayerFactory>(f => f.Create(playerId, worldId));
+            _commandProcessor.CreateAndCommit<CreatureFactory>(f => f.Create(creatureId, worldId));
         }
 
-        private void MovePlayerLeft(PlayerId playerId)
+        private void MoveCreatureLeft(CreatureId creatureId)
         {
-            _commandProcessor.ProcessAndCommit<Player>(playerId, player => player.MoveLeft());
+            _commandProcessor.ProcessAndCommit<Creature>(creatureId, creature => creature.SetMovement(Movement.Left));
         }
 
         private static ICommandProcessor<IDomainEvent> CreateBus(TestEventListener testEventListener)

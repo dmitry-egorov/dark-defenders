@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using DarkDefenders.Domain.Other;
 using DarkDefenders.Domain.Worlds.Events;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
@@ -24,24 +25,15 @@ namespace DarkDefenders.Domain.Worlds
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsInTheAir(Box box)
+        public bool IsTerrainSolidAt(Axis mainAxis, int main, int other)
         {
-            return _terrain.IsInTheAir(box);
+            return _terrain.At(mainAxis, main, other) == Tile.Solid;
         }
 
-        public Vector ApplyPositionChange(Box box, Vector positionChange)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsTerrainSolidAt(int x, int y)
         {
-            return _terrain.ApplyPositionChange(box, positionChange);
-        }
-
-        public Vector LimitMomentum(Vector momentum, Box boundingBox)
-        {
-            return _terrain.LimitMomentum(momentum, boundingBox);
-        }
-
-        public bool IsAdjacentToAWall(Box box)
-        {
-            return _terrain.IsAdjacentToAWall(box);
+            return _terrain[x, y] == Tile.Solid;
         }
 
         public void Recieve(WorldTimeUpdated worldTimeUpdated)
@@ -50,7 +42,7 @@ namespace DarkDefenders.Domain.Worlds
             ElapsedSeconds = worldTimeUpdated.Elapsed;
         }
 
-        internal World(WorldId id, Terrain terrain, Vector spawnPosition) : base(id)
+        internal World(WorldId id, Map<Tile> terrain, Vector spawnPosition) : base(id)
         {
             _terrain = terrain;
             _spawnPosition = spawnPosition;
@@ -59,6 +51,6 @@ namespace DarkDefenders.Domain.Worlds
 
         
         private readonly Vector _spawnPosition;
-        private readonly Terrain _terrain;
+        private readonly Map<Tile> _terrain;
     }
 }

@@ -20,9 +20,9 @@ namespace Infrastructure.Math
             _heightRadius = heightRadius;
         }
 
-        public Box MoveBy(Vector delta)
+        public double RadiusFor(Axis axis)
         {
-            return new Box(Center + delta, _widthRadius, _heightRadius);
+            return axis == Axis.Horizontal ? _widthRadius : _heightRadius;
         }
 
         public Box ChangePosition(Vector newPosition)

@@ -1,6 +1,6 @@
 ﻿using DarkDefenders.Domain.Events;
-using DarkDefenders.Domain.Players;
-using DarkDefenders.Domain.Players.Events;
+using DarkDefenders.Domain.Creatures;
+using DarkDefenders.Domain.Creatures.Events;
 using DarkDefenders.Domain.Projectiles;
 using DarkDefenders.Domain.Projectiles.Events;
 using DarkDefenders.Domain.RigidBodies;
@@ -18,17 +18,17 @@ namespace DarkDefenders.Domain
         {
             var worldRepository = new Repository<WorldId, World>();
             var rigidBodyRepository = new Repository<RigidBodyId, RigidBody>();
-            var playerRepository = new Repository<PlayerId, Player>();
+            var creatureRepository = new Repository<CreatureId, Creature>();
             var projectileRepository = new Repository<ProjectileId, Projectile>();
 
             var rigidBodyFactory = new RigidBodyFactory(rigidBodyRepository, worldRepository);
             var worldFactory = new WorldFactory(worldRepository);
             var projectileFactory = new ProjectileFactory(projectileRepository, rigidBodyRepository, rigidBodyFactory);
-            var playerFactory = new PlayerFactory(playerRepository, worldRepository, rigidBodyRepository, rigidBodyFactory, projectileFactory);
+            var creatureFactory = new CreatureFactory(creatureRepository, worldRepository, rigidBodyRepository, rigidBodyFactory, projectileFactory);
 
             processor.RegisterRoot<WorldId, World, IWorldEvent, WorldFactory, WorldCreated>(worldRepository, worldFactory);
             processor.RegisterRoot<RigidBodyId, RigidBody, IRigidBodyEvent, RigidBodyFactory, RigidBodyCreated>(rigidBodyRepository, rigidBodyFactory);
-            processor.RegisterRoot<PlayerId, Player, IPlayerEvent, PlayerFactory, PlayerCreated>(playerRepository, playerFactory);
+            processor.RegisterRoot<CreatureId, Creature, ICreatureEvent, CreatureFactory, CreatureCreated>(creatureRepository, creatureFactory);
             processor.RegisterRoot<ProjectileId, Projectile, IProjectileEvent, ProjectileFactory, ProjectileCreated>(projectileRepository, projectileFactory);
         }
     }

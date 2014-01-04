@@ -41,7 +41,7 @@
     <Compile Include="Clock.cs" />
     <Compile Include="ConsoleRenderer.cs" />
     <Compile Include="ViewModels\GameViewModel.cs" />
-    <Compile Include="FixedTimeFrameExecutor.cs" />
+    <Compile Include="TimeFiller.cs" />
     <Compile Include="PerformanceCounter.cs" />
     <Compile Include="NativeKeyboard.cs" />
     <Compile Include="ViewModels\RigidBodyViewModel.cs" />
@@ -88,6 +88,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="WorldsData\world1.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WorldsData\world2.bmp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

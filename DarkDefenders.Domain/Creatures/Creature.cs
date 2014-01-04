@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.Other;
-using DarkDefenders.Domain.Players.Events;
+using DarkDefenders.Domain.Creatures.Events;
 using DarkDefenders.Domain.Projectiles;
 using DarkDefenders.Domain.RigidBodies;
 using DarkDefenders.Domain.Worlds;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
 
-namespace DarkDefenders.Domain.Players
+namespace DarkDefenders.Domain.Creatures
 {
-    public class Player : RootBase<PlayerId, IPlayerEventsReciever, IPlayerEvent>, IPlayerEventsReciever
+    public class Creature : RootBase<CreatureId, ICreatureEventsReciever, ICreatureEvent>, ICreatureEventsReciever
     {
         public const double BoundingBoxRadius = 0.4;
         public const double Mass = 1.0;
@@ -23,24 +23,19 @@ namespace DarkDefenders.Domain.Players
         private const double ProjectileMomentum = 150.0 * Projectile.Mass;
 
         private const Direction InitialDirection = Direction.Right;
-        
-        public IEnumerable<IDomainEvent> MoveLeft()
+
+        public IEnumerable<IDomainEvent> SetMovement(Movement movement)
         {
-            var events = SetMovementForce(MovementForceDirection.Left);
+            if (_movement == movement)
+            {
+                yield break;
+            }
 
-            foreach (var e in events) { yield return e; }
-        }
+            yield return new MovementChanged(Id, movement);
 
-        public IEnumerable<IDomainEvent> MoveRight()
-        {
-            var events = SetMovementForce(MovementForceDirection.Right);
+            var movementForce = GetMovementForce(movement);
 
-            foreach (var e in events) { yield return e; }
-        }
-
-        public IEnumerable<IDomainEvent> Stop()
-        {
-            var events = SetMovementForce(MovementForceDirection.Stop);
+            var events = _rigidBody.SetExternalForce(movementForce);
 
             foreach (var e in events) { yield return e; }
         }
@@ -52,7 +47,9 @@ namespace DarkDefenders.Domain.Players
                 yield break;
             }
 
-            foreach (var e in AddJumpMomentum()) { yield return e; }
+            var events = AddJumpMomentum();
+
+            foreach (var e in events) { yield return e; }
         }
 
         public IEnumerable<IDomainEvent> Fire()
@@ -66,38 +63,31 @@ namespace DarkDefenders.Domain.Players
 
             foreach (var e in events) { yield return e; }
 
-            yield return new PlayerFired(Id, _world.TimeSeconds);
+            yield return new CreatureFired(Id, _world.TimeSeconds);
         }
 
-        public IEnumerable<IDomainEvent> ApplyMovementForce()
+        public void Recieve(MovementChanged movementChanged)
         {
-            var events = SetMovementForceToRigidBody();
-
-            foreach (var e in events) { yield return e; }
+            _movement = movementChanged.Movement;
+            _direction = GetDirection();
+            _projectileMomentum = GetProjectileMomentum();
         }
 
-        public void Recieve(MovementForceDirectionChanged movementForceDirectionChanged)
+        public void Recieve(CreatureFired creatureFired)
         {
-            _movementForceDirection = movementForceDirectionChanged.MovementForceDirection;
-            PrepareDirection();
-            PrepareProjectileMomentum();
+            _lastFireTime = creatureFired.Time;
         }
 
-        public void Recieve(PlayerFired playerFired)
-        {
-            _lastFireTime = playerFired.Time;
-        }
-
-        internal Player(PlayerId id, ProjectileFactory projectileFactory, World world, RigidBody rigidBody) 
+        internal Creature(CreatureId id, ProjectileFactory projectileFactory, World world, RigidBody rigidBody) 
             : base(id)
         {
             _world = world;
             _rigidBody = rigidBody;
             _projectileFactory = projectileFactory;
 
-            _movementForceDirection = MovementForceDirection.Stop;
+            _movement = Movement.Stop;
             _direction = InitialDirection;
-            PrepareProjectileMomentum();
+            _projectileMomentum = GetProjectileMomentum();
         }
 
         private bool CantJump()
@@ -110,42 +100,27 @@ namespace DarkDefenders.Domain.Players
             return _rigidBody.AddMomentum(_jumpMomentum);
         }
 
-        private IEnumerable<IDomainEvent> SetMovementForceToRigidBody()
-        {
-            var force = GetMovementForce();
-
-            return _rigidBody.SetExternalForce(force);
-        }
-
         private bool FireDelayInEffect()
         {
             return _world.TimeSeconds - _lastFireTime < FireDelay;
         }
 
-        private void PrepareDirection()
+        private Direction GetDirection()
         {
-            switch (_movementForceDirection)
+            switch (_movement)
             {
-                case MovementForceDirection.Left:
-                    _direction = Direction.Left;
-                    break;
-                case MovementForceDirection.Right:
-                    _direction = Direction.Right;
-                    break;
+                case Movement.Left:
+                    return Direction.Left;
+                case Movement.Right:
+                    return Direction.Right;
+                default:
+                    return _direction;
             }
         }
 
-        private IEnumerable<IDomainEvent> SetMovementForce(MovementForceDirection movementForceDirection)
+        private Vector GetMovementForce(Movement desiredMovement)
         {
-            if (_movementForceDirection != movementForceDirection)
-            {
-                yield return new MovementForceDirectionChanged(Id, movementForceDirection);
-            }
-        }
-
-        private Vector GetMovementForce()
-        {
-            var force = GetMovementForce(_movementForceDirection);
+            var force = GetMovementForceDirection(desiredMovement);
 
             if (_rigidBody.IsInTheAir())
             {
@@ -159,18 +134,18 @@ namespace DarkDefenders.Domain.Players
             return force;
         }
 
-        private static Vector GetMovementForce(MovementForceDirection desiredMovementForceDirection)
+        private static Vector GetMovementForceDirection(Movement desiredMovement)
         {
-            switch (desiredMovementForceDirection)
+            switch (desiredMovement)
             {
-                case MovementForceDirection.Stop:
+                case Movement.Stop:
                     return Vector.Zero;
-                case MovementForceDirection.Left:
+                case Movement.Left:
                     return _leftMovementForce;
-                case MovementForceDirection.Right:
+                case Movement.Right:
                     return _rightMovementForce;
                 default:
-                    throw new ArgumentOutOfRangeException("desiredMovementForceDirection");
+                    throw new ArgumentOutOfRangeException("desiredMovement");
             }
         }
 
@@ -183,12 +158,11 @@ namespace DarkDefenders.Domain.Players
             return _projectileFactory.Create(projectileId, _world.Id, projectilePosition, _projectileMomentum);
         }
 
-        private void PrepareProjectileMomentum()
+        private Vector GetProjectileMomentum()
         {
-            _projectileMomentum = 
-                _direction == Direction.Right 
-                ? _rightProjectileMomentum 
-                : _leftProjectileMomentum;
+            return _direction == Direction.Right 
+                   ? _rightProjectileMomentum 
+                   : _leftProjectileMomentum;
         }
 
         private Vector GetProjectilePosition()
@@ -219,11 +193,10 @@ namespace DarkDefenders.Domain.Players
         private static readonly Vector _rightProjectileMomentum = Vector.XY(ProjectileMomentum, 0);
 
         private readonly ProjectileFactory _projectileFactory;
-
         private readonly World _world;
         private readonly RigidBody _rigidBody;
 
-        private MovementForceDirection _movementForceDirection;
+        private Movement _movement;
         private Direction _direction;
         private Vector _projectileMomentum;
         private double _lastFireTime;

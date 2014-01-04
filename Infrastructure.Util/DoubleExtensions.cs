@@ -4,24 +4,24 @@ namespace Infrastructure.Util
 {
     public static class DoubleExtensions
     {
-        private const double Tolerance = 0.00000000000002;
+        private const double DefaultTolerance = 0.00000000000002;
 
         public static int ToInt(this double d)
         {
             return (int) d;
         }
 
-        public static double TolerantFloor(this double d)
+        public static double TolerantFloor(this double d, double tolerance = DefaultTolerance)
         {
             var ceiling = Math.Ceiling(d);
-            return ceiling - d < Tolerance ? ceiling : Math.Floor(d);
+            return ceiling - d < tolerance ? ceiling : Math.Floor(d);
         }
 
-        public static double TolerantCeiling(this double d)
+        public static double TolerantCeiling(this double d, double tolerance = DefaultTolerance)
         {
             var floor = Math.Floor(d);
 
-            return d - floor < Tolerance ? floor : Math.Ceiling(d);
+            return d - floor < tolerance ? floor : Math.Ceiling(d);
         }
 
         public static double PrevInteger(this double d)

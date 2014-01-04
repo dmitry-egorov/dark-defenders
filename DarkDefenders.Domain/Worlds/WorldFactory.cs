@@ -24,7 +24,7 @@ namespace DarkDefenders.Domain.Worlds
         protected override World Handle(WorldCreated creationEvent)
         {
             var worldId = creationEvent.RootId;
-            var terrain = new Terrain(creationEvent.Map);
+            var terrain = creationEvent.Map;
             var spawnPosition = creationEvent.SpawnPosition;
 
             return new World(worldId, terrain, spawnPosition);

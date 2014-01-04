@@ -17,7 +17,7 @@ namespace DarkDefenders.Domain.Projectiles.Events
 
         protected override string ToStringInternal()
         {
-            return "Player's projectile created: {0}, {1}".FormatWith(RootId, RigidBodyId);
+            return "Creature's projectile created: {0}, {1}".FormatWith(RootId, RigidBodyId);
         }
 
         protected override bool EventEquals(ProjectileCreated other)

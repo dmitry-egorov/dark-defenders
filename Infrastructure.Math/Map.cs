@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Runtime.CompilerServices;
 using Infrastructure.Util;
 
 namespace Infrastructure.Math
@@ -53,9 +54,10 @@ namespace Infrastructure.Math
             }
         }
 
-        private bool IsNotWithinDimensions(int x, int y)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public T At(Axis mainAxis, int main, int other)
         {
-            return x >= _dimensions.Width || x < 0 || y >= _dimensions.Height || y < 0;
+            return mainAxis == Axis.Horizontal ? this[main, other] : this[other, main];
         }
 
         public bool Equals(Map<T> other)
@@ -75,6 +77,11 @@ namespace Infrastructure.Math
             {
                 return (_dimensions.GetHashCode()*397) ^ _data.AllHashCode();
             }
+        }
+
+        private bool IsNotWithinDimensions(int x, int y)
+        {
+            return x >= _dimensions.Width || x < 0 || y >= _dimensions.Height || y < 0;
         }
 
         private readonly Dimensions _dimensions;

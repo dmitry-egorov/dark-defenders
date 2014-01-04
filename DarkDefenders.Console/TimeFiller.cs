@@ -3,20 +3,20 @@ using System.Diagnostics;
 
 namespace DarkDefenders.Console
 {
-    public class FixedTimeFrameExecutor
+    public class TimeFiller
     {
         private readonly Stopwatch _sw = new Stopwatch();
         private readonly TimeSpan _minFrameElapsed;
         private bool _started;
 
-        public static FixedTimeFrameExecutor StartNew(TimeSpan minFrameElapsed)
+        public static TimeFiller StartNew(TimeSpan minFrameElapsed)
         {
-            var executor = new FixedTimeFrameExecutor(minFrameElapsed);
+            var executor = new TimeFiller(minFrameElapsed);
             executor.Start();
             return executor;
         }
 
-        public FixedTimeFrameExecutor(TimeSpan minFrameElapsed)
+        public TimeFiller(TimeSpan minFrameElapsed)
         {
             _minFrameElapsed = minFrameElapsed;
         }

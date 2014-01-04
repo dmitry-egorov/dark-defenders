@@ -40,7 +40,6 @@
     <Compile Include="ActionObserver.cs" />
     <Compile Include="ActionObserverExtensions.cs" />
     <Compile Include="ArgumentAssertionExtensions.cs" />
-    <Compile Include="DecimalExtensions.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="DoubleExtensions.cs" />
     <Compile Include="EnumerableExtensions.cs" />
