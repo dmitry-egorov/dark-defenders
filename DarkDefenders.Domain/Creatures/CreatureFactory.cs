@@ -53,11 +53,13 @@ namespace DarkDefenders.Domain.Creatures
 
         private IEnumerable<IDomainEvent> CreateCreatureRigidBody(RigidBodyId rigidBodyId, WorldId worldId, Vector spawnPosition)
         {
-            double radius = Creature.BoundingBoxRadius;
-
+            var radius = Creature.BoundingBoxRadius;
             var boundingBox = new Box(spawnPosition, radius, radius);
+            var initialMomentum = Vector.Zero;
+            var mass = Creature.Mass;
+            var topHorizontalMomentum = Creature.TopHorizontalMomentum;
 
-            return _rigidBodyFactory.CreateRigidBody(rigidBodyId, worldId, Vector.Zero, Creature.Mass, Creature.TopHorizontalMomentum, boundingBox);
+            return _rigidBodyFactory.CreateRigidBody(rigidBodyId, worldId, initialMomentum, mass, topHorizontalMomentum, boundingBox);
         }
     }
 }

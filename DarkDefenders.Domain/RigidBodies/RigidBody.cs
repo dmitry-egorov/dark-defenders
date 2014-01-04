@@ -13,7 +13,7 @@ namespace DarkDefenders.Domain.RigidBodies
     public class RigidBody : RootBase<RigidBodyId, IRigidBodyEventsReciever, IRigidBodyEvent>, IRigidBodyEventsReciever
     {
         private const double GravityAcceleration = 200;
-        private const double FrictionCoefficient = 300;
+        private const double FrictionCoefficient = 400;
 
         public Vector Position { get { return _boundingBox.Center; } }
 
@@ -156,16 +156,16 @@ namespace DarkDefenders.Domain.RigidBodies
 
         private Vector GetForce(double elapsedSeconds)
         {
-            var isTouchingTheGround = IsTouchingTheGround();
-
             var externalForce = _externalForce;
 
-            if (externalForce.EqualsZero() && isTouchingTheGround || IsTouchingTheCeiling())
+            var isTochingASurface = IsTouchingTheGround() || IsTouchingTheCeiling();
+
+            if (externalForce.EqualsZero() && isTochingASurface)
             {
                 externalForce += GetFrictionForce(elapsedSeconds);
             }
 
-            if (!isTouchingTheGround)
+            if (!IsTouchingTheGround())
             {
                 externalForce += GetGravityForce();
             }

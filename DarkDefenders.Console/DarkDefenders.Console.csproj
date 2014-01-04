@@ -40,6 +40,8 @@
   <ItemGroup>
     <Compile Include="Clock.cs" />
     <Compile Include="ConsoleRenderer.cs" />
+    <Compile Include="PeriodicExecutor.cs" />
+    <Compile Include="Toggle.cs" />
     <Compile Include="ViewModels\GameViewModel.cs" />
     <Compile Include="TimeFiller.cs" />
     <Compile Include="PerformanceCounter.cs" />

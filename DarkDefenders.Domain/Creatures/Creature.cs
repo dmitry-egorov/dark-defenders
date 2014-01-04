@@ -15,11 +15,12 @@ namespace DarkDefenders.Domain.Creatures
     {
         public const double BoundingBoxRadius = 0.4;
         public const double Mass = 1.0;
-        public const double TopHorizontalMomentum = 60.0;
+        public const double TopHorizontalMomentum = 40.0;
 
-        private const double MovementForce = 200.0;
-        private const double FireDelay = 0.25;
+        private const double MovementForce = 180.0;
         private const double JumpMomentum = 60;
+
+        private const double FireDelay = 0.25;
         private const double ProjectileMomentum = 150.0 * Projectile.Mass;
 
         private const Direction InitialDirection = Direction.Right;

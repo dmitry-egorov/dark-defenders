@@ -5,11 +5,10 @@ namespace DarkDefenders.Console
     public class PerformanceCounter
     {
         private readonly TimeSpan _updatePeriod;
-
         private long _totalTicksCount;
         private int _ticksCount;
-        private TimeSpan _totalElapsed;
         private double _currentAverage;
+        private readonly PeriodicExecutor _periodicExecutor;
 
         public PerformanceCounter() : this(TimeSpan.FromSeconds(1))
         {
@@ -19,24 +18,22 @@ namespace DarkDefenders.Console
         public PerformanceCounter(TimeSpan updatePeriod)
         {
             _updatePeriod = updatePeriod;
+            _periodicExecutor = new PeriodicExecutor(updatePeriod);
         }
 
         public bool Tick(int count, TimeSpan elapsed, out double ticksPerPeriod)
         {
-            var changed = _totalElapsed > _updatePeriod;
-            if (changed)
+            _totalTicksCount += count;
+            _ticksCount += count;
+
+            var changed = false;
+
+            _periodicExecutor.Tick(elapsed, () =>
             {
                 _currentAverage = _ticksCount / _updatePeriod.TotalSeconds;
-
-                _totalElapsed -= _updatePeriod;
                 _ticksCount = 0;
-            }
-            else
-            {
-                _totalTicksCount += count;
-                _ticksCount += count;
-                _totalElapsed += elapsed;
-            }
+                changed = true;
+            });
 
             ticksPerPeriod = _currentAverage;
             return changed;

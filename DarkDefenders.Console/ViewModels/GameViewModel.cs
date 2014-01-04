@@ -118,7 +118,7 @@ namespace DarkDefenders.Console.ViewModels
 
         public void RenderAverageEventsCount(double averageEventsCount, long totalEvents)
         {
-            _consoleRenderer.Render(0, 1, "     ");
+            _consoleRenderer.Render(0, 1, "      ");
             _consoleRenderer.Render(0, 1, averageEventsCount.ToString(CultureInfo.InvariantCulture));
             _consoleRenderer.Render(0, 0, totalEvents.ToString(CultureInfo.InvariantCulture));
         }

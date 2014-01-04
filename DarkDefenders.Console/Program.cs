@@ -19,26 +19,29 @@ namespace DarkDefenders.Console
 {
     static class Program
     {
-        private const int MaxFps = 300000000;
-//        private const int MaxFps = 33;
-//        private const int MaxFps = 100;
+        private const int MaxFps = 100;
         private const int TimeSlowdown = 1;
 //        private const int TimeSlowdown = 5;
         private static readonly TimeSpan _minFrameElapsed = TimeSpan.FromSeconds(1.0 / MaxFps);
-        private static readonly TimeSpan _creatureStateUpdatePeriod = TimeSpan.FromSeconds(1.0 / 100);
+        private static readonly TimeSpan _creatureStateUpdatePeriod = TimeSpan.FromSeconds(1.0 / 30);
+        private static readonly TimeSpan _keyboardStateUpdatePeriod = TimeSpan.FromSeconds(1.0 / 100);
 
         private static readonly Vector _spawnPosition = new Vector(35, 5);
-//        private const string WorldFileName = "simpleWorld3.txt";
+        private const string WorldFileName = "simpleWorld3.txt";
 //        private const string WorldFileName = "world1.bmp";
-        private const string WorldFileName = "world2.bmp";
+//        private const string WorldFileName = "world2.bmp";
+
+        private static readonly Toggle _limitFps = new Toggle(true);
+
+        private static bool _escape;
 
         static void Main()
         {
             var renderer = new GameViewModel();
 
-            var countingListener = new CountingEventsListener<IDomainEvent>();
+            var counter = new CountingEventsListener<IDomainEvent>();
 
-            var composite = new CompositeEventsListener<IDomainEvent>(renderer, countingListener);
+            var composite = new CompositeEventsListener<IDomainEvent>(renderer, counter);
 
             var processor = CreateProcessor(composite);
 
@@ -47,36 +50,31 @@ namespace DarkDefenders.Console
             var worlds = processor.CreateRootsAdapter<World>();
             var projectiles = processor.CreateRootsAdapter<Projectile>();
 
+            var keyBoardExecutor = new PeriodicExecutor(_keyboardStateUpdatePeriod);
             var fpsCounter = new PerformanceCounter();
             var eventsCounter = new PerformanceCounter();
-            var creatureStateCounter = new PerformanceCounter(_creatureStateUpdatePeriod);
+            var creatureStateExecutor = new PeriodicExecutor(_creatureStateUpdatePeriod);
 
             var clock = Clock.StartNew();
             var filler = TimeFiller.StartNew(_minFrameElapsed);
 
-            var escape = false;
-            while (!escape)
+            while (!_escape)
             {
                 var elapsed = clock.ElapsedSinceLastCall;
                 var elapsedSeconds = (elapsed.TotalSeconds / TimeSlowdown).LimitTop(1.0);
+
+                keyBoardExecutor.Tick(elapsed, () => ProcessKeyboard(avatar, processor));
 
                 worlds.DoAndCommit(x => x.UpdateWorldTime(elapsedSeconds));
                 rigidBodies.DoAndCommit(x => x.UpdateMomentum());
                 rigidBodies.DoAndCommit(x => x.UpdatePosition());
                 projectiles.DoAndCommit(x => x.CheckForHit());
 
-                creatureStateCounter.Tick(elapsed, (_, __) =>
-                {
-                    renderer.RenderCreatureState();
-                    escape = ProcessKeyboard(avatar, processor);
-                });
-
+                creatureStateExecutor.Tick(elapsed, renderer.RenderCreatureState);
                 fpsCounter.Tick(elapsed, renderer.RenderFps);
+                eventsCounter.Tick(counter.EventsSinceLastCall, elapsed, renderer.RenderAverageEventsCount);
 
-                var eventsCount = countingListener.EventsSinceLastCall;
-                eventsCounter.Tick(eventsCount, elapsed, renderer.RenderAverageEventsCount);
-
-                filler.FillTimeFrame();
+                _limitFps.WhenToggled(filler.FillTimeFrame);
             }
         }
 
@@ -109,7 +107,7 @@ namespace DarkDefenders.Console
             return TerrainLoader.LoadFromFile(path);
         }
 
-        private static bool ProcessKeyboard(IRootAdapter<Creature, IDomainEvent> avatar, IUnitOfWork unitOfWork)
+        private static void ProcessKeyboard(IRootAdapter<Creature, IDomainEvent> avatar, IUnitOfWork unitOfWork)
         {
             var leftIsPressed = NativeKeyboard.IsKeyDown(Keys.Left);
             var rightIsPressed = NativeKeyboard.IsKeyDown(Keys.Right);
@@ -138,7 +136,12 @@ namespace DarkDefenders.Console
 
             unitOfWork.Commit();
 
-            return NativeKeyboard.IsKeyDown(Keys.Escape);
+            _limitFps.Tick(NativeKeyboard.IsKeyDown(Keys.L));
+
+            if (NativeKeyboard.IsKeyDown(Keys.Escape))
+            {
+                _escape = true;
+            }
         }
     }
 }
