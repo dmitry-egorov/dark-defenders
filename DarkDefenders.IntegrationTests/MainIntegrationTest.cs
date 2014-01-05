@@ -14,6 +14,7 @@ using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations;
 using Infrastructure.DDDES.Implementations.Domain.Exceptions;
 using Infrastructure.Math;
+using Infrastructure.Math.Physics;
 using Infrastructure.Util;
 using NUnit.Framework;
 
@@ -24,6 +25,7 @@ namespace DarkDefenders.IntegrationTests
     {
         private TestEventListener _eventListener;
         private ICommandProcessor<IDomainEvent> _commandProcessor;
+        private static readonly RigidBodyProperties _playerProperties = new RigidBodyProperties(0.4, 1.0, 40.0);
 
         [SetUp]
         public void SetUp()
@@ -39,10 +41,6 @@ namespace DarkDefenders.IntegrationTests
             var dimensions = new Dimensions(10, 10);
             var map = new Map<Tile>(dimensions, default(Tile));
 
-            var boundingBox = CreateCreaturesBoundingBox(spawnPosition);
-            var mass = Creature.Mass;
-            var topHorizontalMomentum = Creature.TopHorizontalMomentum;
-
             var worldId = CreateWorld(map, spawnPosition);
             var avatarId = CreateAvatar(worldId);
             var rigidBodyId = FindRigidBodyId();
@@ -50,16 +48,11 @@ namespace DarkDefenders.IntegrationTests
             var expectedEvents = new IDomainEvent[]
             {
                 new WorldCreated(worldId, map, spawnPosition), 
-                new RigidBodyCreated(rigidBodyId, worldId, boundingBox, Vector.Zero, mass, topHorizontalMomentum),
+                new RigidBodyCreated(rigidBodyId, worldId, spawnPosition, Momentum.Zero, _playerProperties),
                 new CreatureCreated(avatarId, worldId, rigidBodyId)
             };
 
             _eventListener.AssertEvents(expectedEvents);
-        }
-
-        private static Box CreateCreaturesBoundingBox(Vector spawnPosition)
-        {
-            return new Box(spawnPosition, Creature.BoundingBoxRadius, Creature.BoundingBoxRadius);
         }
 
         [Test]
@@ -68,10 +61,8 @@ namespace DarkDefenders.IntegrationTests
             var spawnPosition = new Vector(0, 0);
             var dimensions = new Dimensions(10, 10);
             var map = new Map<Tile>(dimensions, default(Tile));
-            var boundingBox = CreateCreaturesBoundingBox(spawnPosition);
             var desiredOrientation = Movement.Left;
-            var mass = Creature.Mass;
-            var topHorizontalMomentum = Creature.TopHorizontalMomentum;
+            var externalForce = Vector.XY(-180, 0).ToForce();
 
             var worldId = CreateWorld(map, spawnPosition);
             var creatureId = CreateAvatar(worldId);
@@ -82,9 +73,10 @@ namespace DarkDefenders.IntegrationTests
             var expectedEvents = new IDomainEvent[]
             {
                 new WorldCreated(worldId, map, spawnPosition), 
-                new RigidBodyCreated(rigidBodyId, worldId, boundingBox, Vector.Zero, mass, topHorizontalMomentum),
+                new RigidBodyCreated(rigidBodyId, worldId, spawnPosition, Momentum.Zero, _playerProperties),
                 new CreatureCreated(creatureId, worldId, rigidBodyId),
                 new MovementChanged(creatureId, desiredOrientation), 
+                new ExternalForceChanged(rigidBodyId, externalForce), 
             };
             _eventListener.AssertEvents(expectedEvents);
         }
@@ -92,18 +84,16 @@ namespace DarkDefenders.IntegrationTests
         [Test]
         public void Should_create_and_set_desired_orientation_to_creature_and_move_creature_on_update()
         {
-            var spawnPosition = new Vector(50, 0.5);
+            var spawnPosition = new Vector(50, 0.4);
             var dimensions = new Dimensions(100, 100);
             var map = new Map<Tile>(dimensions, default(Tile));
-            var boundingBox = CreateCreaturesBoundingBox(spawnPosition);
+            map.Fill(Tile.Open);
             var desiredOrientation = Movement.Left;
-            var elapsed = TimeSpan.FromMilliseconds(20).TotalSeconds;
+            var elapsed = TimeSpan.FromMilliseconds(20).ToSeconds();
 
-            var externalForce = Vector.XY(-200, 0);
-            var newMomentum = Vector.XY(-4, 0);
-            var newPosition = Vector.XY(49.92, 0.5);
-            var mass = Creature.Mass;
-            var topHorizontalMomentum = Creature.TopHorizontalMomentum;
+            var externalForce = Vector.XY(-180, 0).ToForce();
+            var newMomentum = Vector.XY(-3.6, 0).ToMomentum();
+            var newPosition = Vector.XY(49.928, 0.4);
 
             var worldId = CreateWorld(map, spawnPosition);
             var creatureId = CreateAvatar(worldId);
@@ -115,11 +105,11 @@ namespace DarkDefenders.IntegrationTests
             var expectedEvents = new IDomainEvent[]
             {
                 new WorldCreated(worldId, map, spawnPosition), 
-                new RigidBodyCreated(rigidBodyId, worldId, boundingBox, Vector.Zero, mass, topHorizontalMomentum),
+                new RigidBodyCreated(rigidBodyId, worldId, spawnPosition, Momentum.Zero, _playerProperties),
                 new CreatureCreated(creatureId, worldId, rigidBodyId),
                 new MovementChanged(creatureId, desiredOrientation), 
-                new WorldTimeUpdated(worldId, elapsed, elapsed), 
                 new ExternalForceChanged(rigidBodyId, externalForce), 
+                new WorldTimeUpdated(worldId, elapsed, elapsed), 
                 new Accelerated(rigidBodyId, newMomentum),
                 new Moved(rigidBodyId, newPosition), 
             };
@@ -154,7 +144,7 @@ namespace DarkDefenders.IntegrationTests
             return _eventListener.FindEvents<RigidBodyCreated>().Single().RootId;
         }
 
-        private void UpdateAll(double elapsed)
+        private void UpdateAll(Seconds elapsed)
         {
             _commandProcessor.ProcessAllAndCommit<World>(root => root.UpdateWorldTime(elapsed));
             _commandProcessor.ProcessAllAndCommit<RigidBody>(root => root.UpdateMomentum());
@@ -186,7 +176,8 @@ namespace DarkDefenders.IntegrationTests
 
         private void CreateAvatar(CreatureId creatureId, WorldId worldId)
         {
-            _commandProcessor.CreateAndCommit<CreatureFactory>(f => f.Create(creatureId, worldId));
+            var world = _commandProcessor.CreateRootAdapter<World>(worldId);
+            world.DoAndCommit(x => x.SpawnPlayer(creatureId));
         }
 
         private void MoveCreatureLeft(CreatureId creatureId)
@@ -198,7 +189,7 @@ namespace DarkDefenders.IntegrationTests
         {
             var processor = new CommandProcessor<IDomainEvent>(testEventListener);
 
-            processor.ConfigureDomain();
+            processor.ConfigureDomain(_playerProperties);
 
             return processor;
         }

@@ -18,6 +18,11 @@
             _height = height;
         }
 
+        public int DimensionFor(Axis axis)
+        {
+            return axis == Axis.Horizontal ? _width : _height;
+        }
+
         public bool Equals(Dimensions other)
         {
             return _width.Equals(other._width) && _height.Equals(other._height);

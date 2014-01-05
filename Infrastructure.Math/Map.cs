@@ -50,14 +50,71 @@ namespace Infrastructure.Math
                     throw new IndexOutOfRangeException();
                 }
 
-                _data[y*_dimensions.Width + x] = value;
+                _data[y * _dimensions.Width + x] = value;
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsAnyAtLine(Axis axis, int mainStart, int mainEnd, int other, T value)
+        {
+            var mainDimension = _dimensions.DimensionFor(axis);
+            var otherDimension = _dimensions.DimensionFor(axis.Other());
+
+            if (other < 0 || other >= otherDimension)
+            {
+                return _defaultItem.Equals(value);
+            }
+
+            if (mainStart < 0)
+            {
+                if (_defaultItem.Equals(value))
+                {
+                    return true;
+                }
+
+                mainStart = 0;
+            }
+
+            if (mainEnd >= mainDimension)
+            {
+                if (_defaultItem.Equals(value))
+                {
+                    return true;
+                }
+
+                mainEnd = mainDimension - 1;
+            }
+
+            var width = _dimensions.Width;
+            var start = axis == Axis.Horizontal ? other * width + mainStart : mainStart * width + other;
+            var count = mainEnd - mainStart + 1;
+            var step = axis == Axis.Horizontal ? 1 : width;
+
+            for (int i = 0, index = start; i < count; i++, index += step)
+            {
+                var isSolid = _data[index].Equals(value);
+
+                if (isSolid)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T At(Axis mainAxis, int main, int other)
         {
             return mainAxis == Axis.Horizontal ? this[main, other] : this[other, main];
+        }
+
+        public void Fill(T value)
+        {
+            for (var i = 0; i < _data.Length; i++)
+            {
+                _data[i] = value;
+            }
         }
 
         public bool Equals(Map<T> other)

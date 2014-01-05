@@ -1,15 +1,18 @@
 ﻿using DarkDefenders.Domain.Events;
 using Infrastructure.DDDES.Implementations.Domain;
+using Infrastructure.Math;
+using Infrastructure.Math.Physics;
 using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.Worlds.Events
 {
     public class WorldTimeUpdated : EventBase<WorldId, WorldTimeUpdated>, IWorldEvent
     {
-        public double NewTime { get; private set; }
-        public double Elapsed { get; private set; }
+        public Seconds NewTime { get; private set; }
+        public Seconds Elapsed { get; private set; }
 
-        public WorldTimeUpdated(WorldId worldId, double newTime, double elapsed): base(worldId)
+        public WorldTimeUpdated(WorldId worldId, Seconds newTime, Seconds elapsed)
+            : base(worldId)
         {
             NewTime = newTime;
             Elapsed = elapsed;

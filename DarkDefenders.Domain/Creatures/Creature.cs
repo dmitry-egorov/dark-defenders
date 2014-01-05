@@ -8,19 +8,16 @@ using DarkDefenders.Domain.RigidBodies;
 using DarkDefenders.Domain.Worlds;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
+using Infrastructure.Math.Physics;
 
 namespace DarkDefenders.Domain.Creatures
 {
     public class Creature : RootBase<CreatureId, ICreatureEventsReciever, ICreatureEvent>, ICreatureEventsReciever
     {
-        public const double BoundingBoxRadius = 0.4;
-        public const double Mass = 1.0;
-        public const double TopHorizontalMomentum = 40.0;
-
         private const double MovementForce = 180.0;
         private const double JumpMomentum = 60;
 
-        private const double FireDelay = 0.25;
+        private static readonly Seconds _fireDelay = 0.25.ToSeconds();
         private const double ProjectileMomentum = 150.0 * Projectile.Mass;
 
         private const Direction InitialDirection = Direction.Right;
@@ -55,7 +52,7 @@ namespace DarkDefenders.Domain.Creatures
 
         public IEnumerable<IDomainEvent> Fire()
         {
-            if (FireDelayInEffect())
+            if (_fireCooldown.IsInEffect())
             {
                 yield break;
             }
@@ -64,7 +61,7 @@ namespace DarkDefenders.Domain.Creatures
 
             foreach (var e in events) { yield return e; }
 
-            yield return new CreatureFired(Id, _world.TimeSeconds);
+            yield return new CreatureFired(Id, _world.GetCurrentTime());
         }
 
         public void Recieve(MovementChanged movementChanged)
@@ -76,7 +73,7 @@ namespace DarkDefenders.Domain.Creatures
 
         public void Recieve(CreatureFired creatureFired)
         {
-            _lastFireTime = creatureFired.Time;
+            _fireCooldown.Activate(creatureFired.Time);
         }
 
         internal Creature(CreatureId id, ProjectileFactory projectileFactory, World world, RigidBody rigidBody) 
@@ -89,6 +86,8 @@ namespace DarkDefenders.Domain.Creatures
             _movement = Movement.Stop;
             _direction = InitialDirection;
             _projectileMomentum = GetProjectileMomentum();
+
+            _fireCooldown = new Cooldown(world, _fireDelay);
         }
 
         private bool CantJump()
@@ -99,11 +98,6 @@ namespace DarkDefenders.Domain.Creatures
         private IEnumerable<IDomainEvent> AddJumpMomentum()
         {
             return _rigidBody.AddMomentum(_jumpMomentum);
-        }
-
-        private bool FireDelayInEffect()
-        {
-            return _world.TimeSeconds - _lastFireTime < FireDelay;
         }
 
         private Direction GetDirection()
@@ -119,7 +113,7 @@ namespace DarkDefenders.Domain.Creatures
             }
         }
 
-        private Vector GetMovementForce(Movement desiredMovement)
+        private Force GetMovementForce(Movement desiredMovement)
         {
             var force = GetMovementForceDirection(desiredMovement);
 
@@ -127,7 +121,7 @@ namespace DarkDefenders.Domain.Creatures
             {
                 force *= 0.5;
             }
-            else if (_rigidBody.MomentumHasDifferentHorizontalDirectionFrom(force))
+            else if (_rigidBody.MomentumHasDifferentHorizontalDirectionFrom(force.Value))
             {
                 force *= 2.0;
             }
@@ -135,12 +129,12 @@ namespace DarkDefenders.Domain.Creatures
             return force;
         }
 
-        private static Vector GetMovementForceDirection(Movement desiredMovement)
+        private static Force GetMovementForceDirection(Movement desiredMovement)
         {
             switch (desiredMovement)
             {
                 case Movement.Stop:
-                    return Vector.Zero;
+                    return Force.Zero;
                 case Movement.Left:
                     return _leftMovementForce;
                 case Movement.Right:
@@ -159,7 +153,7 @@ namespace DarkDefenders.Domain.Creatures
             return _projectileFactory.Create(projectileId, _world.Id, projectilePosition, _projectileMomentum);
         }
 
-        private Vector GetProjectileMomentum()
+        private Momentum GetProjectileMomentum()
         {
             return _direction == Direction.Right 
                    ? _rightProjectileMomentum 
@@ -172,7 +166,7 @@ namespace DarkDefenders.Domain.Creatures
             var x = position.X;
             var y = position.Y;
 
-            const double radius = BoundingBoxRadius + Projectile.BoundingBoxRadius;
+            const double radius = 1.0;
 
             if (_direction == Direction.Right)
             {
@@ -186,20 +180,20 @@ namespace DarkDefenders.Domain.Creatures
             return Vector.XY(x, y);
         }
 
-        private static readonly Vector _jumpMomentum = Vector.XY(0, JumpMomentum);
-        private static readonly Vector _leftMovementForce = Vector.Left * MovementForce;
-        private static readonly Vector _rightMovementForce = Vector.Right * MovementForce;
+        private static readonly Momentum _jumpMomentum = Vector.XY(0, JumpMomentum).ToMomentum();
+        private static readonly Force _leftMovementForce = Force.Left * MovementForce;
+        private static readonly Force _rightMovementForce = Force.Right * MovementForce;
 
-        private static readonly Vector _leftProjectileMomentum = Vector.XY(-ProjectileMomentum, 0);
-        private static readonly Vector _rightProjectileMomentum = Vector.XY(ProjectileMomentum, 0);
+        private static readonly Momentum _leftProjectileMomentum = Vector.XY(-ProjectileMomentum, 0).ToMomentum();
+        private static readonly Momentum _rightProjectileMomentum = Vector.XY(ProjectileMomentum, 0).ToMomentum();
 
         private readonly ProjectileFactory _projectileFactory;
         private readonly World _world;
         private readonly RigidBody _rigidBody;
+        private readonly Cooldown _fireCooldown;
 
         private Movement _movement;
         private Direction _direction;
-        private Vector _projectileMomentum;
-        private double _lastFireTime;
+        private Momentum _projectileMomentum;
     }
 }

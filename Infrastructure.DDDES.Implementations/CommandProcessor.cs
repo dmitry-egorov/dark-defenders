@@ -131,14 +131,14 @@ namespace Infrastructure.DDDES.Implementations
         {
             var rootCommandProcessor = GetProcessorFor<TRoot>();
 
-            return new AllRootsToProcessorAdapter<TRoot, TDomainEvent>(this, rootCommandProcessor);
+            return new AllRootsToProcessorAdapter<TRoot, TDomainEvent>(rootCommandProcessor, this);
         }
 
         public IRootAdapter<TRoot, TDomainEvent> CreateRootAdapter<TRoot>(Identity id)
         {
             var rootCommandProcessor = GetProcessorFor<TRoot>();
 
-            return new RootToProcessorAdapter<TRoot, TDomainEvent>(id, rootCommandProcessor);
+            return new RootToProcessorAdapter<TRoot, TDomainEvent>(id, rootCommandProcessor, this);
         }
 
         private IRootCommandProcessor<TRoot, TDomainEvent> GetProcessorFor<TRoot>()

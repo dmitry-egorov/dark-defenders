@@ -7,6 +7,7 @@ using DarkDefenders.Domain.Worlds;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
+using Infrastructure.Math.Physics;
 
 namespace DarkDefenders.Domain.Creatures
 {
@@ -25,17 +26,13 @@ namespace DarkDefenders.Domain.Creatures
             _rigidBodyRepository = rigidBodyRepository;
         }
 
-        public IEnumerable<IDomainEvent> Create(CreatureId creatureId, WorldId worldId)
+        public IEnumerable<IDomainEvent> Create(CreatureId creatureId, WorldId worldId, Vector spawnPosition, RigidBodyProperties properties)
         {
             AssertDoesntExist(creatureId);
 
-            var world = _worldRepository.GetById(worldId);
-
-            var spawnPosition = world.GetSpawnPosition();
-
             var rigidBodyId = new RigidBodyId();
 
-            var events = CreateCreatureRigidBody(rigidBodyId, worldId, spawnPosition);
+            var events = CreateCreatureRigidBody(rigidBodyId, worldId, spawnPosition, properties);
 
             foreach (var e in events) { yield return e; }
 
@@ -51,15 +48,10 @@ namespace DarkDefenders.Domain.Creatures
             return new Creature(creationEvent.RootId, _projectileFactory, world, rigidBody);
         }
 
-        private IEnumerable<IDomainEvent> CreateCreatureRigidBody(RigidBodyId rigidBodyId, WorldId worldId, Vector spawnPosition)
+        private IEnumerable<IDomainEvent> CreateCreatureRigidBody(RigidBodyId rigidBodyId, WorldId worldId, Vector position, RigidBodyProperties properties)
         {
-            var radius = Creature.BoundingBoxRadius;
-            var boundingBox = new Box(spawnPosition, radius, radius);
-            var initialMomentum = Vector.Zero;
-            var mass = Creature.Mass;
-            var topHorizontalMomentum = Creature.TopHorizontalMomentum;
-
-            return _rigidBodyFactory.CreateRigidBody(rigidBodyId, worldId, initialMomentum, mass, topHorizontalMomentum, boundingBox);
+            var initialMomentum = Momentum.Zero;
+            return _rigidBodyFactory.CreateRigidBody(rigidBodyId, worldId, initialMomentum, position, properties);
         }
     }
 }

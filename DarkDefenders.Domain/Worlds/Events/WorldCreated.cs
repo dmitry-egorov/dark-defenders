@@ -9,29 +9,29 @@ namespace DarkDefenders.Domain.Worlds.Events
     public class WorldCreated : EventBase<WorldId, WorldCreated>, IDomainEvent
     {
         public Map<Tile> Map { get; private set; }
-        public Vector SpawnPosition { get; private set; }
+        public Vector PlayersSpawnPosition { get; private set; }
 
-        public WorldCreated(WorldId worldId, Map<Tile> map, Vector spawnPosition)
+        public WorldCreated(WorldId worldId, Map<Tile> map, Vector playersSpawnPosition)
             : base(worldId)
         {
             Map = map;
-            SpawnPosition = spawnPosition;
+            PlayersSpawnPosition = playersSpawnPosition;
         }
 
         protected override string ToStringInternal()
         {
-            return "World created: {0}, {1}".FormatWith(RootId, SpawnPosition);
+            return "World created: {0}, {1}".FormatWith(RootId, PlayersSpawnPosition);
         }
 
         protected override bool EventEquals(WorldCreated other)
         {
             return Map.Equals(other.Map)
-                && SpawnPosition.Equals(other.SpawnPosition);
+                && PlayersSpawnPosition.Equals(other.PlayersSpawnPosition);
         }
 
         protected override int GetEventHashCode()
         {
-            return (Map.GetHashCode() * 397) ^ SpawnPosition.GetHashCode();
+            return (Map.GetHashCode() * 397) ^ PlayersSpawnPosition.GetHashCode();
         }
 
         public void Accept(IDomainEventReciever reciever)

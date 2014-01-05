@@ -1,15 +1,17 @@
 ﻿using DarkDefenders.Domain.Events;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
+using Infrastructure.Math.Physics;
 using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.RigidBodies.Events
 {
     public class ExternalForceChanged : EventBase<RigidBodyId, ExternalForceChanged>, IRigidBodyEvent
     {
-        public Vector ExternalForce { get; private set; }
+        public Force ExternalForce { get; private set; }
 
-        public ExternalForceChanged(RigidBodyId rigidBodyId, Vector externalForce): base(rigidBodyId)
+        public ExternalForceChanged(RigidBodyId rigidBodyId, Force externalForce)
+            : base(rigidBodyId)
         {
             ExternalForce = externalForce;
         }

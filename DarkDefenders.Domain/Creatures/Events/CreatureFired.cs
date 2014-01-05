@@ -1,14 +1,16 @@
 ﻿using DarkDefenders.Domain.Events;
 using Infrastructure.DDDES.Implementations.Domain;
+using Infrastructure.Math;
+using Infrastructure.Math.Physics;
 using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.Creatures.Events
 {
     public class CreatureFired: EventBase<CreatureId, CreatureFired>, ICreatureEvent
     {
-        public double Time { get; private set; }
+        public Seconds Time { get; private set; }
 
-        public CreatureFired(CreatureId rootId, double time) : base(rootId)
+        public CreatureFired(CreatureId rootId, Seconds time) : base(rootId)
         {
             Time = time;
         }

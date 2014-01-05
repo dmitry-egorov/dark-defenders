@@ -1,15 +1,16 @@
 using DarkDefenders.Domain.Events;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
+using Infrastructure.Math.Physics;
 using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.RigidBodies.Events
 {
     public class Accelerated : EventBase<RigidBodyId, Accelerated>, IRigidBodyEvent
     {
-        public Vector NewMomentum { get; private set; }
+        public Momentum NewMomentum { get; private set; }
 
-        public Accelerated(RigidBodyId id, Vector newMomentum)
+        public Accelerated(RigidBodyId id, Momentum newMomentum)
             : base(id)
         {
             NewMomentum = newMomentum;

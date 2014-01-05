@@ -34,7 +34,7 @@ namespace DarkDefenders.Console.ViewModels
 
         public void Recieve(RigidBodyCreated rigidBodyCreated)
         {
-            var position = rigidBodyCreated.BoundingBox.Center;
+            var position = rigidBodyCreated.Position;
             var point = position.ToPoint();
 
             _lastPosition = point;

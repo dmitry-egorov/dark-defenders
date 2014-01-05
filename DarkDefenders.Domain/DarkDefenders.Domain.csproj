@@ -35,8 +35,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configurator.cs" />
+    <Compile Include="RigidBodies\RigidBodyProperties.cs" />
     <Compile Include="Events\IDomainEvent.cs" />
     <Compile Include="Events\IDomainEventReciever.cs" />
+    <Compile Include="Other\Cooldown.cs" />
     <Compile Include="Other\Tile.cs" />
     <Compile Include="Creatures\Events\CreatureFired.cs" />
     <Compile Include="Projectiles\Events\ProjectileDestroyed.cs" />

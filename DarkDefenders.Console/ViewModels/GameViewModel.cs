@@ -10,6 +10,7 @@ using DarkDefenders.Domain.RigidBodies.Events;
 using DarkDefenders.Domain.Worlds.Events;
 using Infrastructure.DDDES;
 using Infrastructure.Math;
+using Infrastructure.Math.Physics;
 
 namespace DarkDefenders.Console.ViewModels
 {
@@ -148,7 +149,7 @@ namespace DarkDefenders.Console.ViewModels
 
         private void RenderMomentum()
         {
-            _consoleRenderer.RenderFloatRight("v: " + _lastCreatureMomentum.ToString("0.0"), 2, 18, _map.Dimensions.Width + 2);
+            _consoleRenderer.RenderFloatRight("v: " + _lastCreatureMomentum.Value.ToString("0.0"), 2, 18, _map.Dimensions.Width + 2);
         }
 
         private void RenderWorld()
@@ -174,7 +175,7 @@ namespace DarkDefenders.Console.ViewModels
 
         private readonly Dictionary<RigidBodyId, RigidBodyViewModel> _rigidBodyMap = new Dictionary<RigidBodyId, RigidBodyViewModel>();
 
-        private Vector _lastCreatureMomentum = Vector.Zero;
+        private Momentum _lastCreatureMomentum = Momentum.Zero;
         private Vector _lastCreaturePosition = Vector.Zero;
         private RigidBodyId _creatureRigidBodyId;
         private Map<Tile> _map;

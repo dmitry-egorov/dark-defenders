@@ -14,7 +14,7 @@ namespace DarkDefenders.Domain
 {
     public static class Configurator
     {
-        public static void ConfigureDomain(this CommandProcessor<IDomainEvent> processor)
+        public static void ConfigureDomain(this CommandProcessor<IDomainEvent> processor, RigidBodyProperties playersRigidBodyProperties)
         {
             var worldRepository = new Repository<WorldId, World>();
             var rigidBodyRepository = new Repository<RigidBodyId, RigidBody>();
@@ -22,9 +22,9 @@ namespace DarkDefenders.Domain
             var projectileRepository = new Repository<ProjectileId, Projectile>();
 
             var rigidBodyFactory = new RigidBodyFactory(rigidBodyRepository, worldRepository);
-            var worldFactory = new WorldFactory(worldRepository);
             var projectileFactory = new ProjectileFactory(projectileRepository, rigidBodyRepository, rigidBodyFactory);
             var creatureFactory = new CreatureFactory(creatureRepository, worldRepository, rigidBodyRepository, rigidBodyFactory, projectileFactory);
+            var worldFactory = new WorldFactory(worldRepository, creatureFactory, playersRigidBodyProperties);
 
             processor.RegisterRoot<WorldId, World, IWorldEvent, WorldFactory, WorldCreated>(worldRepository, worldFactory);
             processor.RegisterRoot<RigidBodyId, RigidBody, IRigidBodyEvent, RigidBodyFactory, RigidBodyCreated>(rigidBodyRepository, rigidBodyFactory);

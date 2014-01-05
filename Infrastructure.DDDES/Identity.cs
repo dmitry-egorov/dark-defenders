@@ -1,19 +1,22 @@
-﻿using System;
+﻿using System.Globalization;
+using System.Threading;
 
 namespace Infrastructure.DDDES
 {
     public abstract class Identity
     {
-        private readonly Guid _value;
+        private static long _currentIdValue;
+
+        private readonly long _value;
 
         protected Identity()
         {
-            _value = Guid.NewGuid();
+            _value = Interlocked.Increment(ref _currentIdValue);
         }
 
         public override string ToString()
         {
-            return _value.ToString();
+            return _value.ToString(CultureInfo.InvariantCulture);
         }
 
         public override int GetHashCode()
@@ -25,7 +28,7 @@ namespace Infrastructure.DDDES
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return EqualsInternal((Identity) obj);
         }
 

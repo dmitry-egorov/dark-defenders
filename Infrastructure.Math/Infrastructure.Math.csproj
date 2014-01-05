@@ -38,8 +38,14 @@
     <Compile Include="Axis.cs" />
     <Compile Include="Box.cs" />
     <Compile Include="Dimensions.cs" />
+    <Compile Include="Physics\Force.cs" />
+    <Compile Include="Physics\ForceExtensions.cs" />
     <Compile Include="Map.cs" />
+    <Compile Include="Physics\Momentum.cs" />
+    <Compile Include="Physics\MomentumExtensions.cs" />
     <Compile Include="Round.cs" />
+    <Compile Include="Physics\Seconds.cs" />
+    <Compile Include="Physics\SecondsExtensions.cs" />
     <Compile Include="Vector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

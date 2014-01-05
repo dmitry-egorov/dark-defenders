@@ -13,12 +13,15 @@ using DarkDefenders.Domain.Worlds;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations;
 using Infrastructure.Math;
+using Infrastructure.Math.Physics;
 using Infrastructure.Util;
 
 namespace DarkDefenders.Console
 {
     static class Program
     {
+        private static readonly RigidBodyProperties _playersRigidBodyProperties = new RigidBodyProperties(0.4, 1.0, 40.0);
+
         private const int MaxFps = 100;
         private const int TimeSlowdown = 1;
 //        private const int TimeSlowdown = 5;
@@ -26,7 +29,7 @@ namespace DarkDefenders.Console
         private static readonly TimeSpan _playerStateUpdatePeriod = TimeSpan.FromSeconds(1.0 / 30);
         private static readonly TimeSpan _keyboardUpdatePeriod = TimeSpan.FromSeconds(1.0 / 100);
 
-        private static readonly Vector _spawnPosition = new Vector(35, 5);
+        private static readonly Vector _spawnPosition = new Vector(35, 65);
 //        private const string WorldFileName = "simpleWorld3.txt";
 //        private const string WorldFileName = "world1.bmp";
         private const string WorldFileName = "world2.bmp";
@@ -43,9 +46,10 @@ namespace DarkDefenders.Console
 
             var composite = new CompositeEventsListener<IDomainEvent>(renderer, counter);
 
-            var processor = CreateProcessor(composite);
+            var processor = CreateAndConfigureProcessor(composite, _playersRigidBodyProperties);
 
-            var avatar = InitializeDomain(processor);
+            var world = InitializeDomain(processor);
+            var avatar = CreateAvatar(processor, world);
             var rigidBodies = processor.CreateRootsAdapter<RigidBody>();
             var worlds = processor.CreateRootsAdapter<World>();
             var projectiles = processor.CreateRootsAdapter<Projectile>();
@@ -61,7 +65,7 @@ namespace DarkDefenders.Console
             while (!_escape)
             {
                 var elapsed = clock.ElapsedSinceLastCall;
-                var elapsedSeconds = (elapsed.TotalSeconds / TimeSlowdown).LimitTop(1.0);
+                var elapsedSeconds = (elapsed.TotalSeconds / TimeSlowdown).LimitTop(1.0).ToSeconds();
 
                 keyBoardExecutor.Tick(elapsed, () => ProcessKeyboard(avatar, processor));
 
@@ -78,23 +82,29 @@ namespace DarkDefenders.Console
             }
         }
 
-        private static ICommandProcessor<IDomainEvent> CreateProcessor(IEventsListener<IDomainEvent> eventsListener)
+        private static ICommandProcessor<IDomainEvent> CreateAndConfigureProcessor(IEventsListener<IDomainEvent> eventsListener, RigidBodyProperties playersRigidBodyProperties)
         {
             var processor = new CommandProcessor<IDomainEvent>(eventsListener);
 
-            processor.ConfigureDomain();
+            processor.ConfigureDomain(playersRigidBodyProperties);
 
             return processor;
         }
 
-        private static IRootAdapter<Creature, IDomainEvent> InitializeDomain(ICommandProcessor<IDomainEvent> processor)
+        private static IRootAdapter<World, IDomainEvent> InitializeDomain(ICommandProcessor<IDomainEvent> processor)
         {
             var worldId = new WorldId();
-            var creatureId = new CreatureId();
             var map = LoadTerrain();
 
             processor.CreateAndCommit<WorldFactory>(t => t.Create(worldId, map, _spawnPosition));
-            processor.CreateAndCommit<CreatureFactory>(p => p.Create(creatureId, worldId));
+
+            return processor.CreateRootAdapter<World>(worldId);
+        }
+
+        private static IRootAdapter<Creature, IDomainEvent> CreateAvatar(ICommandProcessor<IDomainEvent> processor, IRootAdapter<World, IDomainEvent> world)
+        {
+            var creatureId = new CreatureId();
+            world.DoAndCommit(x => x.SpawnPlayer(creatureId));
 
             return processor.CreateRootAdapter<Creature>(creatureId);
         }

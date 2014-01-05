@@ -6,6 +6,7 @@ using DarkDefenders.Domain.RigidBodies.Events;
 using DarkDefenders.Domain.Worlds;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
+using Infrastructure.Math.Physics;
 using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.RigidBodies
@@ -19,9 +20,7 @@ namespace DarkDefenders.Domain.RigidBodies
 
         public IEnumerable<IDomainEvent> UpdateMomentum()
         {
-            var elapsedSeconds = _world.ElapsedSeconds;
-
-            var newMomentum = GetNewMomentum(elapsedSeconds);
+            var newMomentum = GetNewMomentum();
 
             if (newMomentum.Equals(_momentum))
             {
@@ -33,19 +32,17 @@ namespace DarkDefenders.Domain.RigidBodies
 
         public IEnumerable<IDomainEvent> UpdatePosition()
         {
-            var elapsedSeconds = _world.ElapsedSeconds;
-
             if (_momentum.EqualsZero())
             {
                 yield break;
             }
 
-            var newPosition = GetNewPosition(elapsedSeconds);
+            var newPosition = GetNewPosition();
 
             yield return new Moved(Id, newPosition);
         }
 
-        public IEnumerable<IDomainEvent> AddMomentum(Vector additionalMomentum)
+        public IEnumerable<IDomainEvent> AddMomentum(Momentum additionalMomentum)
         {
             if (additionalMomentum.EqualsZero())
             {
@@ -57,7 +54,7 @@ namespace DarkDefenders.Domain.RigidBodies
             yield return new Accelerated(Id, newMomentum);
         }
 
-        public IEnumerable<IDomainEvent> SetExternalForce(Vector force)
+        public IEnumerable<IDomainEvent> SetExternalForce(Force force)
         {
             if (_externalForce.Equals(force))
             {
@@ -74,32 +71,34 @@ namespace DarkDefenders.Domain.RigidBodies
 
         public bool IsInTheAir()
         {
-            return !IsTouchingTheGround();
+            return !_isTouchingTheGround;
         }
 
         public bool HasVerticalMomentum()
         {
-            return Math.Abs(_momentum.Y) > 0.01d;
+            return Math.Abs(_momentum.Value.Y) > 0.01d;
         }
 
         public bool MomentumHasDifferentHorizontalDirectionFrom(Vector vector)
         {
-            var momentumSign = Math.Sign(_momentum.X);
+            var momentumSign = Math.Sign(_momentum.Value.X);
 
             return momentumSign != 0 && momentumSign != Math.Sign(vector.X);
         }
 
         public bool IsTouchingAWall()
         {
-            return IsTouchingAWallToTheRight()
-                || IsTouchingAWallToTheLeft()
-                || IsTouchingTheCeiling()
-                || IsTouchingTheGround();
+            return _isTouchingAWallToTheRight
+                || _isTouchingAWallToTheLeft
+                || _isTouchingTheCeiling
+                || _isTouchingTheGround;
         }
 
         public void Recieve(Moved moved)
         {
             _boundingBox = _boundingBox.ChangePosition(moved.NewPosition);
+
+            PrepareToching();
         }
 
         public void Recieve(Accelerated accelerated)
@@ -116,7 +115,7 @@ namespace DarkDefenders.Domain.RigidBodies
             (
                 RigidBodyId id, 
                 World world, 
-                Vector initialMomentum, 
+                Momentum initialMomentum, 
                 double mass, 
                 double topHorizontalMomentum, 
                 Box boundingBox
@@ -125,28 +124,43 @@ namespace DarkDefenders.Domain.RigidBodies
             _world = world;
 
             _momentum = initialMomentum;
-            _mass = mass;
             _topHorizontalMomentum = topHorizontalMomentum;
             _boundingBox = boundingBox;
-            _externalForce = Vector.Zero;
+            _externalForce = Force.Zero;
+            _mass = mass;
+
+            _gravityForce = GetGravityForce();
+            PrepareToching();
         }
 
-        private Vector GetNewPosition(double elapsedSeconds)
+        private void PrepareToching()
         {
-            var positionChange = _momentum * (elapsedSeconds / _mass);
+            _isTouchingAWallToTheRight = IsTouchingAWallToTheRight();
+            _isTouchingAWallToTheLeft = IsTouchingAWallToTheLeft();
+            _isTouchingTheCeiling = IsTouchingTheCeiling();
+            _isTouchingTheGround = IsTouchingTheGround();
+        }
+
+        private Vector GetNewPosition()
+        {
+            var elapsedSeconds = _world.GetElapsed();
+
+            var positionChange = _momentum * elapsedSeconds * (1.0 / _mass);
 
             return ApplyPositionChange(positionChange);
         }
 
-        private Vector GetNewMomentum(double elapsedSeconds)
+        private Momentum GetNewMomentum()
         {
-            var force = GetForce(elapsedSeconds);
+            var elapsed = _world.GetElapsed();
+
+            var force = GetForce(elapsed);
 
             var newMomentum = _momentum;
 
             if (force.NotEqualsZero())
             {
-                newMomentum += force * elapsedSeconds;
+                newMomentum += force * elapsed;
 
                 newMomentum = LimitTopMomentum(newMomentum);
             }
@@ -154,72 +168,74 @@ namespace DarkDefenders.Domain.RigidBodies
             return LimitMomentumByTerrain(newMomentum);
         }
 
-        private Vector GetForce(double elapsedSeconds)
+        private Force GetForce(Seconds elapsedSeconds)
         {
             var externalForce = _externalForce;
 
-            var isTochingASurface = IsTouchingTheGround() || IsTouchingTheCeiling();
+            var isTochingASurface = _isTouchingTheGround || _isTouchingTheCeiling;
 
             if (externalForce.EqualsZero() && isTochingASurface)
             {
                 externalForce += GetFrictionForce(elapsedSeconds);
             }
 
-            if (!IsTouchingTheGround())
+            if (!_isTouchingTheGround)
             {
-                externalForce += GetGravityForce();
+                externalForce += _gravityForce;
             }
 
             return externalForce;
         }
 
-        private Vector LimitTopMomentum(Vector momentum)
+        private Momentum LimitTopMomentum(Momentum momentum)
         {
-            var vx = momentum.X;
-            var vy = momentum.Y;
+            var vx = momentum.Value.X;
+            var vy = momentum.Value.Y;
 
             var vxAbs = Math.Abs(vx);
 
             var topHorizontalMomentum = _topHorizontalMomentum;
 
             return vxAbs > topHorizontalMomentum 
-                ? Vector.XY(Math.Sign(vx) * topHorizontalMomentum, vy) 
+                ? Vector.XY(Math.Sign(vx) * topHorizontalMomentum, vy).ToMomentum() 
                 : momentum;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private Vector GetGravityForce()
+        private Force GetGravityForce()
         {
-            return Vector.XY(0, -_mass * GravityAcceleration);
+            return Vector.XY(0, -_mass * GravityAcceleration).ToForce();
         }
 
-        private Vector GetFrictionForce(double elapsedSeconds)
+        private Force GetFrictionForce(Seconds elapsedSeconds)
         {
-            var sign = - Math.Sign(_momentum.X);
-            var maxForce = Math.Abs(_momentum.X / elapsedSeconds);
+            var px = _momentum.Value.X;
+
+            var sign = - Math.Sign(px);
+            var maxForce = Math.Abs(px / elapsedSeconds.Value);
 
             var frictionForce = _mass * FrictionCoefficient;
 
             var fx = Math.Min(maxForce, frictionForce);
 
-            return Vector.XY(sign * fx, 0);
+            return Vector.XY(sign * fx, 0).ToForce();
         }
 
-        private Vector LimitMomentumByTerrain(Vector momentum)
+        private Momentum LimitMomentumByTerrain(Momentum momentum)
         {
-            var px = momentum.X;
-            var py = momentum.Y;
+            var px = momentum.Value.X;
+            var py = momentum.Value.Y;
 
             if (px > 0)
             {
-                if (IsTouchingAWallToTheRight())
+                if (_isTouchingAWallToTheRight)
                 {
                     px = 0;
                 }
             }
             else if (px < 0)
             {
-                if (IsTouchingAWallToTheLeft())
+                if (_isTouchingAWallToTheLeft)
                 {
                     px = 0;
                 }
@@ -227,20 +243,20 @@ namespace DarkDefenders.Domain.RigidBodies
 
             if (py > 0)
             {
-                if (IsTouchingTheCeiling())
+                if (_isTouchingTheCeiling)
                 {
                     py = 0;
                 }
             }
             else if (py < 0)
             {
-                if (IsTouchingTheGround())
+                if (_isTouchingTheGround)
                 {
                     py = 0;
                 }
             }
 
-            return Vector.XY(px, py);
+            return Vector.XY(px, py).ToMomentum();
         }
 
         private bool IsTouchingAWallToTheLeft()
@@ -253,7 +269,7 @@ namespace DarkDefenders.Domain.RigidBodies
 
             var x = left.PrevInteger().ToInt();
 
-            return IsTouchingWallsOn(Axis.Vertical, center.Y, heightRadius, x);
+            return IsTouchingWallsAt(Axis.Vertical, center.Y, heightRadius, x);
         }
 
         private bool IsTouchingAWallToTheRight()
@@ -266,7 +282,7 @@ namespace DarkDefenders.Domain.RigidBodies
 
             var x = right.TolerantFloor().ToInt();
 
-            return IsTouchingWallsOn(Axis.Vertical, center.Y, heightRadius, x);
+            return IsTouchingWallsAt(Axis.Vertical, center.Y, heightRadius, x);
         }
 
         private bool IsTouchingTheGround()
@@ -279,7 +295,7 @@ namespace DarkDefenders.Domain.RigidBodies
 
             var y = bottom.PrevInteger().ToInt();
 
-            return IsTouchingWallsOn(Axis.Horizontal, center.X, widthRadius, y);
+            return IsTouchingWallsAt(Axis.Horizontal, center.X, widthRadius, y);
         }
 
         private bool IsTouchingTheCeiling()
@@ -292,7 +308,7 @@ namespace DarkDefenders.Domain.RigidBodies
 
             var y = top.TolerantFloor().ToInt();
 
-            return IsTouchingWallsOn(Axis.Horizontal, center.X, widthRadius, y);
+            return IsTouchingWallsAt(Axis.Horizontal, center.X, widthRadius, y);
         }
 
         private Vector ApplyPositionChange(Vector positionDelta)
@@ -361,7 +377,7 @@ namespace DarkDefenders.Domain.RigidBodies
                 var mainToCheck = (sign == 1) ? main : main - 1;
                 var other = slope * (main - startBoundMain) + startBoundOther;
 
-                var isTouchingWalls = IsTouchingWallsOn(axis.Other(), other, otherRadius, mainToCheck);
+                var isTouchingWalls = IsTouchingWallsAt(axis.Other(), other, otherRadius, mainToCheck);
 
                 if (!isTouchingWalls)
                 {
@@ -377,31 +393,27 @@ namespace DarkDefenders.Domain.RigidBodies
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool IsTouchingWallsOn(Axis axis, double mainCenter, double radius, int other)
+        private bool IsTouchingWallsAt(Axis axis, double mainCenter, double radius, int other)
         {
             var start = (mainCenter - radius).TolerantFloor().ToInt();
             var end = (mainCenter + radius).PrevInteger().ToInt();
 
-            for (var main = start; main <= end; main++)
-            {
-                var isSolid = _world.IsTerrainSolidAt(axis, main, other);
-
-                if (isSolid)
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return _world.AnySolidWallsAt(axis, start, end, other);
         }
 
         private readonly World _world;
         
         private readonly double _mass;
         private readonly double _topHorizontalMomentum;
+        private readonly Force _gravityForce;
         
         private Box _boundingBox;
-        private Vector _momentum;
-        private Vector _externalForce;
+        private Momentum _momentum;
+        private Force _externalForce;
+
+        private bool _isTouchingAWallToTheRight;
+        private bool _isTouchingAWallToTheLeft;
+        private bool _isTouchingTheCeiling;
+        private bool _isTouchingTheGround;
     }
 }

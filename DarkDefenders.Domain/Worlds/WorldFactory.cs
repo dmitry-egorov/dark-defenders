@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using DarkDefenders.Domain.Creatures;
 using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.Other;
+using DarkDefenders.Domain.RigidBodies;
 using DarkDefenders.Domain.Worlds.Events;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
@@ -11,8 +13,13 @@ namespace DarkDefenders.Domain.Worlds
 {
     public class WorldFactory : RootFactory<WorldId, World, WorldCreated>
     {
-        public WorldFactory(IRepository<WorldId, World> repository) : base(repository)
+        private readonly CreatureFactory _creatureFactory;
+        private readonly RigidBodyProperties _playersRigidBodyProperties;
+
+        public WorldFactory(IRepository<WorldId, World> repository, CreatureFactory creatureFactory, RigidBodyProperties playersRigidBodyProperties) : base(repository)
         {
+            _creatureFactory = creatureFactory;
+            _playersRigidBodyProperties = playersRigidBodyProperties;
         }
 
         public IEnumerable<IDomainEvent> Create(WorldId worldId, Map<Tile> map, Vector spawnPosition)
@@ -25,9 +32,9 @@ namespace DarkDefenders.Domain.Worlds
         {
             var worldId = creationEvent.RootId;
             var terrain = creationEvent.Map;
-            var spawnPosition = creationEvent.SpawnPosition;
+            var spawnPosition = creationEvent.PlayersSpawnPosition;
 
-            return new World(worldId, terrain, spawnPosition);
+            return new World(worldId, terrain, spawnPosition, _playersRigidBodyProperties, _creatureFactory);
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Infrastructure.DDDES.Implementations.Internal
         private readonly IUnitOfWork _unitOfWork;
         private readonly IRootCommandProcessor<TRoot, TDomainEvent> _rootCommandProcessor;
 
-        public AllRootsToProcessorAdapter(IUnitOfWork unitOfWork, IRootCommandProcessor<TRoot, TDomainEvent> rootCommandProcessor)
+        public AllRootsToProcessorAdapter(IRootCommandProcessor<TRoot, TDomainEvent> rootCommandProcessor, IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
             _rootCommandProcessor = rootCommandProcessor;
