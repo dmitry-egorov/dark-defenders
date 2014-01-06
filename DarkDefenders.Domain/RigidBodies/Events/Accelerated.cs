@@ -1,6 +1,5 @@
 using DarkDefenders.Domain.Events;
 using Infrastructure.DDDES.Implementations.Domain;
-using Infrastructure.Math;
 using Infrastructure.Math.Physics;
 using Infrastructure.Util;
 

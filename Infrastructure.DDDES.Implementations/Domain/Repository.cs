@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Infrastructure.DDDES.Implementations.Domain.Exceptions;
+using Infrastructure.Util.Structures;
 
 namespace Infrastructure.DDDES.Implementations.Domain
 {
@@ -7,7 +8,8 @@ namespace Infrastructure.DDDES.Implementations.Domain
         where TRootId: Identity
         where TRoot: IEntity<TRootId>
     {
-        private readonly Dictionary<TRootId, TRoot> _roots = new Dictionary<TRootId, TRoot>();
+        private readonly Dictionary<TRootId, TRoot> _rootsMap = new Dictionary<TRootId, TRoot>();
+        private readonly FastList<TRoot> _allRoots = new FastList<TRoot>();
 
         public TRoot GetById(TRootId id)
         {
@@ -22,27 +24,31 @@ namespace Infrastructure.DDDES.Implementations.Domain
 
         public IEnumerable<TRoot> GetAll()
         {
-            return _roots.Values;
+            return _allRoots;
         }
 
         public bool Exists(TRootId id)
         {
-            return _roots.ContainsKey(id);
+            return _rootsMap.ContainsKey(id);
         }
 
         public bool TryGetById(TRootId id, out TRoot root)
         {
-            return _roots.TryGetValue(id, out root);
+            return _rootsMap.TryGetValue(id, out root);
         }
 
         public void Store(TRoot root)
         {
-            _roots.Add(root.Id, root);
+            _rootsMap.Add(root.Id, root);
+            _allRoots.Add(root);
         }
 
         public void Remove(TRootId rootId)
         {
-            _roots.Remove(rootId);
+            //TODO: optimize (store index in a map)
+            var root = _rootsMap[rootId];
+            _rootsMap.Remove(rootId);
+            _allRoots.Remove(root);
         }
     }
 }

@@ -34,7 +34,14 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Clocks\Clock.cs" />
+    <Compile Include="Clocks\Events\ClockCreated.cs" />
+    <Compile Include="Clocks\ClockFactory.cs" />
+    <Compile Include="Clocks\ClockId.cs" />
+    <Compile Include="Clocks\Events\IClockEvent.cs" />
+    <Compile Include="Clocks\Events\IClockEventsReciever.cs" />
     <Compile Include="Configurator.cs" />
+    <Compile Include="Creatures\CreatureProperties.cs" />
     <Compile Include="RigidBodies\RigidBodyProperties.cs" />
     <Compile Include="Events\IDomainEvent.cs" />
     <Compile Include="Events\IDomainEventReciever.cs" />
@@ -69,14 +76,17 @@
     <Compile Include="RigidBodies\Events\ExternalForceChanged.cs" />
     <Compile Include="RigidBodies\RigidBody.cs" />
     <Compile Include="RigidBodies\RigidBodyId.cs" />
+    <Compile Include="Clocks\Events\ClockDestroyed.cs" />
+    <Compile Include="Worlds\Events\PlayerAvatarSpawned.cs" />
     <Compile Include="Worlds\Events\WorldDestroyed.cs" />
     <Compile Include="Worlds\Events\WorldCreated.cs" />
     <Compile Include="Worlds\Events\IWorldEvent.cs" />
     <Compile Include="Worlds\Events\IWorldEventsReciever.cs" />
+    <Compile Include="Worlds\Events\HeroesSpawned.cs" />
     <Compile Include="Worlds\World.cs" />
     <Compile Include="Worlds\WorldFactory.cs" />
     <Compile Include="Worlds\WorldId.cs" />
-    <Compile Include="Worlds\Events\WorldTimeUpdated.cs" />
+    <Compile Include="Clocks\Events\ClockTimeUpdated.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Infrastructure.DDDES.Implementations\Infrastructure.DDDES.Implementations.csproj">

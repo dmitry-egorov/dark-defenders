@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DarkDefenders.Domain.Clocks;
 using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.Other;
 using DarkDefenders.Domain.Creatures.Events;
@@ -14,10 +15,7 @@ namespace DarkDefenders.Domain.Creatures
 {
     public class Creature : RootBase<CreatureId, ICreatureEventsReciever, ICreatureEvent>, ICreatureEventsReciever
     {
-        private const double MovementForce = 180.0;
-        private const double JumpMomentum = 60;
-
-        private static readonly Seconds _fireDelay = 0.25.ToSeconds();
+        private static readonly TimeSpan _fireDelay = TimeSpan.FromSeconds(0.25);
         private const double ProjectileMomentum = 150.0 * Projectile.Mass;
 
         private const Direction InitialDirection = Direction.Right;
@@ -61,7 +59,9 @@ namespace DarkDefenders.Domain.Creatures
 
             foreach (var e in events) { yield return e; }
 
-            yield return new CreatureFired(Id, _world.GetCurrentTime());
+            var currentTime = _clock.GetCurrentTime();
+
+            yield return new CreatureFired(Id, currentTime);
         }
 
         public void Recieve(MovementChanged movementChanged)
@@ -73,21 +73,27 @@ namespace DarkDefenders.Domain.Creatures
 
         public void Recieve(CreatureFired creatureFired)
         {
-            _fireCooldown.Activate(creatureFired.Time);
+            _fireCooldown.SetLastActivationTime(creatureFired.Time);
         }
 
-        internal Creature(CreatureId id, ProjectileFactory projectileFactory, World world, RigidBody rigidBody) 
+        internal Creature(CreatureId id, ProjectileFactory projectileFactory, Clock clock, World world, RigidBody rigidBody, CreatureProperties properties) 
             : base(id)
         {
+            
             _world = world;
             _rigidBody = rigidBody;
+            _clock = clock;
             _projectileFactory = projectileFactory;
 
             _movement = Movement.Stop;
             _direction = InitialDirection;
             _projectileMomentum = GetProjectileMomentum();
 
-            _fireCooldown = new Cooldown(world, _fireDelay);
+            _fireCooldown = new Cooldown(clock, _fireDelay);
+
+            _rightMovementForce = Force.Right * properties.MovementForce;
+            _leftMovementForce = Force.Left * properties.MovementForce;
+            _jumpMomentum = Vector.XY(0, properties.JumpMomentum).ToMomentum();
         }
 
         private bool CantJump()
@@ -129,7 +135,7 @@ namespace DarkDefenders.Domain.Creatures
             return force;
         }
 
-        private static Force GetMovementForceDirection(Movement desiredMovement)
+        private Force GetMovementForceDirection(Movement desiredMovement)
         {
             switch (desiredMovement)
             {
@@ -150,7 +156,7 @@ namespace DarkDefenders.Domain.Creatures
 
             var projectileId = new ProjectileId();
 
-            return _projectileFactory.Create(projectileId, _world.Id, projectilePosition, _projectileMomentum);
+            return _projectileFactory.Create(projectileId, _clock.Id, _world.Id, projectilePosition, _projectileMomentum);
         }
 
         private Momentum GetProjectileMomentum()
@@ -180,14 +186,15 @@ namespace DarkDefenders.Domain.Creatures
             return Vector.XY(x, y);
         }
 
-        private static readonly Momentum _jumpMomentum = Vector.XY(0, JumpMomentum).ToMomentum();
-        private static readonly Force _leftMovementForce = Force.Left * MovementForce;
-        private static readonly Force _rightMovementForce = Force.Right * MovementForce;
+        private readonly Momentum _jumpMomentum;
+        private readonly Force _leftMovementForce;
+        private readonly Force _rightMovementForce;
 
         private static readonly Momentum _leftProjectileMomentum = Vector.XY(-ProjectileMomentum, 0).ToMomentum();
         private static readonly Momentum _rightProjectileMomentum = Vector.XY(ProjectileMomentum, 0).ToMomentum();
 
         private readonly ProjectileFactory _projectileFactory;
+        private readonly Clock _clock;
         private readonly World _world;
         private readonly RigidBody _rigidBody;
         private readonly Cooldown _fireCooldown;

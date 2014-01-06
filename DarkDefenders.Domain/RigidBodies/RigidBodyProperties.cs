@@ -17,8 +17,7 @@ namespace DarkDefenders.Domain.RigidBodies
 
         protected override string ToStringInternal()
         {
-            return "Radius: {0}, mass: {1}, top horizontal momentum: {2}"
-                   .FormatWith(BoundingBoxRadius, Mass, TopHorizontalMomentum);
+            return "{0}, {1}, {2}".FormatWith(BoundingBoxRadius, Mass, TopHorizontalMomentum);
         }
 
         protected override bool EqualsInternal(RigidBodyProperties other)

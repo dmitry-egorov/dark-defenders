@@ -1,3 +1,4 @@
+using System;
 using System.Drawing;
 using System.Linq;
 
@@ -47,15 +48,19 @@ namespace DarkDefenders.Console
             Render(width - text.Length, top, text);
         }
 
-        public void Render(int x, int y, char c)
+        public void Render(int x, int y, char c, ConsoleColor color = ConsoleColor.White)
         {
             if (IsOutOfScreen(x, y))
             {
                 return;
             }
 
+            var previousColor = System.Console.ForegroundColor;
+
+            System.Console.ForegroundColor = color;
             System.Console.SetCursorPosition(x, y);
             System.Console.Write(c);
+            System.Console.ForegroundColor = previousColor;
         }
 
         private bool IsOutOfScreen(int x, int y)
@@ -63,9 +68,20 @@ namespace DarkDefenders.Console
             return x < 0 || x >= _width || y < 0 || y >= _height;
         }
 
-        public void Render(Point position, char c)
+        public void Render(int left, int top, char[] line, ConsoleColor color = ConsoleColor.White)
         {
-            Render(position.X, position.Y, c);
+            
+            var previousColor = System.Console.ForegroundColor;
+
+            System.Console.ForegroundColor = color;
+            System.Console.SetCursorPosition(left, top);
+            System.Console.Write(line);
+            System.Console.ForegroundColor = previousColor;
+        }
+
+        public void Render(Point position, char c, ConsoleColor color = ConsoleColor.White)
+        {
+            Render(position.X, position.Y, c, color);
         }
 
         public void Render(int left, int top, string str)

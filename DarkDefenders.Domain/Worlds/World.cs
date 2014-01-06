@@ -1,42 +1,48 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using DarkDefenders.Domain.Clocks;
 using DarkDefenders.Domain.Creatures;
 using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.Other;
-using DarkDefenders.Domain.RigidBodies;
 using DarkDefenders.Domain.Worlds.Events;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
-using Infrastructure.Math.Physics;
 
 namespace DarkDefenders.Domain.Worlds
 {
     public class World : RootBase<WorldId, IWorldEventsReciever, IWorldEvent>, IWorldEventsReciever
     {
-        public IEnumerable<IWorldEvent> UpdateWorldTime(Seconds elapsed)
+        public IEnumerable<IDomainEvent> SpawnPlayerAvatar(CreatureId creatureId)
         {
-            var newTime = _currentTime + elapsed;
+            var events = _creatureFactory.Create(creatureId, _clock.Id, Id, _playersSpawnPosition, _playerAvatarProperties);
 
-            yield return new WorldTimeUpdated(Id, newTime, elapsed);
+            foreach (var e in events) { yield return e; }
+
+            yield return new PlayerAvatarSpawned(Id, creatureId);
         }
 
-        public IEnumerable<IDomainEvent> SpawnPlayer(CreatureId creatureId)
+        public IEnumerable<IDomainEvent> SpawnHeroes()
         {
-            var events = _creatureFactory.Create(creatureId, Id, _playersSpawnPosition, _playersRigidBodyProperties);
+            if (_heroSpawnCooldown.IsInEffect())
+            {
+                yield break;
+            }
+
+            var events = SpawnHero();
 
             foreach (var e in events) { yield return e; }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Seconds GetCurrentTime()
+        public IEnumerable<IDomainEvent> SpawnHero()
         {
-            return _currentTime;
-        }
+            var heroCreatureId = new CreatureId();
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Seconds GetElapsed()
-        {
-            return _elapsed;
+            var events = _creatureFactory.Create(heroCreatureId, _clock.Id, Id, _heroesSpawnPosition, _heroesCreatureProperties);
+
+            foreach (var e in events) { yield return e; }
+
+            yield return new HeroesSpawned(Id, _clock.GetCurrentTime(), heroCreatureId);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -45,29 +51,50 @@ namespace DarkDefenders.Domain.Worlds
             return _terrain.IsAnyAtLine(axis, mainStart, mainEnd, other, Tile.Solid);
         }
 
-        public void Recieve(WorldTimeUpdated worldTimeUpdated)
+        public void Recieve(HeroesSpawned heroesSpawned)
         {
-            _currentTime = worldTimeUpdated.NewTime;
-            _elapsed = worldTimeUpdated.Elapsed;
+            _heroSpawnCooldown.SetLastActivationTime(heroesSpawned.Time);
         }
 
-        internal World(WorldId id, Map<Tile> terrain, Vector playersSpawnPosition, RigidBodyProperties playersRigidBodyProperties, CreatureFactory creatureFactory) : base(id)
+        public void Recieve(PlayerAvatarSpawned playerAvatarSpawned)
+        {
+            
+        }
+
+        internal World
+            (
+                WorldId id, 
+                Clock clock, 
+                CreatureFactory creatureFactory, 
+                Map<Tile> terrain, 
+                Vector playersSpawnPosition, 
+                CreatureProperties playerAvatarProperties, 
+                Vector heroesSpawnPosition, 
+                TimeSpan heroesSpawnCooldown, 
+                CreatureProperties heroesCreatureProperties
+            ) : base(id)
         {
             _creatureFactory = creatureFactory;
-            _playersRigidBodyProperties = playersRigidBodyProperties;
+            _heroesSpawnPosition = heroesSpawnPosition;
+            _heroesCreatureProperties = heroesCreatureProperties;
+            _playerAvatarProperties = playerAvatarProperties;
 
             _terrain = terrain;
             _playersSpawnPosition = playersSpawnPosition;
-            _currentTime = Seconds.Zero;
+
+            _clock = clock;
+            _heroSpawnCooldown = new Cooldown(clock, heroesSpawnCooldown);
         }
 
 
         private readonly CreatureFactory _creatureFactory;
 
         private readonly Vector _playersSpawnPosition;
-        private readonly RigidBodyProperties _playersRigidBodyProperties;
+        private readonly CreatureProperties _playerAvatarProperties;
         private readonly Map<Tile> _terrain;
-        private Seconds _elapsed;
-        private Seconds _currentTime;
+        private readonly Clock _clock;
+        private readonly Cooldown _heroSpawnCooldown;
+        private readonly Vector _heroesSpawnPosition;
+        private readonly CreatureProperties _heroesCreatureProperties;
     }
 }

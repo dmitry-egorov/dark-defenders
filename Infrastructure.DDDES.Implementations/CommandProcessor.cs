@@ -23,18 +23,18 @@ namespace Infrastructure.DDDES.Implementations
             _eventsListener = eventsListener;
         }
 
-        public void RegisterRoot<TRootId, TRoot, TRootEvent, TRootFactory, TCreatedEvent>(Repository<TRootId, TRoot> repository, TRootFactory factory)
+        public void RegisterRoot<TRootId, TRoot, TRootEvent, TRootFactory, TCreatedEvent, TDestroyedEvent>(Repository<TRootId, TRoot> repository, TRootFactory factory)
             where TRootId : Identity
             where TRoot: class, IRoot<TRootId, TRootEvent> 
             where TRootFactory: IRootFactory<TRoot, TCreatedEvent>
             where TCreatedEvent : class where TRootEvent : class
         {
             _containersTypeMap[typeof(TRoot)] = new RootCommandProcessor<TRootId, TRoot, TRootEvent>(repository, _commitQueue);
-            _idTypeAppliersMap[typeof(TRootId)] = new RootEventsApplier<TRootId, TRoot, TRootEvent, TCreatedEvent>(repository, factory);
+            _idTypeAppliersMap[typeof(TRootId)] = new RootEventsApplier<TRootId, TRoot, TRootEvent, TCreatedEvent, TDestroyedEvent>(repository, factory);
             _factories[typeof (TRootFactory)] = factory;
         }
 
-        public void ProcessAllAndCommit<TRoot>(Func<TRoot, IEnumerable<TDomainEvent>> command)
+        public void CommitAll<TRoot>(Func<TRoot, IEnumerable<TDomainEvent>> command)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace Infrastructure.DDDES.Implementations
             _commitQueue.Enqueue(events);
         }
 
-        public void CreateAndCommit<TRootFactory>(Func<TRootFactory, IEnumerable<TDomainEvent>> creation)
+        public void CommitCreation<TRootFactory>(Func<TRootFactory, IEnumerable<TDomainEvent>> creation)
         {
             try
             {
@@ -78,7 +78,7 @@ namespace Infrastructure.DDDES.Implementations
             commmandProcessor.Process(id, command);
         }
 
-        public void ProcessAndCommit<TRoot>(Identity id, Func<TRoot, IEnumerable<TDomainEvent>> command)
+        public void Commit<TRoot>(Identity id, Func<TRoot, IEnumerable<TDomainEvent>> command)
         {
             try
             {
@@ -185,15 +185,16 @@ namespace Infrastructure.DDDES.Implementations
             }
         }
 
-        private class RootEventsApplier<TRootId, TRoot, TRootEvent, TCreationEvent> : IRootEventsApplier
+        private class RootEventsApplier<TRootId, TRoot, TRootEvent, TCreatedEvent, TDestoyedEvent> : IRootEventsApplier
             where TRootId: Identity
             where TRoot: IRoot<TRootId, TRootEvent> 
-            where TCreationEvent : class where TRootEvent : class
+            where TCreatedEvent : class 
+            where TRootEvent : class
         {
             private readonly Repository<TRootId, TRoot> _repository;
-            private readonly IRootFactory<TRoot, TCreationEvent> _factory;
+            private readonly IRootFactory<TRoot, TCreatedEvent> _factory;
 
-            public RootEventsApplier(Repository<TRootId, TRoot> repository, IRootFactory<TRoot, TCreationEvent> factory)
+            public RootEventsApplier(Repository<TRootId, TRoot> repository, IRootFactory<TRoot, TCreatedEvent> factory)
             {
                 _repository = repository;
                 _factory = factory;
@@ -212,7 +213,7 @@ namespace Infrastructure.DDDES.Implementations
                     TDomainEvent firstEvent;
                     events = events.HeadAndTail(out firstEvent);
 
-                    var creationEvent = firstEvent as TCreationEvent;
+                    var creationEvent = firstEvent as TCreatedEvent;
 
                     if (creationEvent == null)
                     {
@@ -227,10 +228,14 @@ namespace Infrastructure.DDDES.Implementations
                 using (var enumerator = events.GetEnumerator())
                 while (enumerator.MoveNext())
                 {
-                    var @event = enumerator.Current as TRootEvent;
-                    if (@event != null)
+                    var e = enumerator.Current as TRootEvent;
+                    if (e != null)
                     {
-                        root.Apply(@event);
+                        root.Apply(e);
+                    }
+                    else if (enumerator.Current.IsNot<TDestoyedEvent>())
+                    {
+                        throw new InvalidOperationException("Event doesn't implement " + typeof(TRootEvent).Name);
                     }
                     else
                     {

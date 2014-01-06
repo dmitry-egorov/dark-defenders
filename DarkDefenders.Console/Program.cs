@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows.Forms;
 using DarkDefenders.Console.ViewModels;
 using DarkDefenders.Domain;
+using DarkDefenders.Domain.Clocks;
 using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.Files;
 using DarkDefenders.Domain.Other;
@@ -13,28 +14,32 @@ using DarkDefenders.Domain.Worlds;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations;
 using Infrastructure.Math;
-using Infrastructure.Math.Physics;
-using Infrastructure.Util;
 
 namespace DarkDefenders.Console
 {
     static class Program
     {
-        private static readonly RigidBodyProperties _playersRigidBodyProperties = new RigidBodyProperties(0.4, 1.0, 40.0);
-
         private const int MaxFps = 100;
-        private const int TimeSlowdown = 1;
-//        private const int TimeSlowdown = 5;
+
+        //        private const string WorldFileName = "simpleWorld3.txt";
+        //        private const string WorldFileName = "world1.bmp";
+        private const string WorldFileName = "world3.bmp";
+
+        private static readonly RigidBodyProperties _playersRigidBodyProperties = new RigidBodyProperties(0.4, 1.0, 40.0);
+        private static readonly CreatureProperties _playersAvatarProperties = new CreatureProperties(180.0, 60.0, _playersRigidBodyProperties);
+        private static readonly Vector _playersSpawnPosition = new Vector(33.5, 5.4);
+
+        private static readonly Vector _heroesSpawnPosition = Vector.XY(92.4, 79.4);
+        private static readonly TimeSpan _heroesSpawnCooldown = TimeSpan.FromSeconds(10);
+        private static readonly RigidBodyProperties _heroesRigidBodyProperties = new RigidBodyProperties(0.4, 1.0, 20.0);
+        private static readonly CreatureProperties _heroesCreatureProperties = new CreatureProperties(180, 20, _heroesRigidBodyProperties);
+        
         private static readonly TimeSpan _minFrameElapsed = TimeSpan.FromSeconds(1.0 / MaxFps);
         private static readonly TimeSpan _playerStateUpdatePeriod = TimeSpan.FromSeconds(1.0 / 30);
         private static readonly TimeSpan _keyboardUpdatePeriod = TimeSpan.FromSeconds(1.0 / 100);
 
-        private static readonly Vector _spawnPosition = new Vector(35, 65);
-//        private const string WorldFileName = "simpleWorld3.txt";
-//        private const string WorldFileName = "world1.bmp";
-        private const string WorldFileName = "world2.bmp";
-
-        private static readonly Toggle _limitFps = new Toggle(true);
+        private static readonly OnOffSwitch _limitFpsSwitch = new OnOffSwitch(true);
+        private static readonly Button _spawnHeroButton = new Button();
 
         private static bool _escape;
 
@@ -46,12 +51,17 @@ namespace DarkDefenders.Console
 
             var composite = new CompositeEventsListener<IDomainEvent>(renderer, counter);
 
-            var processor = CreateAndConfigureProcessor(composite, _playersRigidBodyProperties);
+            var processor = CreateAndConfigureProcessor(composite);
 
-            var world = InitializeDomain(processor);
+            var clockId = new ClockId();
+            var worldId = new WorldId();
+            InitializeDomain(processor, clockId, worldId);
+            var clock = processor.CreateRootAdapter<Clock>(clockId);
+            var world = processor.CreateRootAdapter<World>(worldId);
+
+
             var avatar = CreateAvatar(processor, world);
             var rigidBodies = processor.CreateRootsAdapter<RigidBody>();
-            var worlds = processor.CreateRootsAdapter<World>();
             var projectiles = processor.CreateRootsAdapter<Projectile>();
 
             var keyBoardExecutor = new PeriodicExecutor(_keyboardUpdatePeriod);
@@ -59,52 +69,50 @@ namespace DarkDefenders.Console
             var eventsCounter = new PerformanceCounter();
             var creatureStateExecutor = new PeriodicExecutor(_playerStateUpdatePeriod);
 
-            var clock = Clock.StartNew();
+            var stopwatch = AutoResetStopwatch.StartNew();
             var filler = TimeFiller.StartNew(_minFrameElapsed);
 
             while (!_escape)
             {
-                var elapsed = clock.ElapsedSinceLastCall;
-                var elapsedSeconds = (elapsed.TotalSeconds / TimeSlowdown).LimitTop(1.0).ToSeconds();
+                var elapsed = stopwatch.ElapsedSinceLastCall;
 
-                keyBoardExecutor.Tick(elapsed, () => ProcessKeyboard(avatar, processor));
+                keyBoardExecutor.Tick(elapsed, () => ProcessKeyboard(world, avatar, processor));
 
-                worlds.DoAndCommit(x => x.UpdateWorldTime(elapsedSeconds));
-                rigidBodies.DoAndCommit(x => x.UpdateMomentum());
-                rigidBodies.DoAndCommit(x => x.UpdatePosition());
-                projectiles.DoAndCommit(x => x.CheckForHit());
+                clock.Commit(x => x.UpdateTime(elapsed));
+                rigidBodies.Commit(x => x.UpdateMomentum());
+                rigidBodies.Commit(x => x.UpdatePosition());
+                projectiles.Commit(x => x.CheckForHit());
+                //world.Commit(x => x.SpawnHeroes());
 
                 creatureStateExecutor.Tick(elapsed, renderer.RenderCreatureState);
                 fpsCounter.Tick(elapsed, renderer.RenderFps);
                 eventsCounter.Tick(counter.EventsSinceLastCall, elapsed, renderer.RenderAverageEventsCount);
 
-                _limitFps.WhenToggled(filler.FillTimeFrame);
+                _limitFpsSwitch.WhenOn(filler.FillTimeFrame);
             }
         }
 
-        private static ICommandProcessor<IDomainEvent> CreateAndConfigureProcessor(IEventsListener<IDomainEvent> eventsListener, RigidBodyProperties playersRigidBodyProperties)
+        private static ICommandProcessor<IDomainEvent> CreateAndConfigureProcessor(IEventsListener<IDomainEvent> eventsListener)
         {
             var processor = new CommandProcessor<IDomainEvent>(eventsListener);
 
-            processor.ConfigureDomain(playersRigidBodyProperties);
+            processor.ConfigureDomain();
 
             return processor;
         }
 
-        private static IRootAdapter<World, IDomainEvent> InitializeDomain(ICommandProcessor<IDomainEvent> processor)
+        private static void InitializeDomain(ICommandProcessor<IDomainEvent> processor, ClockId clockId, WorldId worldId)
         {
-            var worldId = new WorldId();
             var map = LoadTerrain();
 
-            processor.CreateAndCommit<WorldFactory>(t => t.Create(worldId, map, _spawnPosition));
-
-            return processor.CreateRootAdapter<World>(worldId);
+            processor.CommitCreation<ClockFactory>(t => t.Create(clockId));
+            processor.CommitCreation<WorldFactory>(t => t.Create(worldId, clockId, map, _playersSpawnPosition, _playersAvatarProperties, _heroesSpawnPosition, _heroesSpawnCooldown, _heroesCreatureProperties));
         }
 
         private static IRootAdapter<Creature, IDomainEvent> CreateAvatar(ICommandProcessor<IDomainEvent> processor, IRootAdapter<World, IDomainEvent> world)
         {
             var creatureId = new CreatureId();
-            world.DoAndCommit(x => x.SpawnPlayer(creatureId));
+            world.Commit(x => x.SpawnPlayerAvatar(creatureId));
 
             return processor.CreateRootAdapter<Creature>(creatureId);
         }
@@ -117,7 +125,7 @@ namespace DarkDefenders.Console
             return TerrainLoader.LoadFromFile(path);
         }
 
-        private static void ProcessKeyboard(IRootAdapter<Creature, IDomainEvent> avatar, IUnitOfWork unitOfWork)
+        private static void ProcessKeyboard(IRootAdapter<World, IDomainEvent> world, IRootAdapter<Creature, IDomainEvent> avatar, IUnitOfWork unitOfWork)
         {
             var leftIsPressed = NativeKeyboard.IsKeyDown(Keys.Left);
             var rightIsPressed = NativeKeyboard.IsKeyDown(Keys.Right);
@@ -144,9 +152,11 @@ namespace DarkDefenders.Console
                 avatar.Do(x => x.Fire());
             }
 
+            _spawnHeroButton.State(NativeKeyboard.IsKeyDown(Keys.H), () => world.Do(x => x.SpawnHero()));
+
             unitOfWork.Commit();
 
-            _limitFps.Tick(NativeKeyboard.IsKeyDown(Keys.L));
+            _limitFpsSwitch.State(NativeKeyboard.IsKeyDown(Keys.L));
 
             if (NativeKeyboard.IsKeyDown(Keys.Escape))
             {

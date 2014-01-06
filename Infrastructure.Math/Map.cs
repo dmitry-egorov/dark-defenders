@@ -103,12 +103,6 @@ namespace Infrastructure.Math
             return false;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T At(Axis mainAxis, int main, int other)
-        {
-            return mainAxis == Axis.Horizontal ? this[main, other] : this[other, main];
-        }
-
         public void Fill(T value)
         {
             for (var i = 0; i < _data.Length; i++)

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using DarkDefenders.Domain.Clocks;
 using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.RigidBodies.Events;
 using DarkDefenders.Domain.Worlds;
@@ -20,19 +21,19 @@ namespace DarkDefenders.Domain.RigidBodies
 
         public IEnumerable<IDomainEvent> UpdateMomentum()
         {
-            var newMomentum = GetNewMomentum();
-
-            if (newMomentum.Equals(_momentum))
+            if (_isTouchingTheGround && _momentumIsZero && _externalForceIsZero)
             {
                 yield break;
             }
+
+            var newMomentum = GetNewMomentum();
 
             yield return new Accelerated(Id, newMomentum);
         }
 
         public IEnumerable<IDomainEvent> UpdatePosition()
         {
-            if (_momentum.EqualsZero())
+            if (_momentumIsZero)
             {
                 yield break;
             }
@@ -98,42 +99,51 @@ namespace DarkDefenders.Domain.RigidBodies
         {
             _boundingBox = _boundingBox.ChangePosition(moved.NewPosition);
 
-            PrepareToching();
+            PrepareTouching();
         }
 
         public void Recieve(Accelerated accelerated)
         {
             _momentum = accelerated.NewMomentum;
+
+            PrepareMomentumIsZero();
         }
 
         public void Recieve(ExternalForceChanged externalForceChanged)
         {
             _externalForce = externalForceChanged.ExternalForce;
+
+            PrepareForceIsZero();
         }
 
         internal RigidBody
-            (
-                RigidBodyId id, 
-                World world, 
-                Momentum initialMomentum, 
-                double mass, 
-                double topHorizontalMomentum, 
-                Box boundingBox
-            ) : base(id)
+        (
+            RigidBodyId id, 
+            Clock clock, 
+            World world, 
+            Momentum initialMomentum, 
+            double mass, 
+            double topHorizontalMomentum, 
+            Box boundingBox
+        ) 
+            : base(id)
         {
             _world = world;
 
             _momentum = initialMomentum;
             _topHorizontalMomentum = topHorizontalMomentum;
             _boundingBox = boundingBox;
+            _clock = clock;
             _externalForce = Force.Zero;
             _mass = mass;
 
             _gravityForce = GetGravityForce();
-            PrepareToching();
+            PrepareTouching();
+            PrepareMomentumIsZero();
+            PrepareForceIsZero();
         }
 
-        private void PrepareToching()
+        private void PrepareTouching()
         {
             _isTouchingAWallToTheRight = IsTouchingAWallToTheRight();
             _isTouchingAWallToTheLeft = IsTouchingAWallToTheLeft();
@@ -141,9 +151,21 @@ namespace DarkDefenders.Domain.RigidBodies
             _isTouchingTheGround = IsTouchingTheGround();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void PrepareMomentumIsZero()
+        {
+            _momentumIsZero = _momentum.EqualsZero();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void PrepareForceIsZero()
+        {
+            _externalForceIsZero = _externalForce.EqualsZero();
+        }
+
         private Vector GetNewPosition()
         {
-            var elapsedSeconds = _world.GetElapsed();
+            var elapsedSeconds = _clock.GetElapsedSeconds();
 
             var positionChange = _momentum * elapsedSeconds * (1.0 / _mass);
 
@@ -152,7 +174,7 @@ namespace DarkDefenders.Domain.RigidBodies
 
         private Momentum GetNewMomentum()
         {
-            var elapsed = _world.GetElapsed();
+            var elapsed = _clock.GetElapsedSeconds();
 
             var force = GetForce(elapsed);
 
@@ -174,7 +196,7 @@ namespace DarkDefenders.Domain.RigidBodies
 
             var isTochingASurface = _isTouchingTheGround || _isTouchingTheCeiling;
 
-            if (externalForce.EqualsZero() && isTochingASurface)
+            if (_externalForceIsZero && isTochingASurface)
             {
                 externalForce += GetFrictionForce(elapsedSeconds);
             }
@@ -401,8 +423,9 @@ namespace DarkDefenders.Domain.RigidBodies
             return _world.AnySolidWallsAt(axis, start, end, other);
         }
 
+        private readonly Clock _clock;
         private readonly World _world;
-        
+
         private readonly double _mass;
         private readonly double _topHorizontalMomentum;
         private readonly Force _gravityForce;
@@ -415,5 +438,7 @@ namespace DarkDefenders.Domain.RigidBodies
         private bool _isTouchingAWallToTheLeft;
         private bool _isTouchingTheCeiling;
         private bool _isTouchingTheGround;
+        private bool _momentumIsZero;
+        private bool _externalForceIsZero;
     }
 }

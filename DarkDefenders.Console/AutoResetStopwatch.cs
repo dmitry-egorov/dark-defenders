@@ -3,15 +3,15 @@ using System.Diagnostics;
 
 namespace DarkDefenders.Console
 {
-    public class Clock
+    public class AutoResetStopwatch
     {
         private readonly Stopwatch _stopwatch = new Stopwatch();
 
         private TimeSpan _last = TimeSpan.Zero;
 
-        public static Clock StartNew()
+        public static AutoResetStopwatch StartNew()
         {
-            var clock = new Clock();
+            var clock = new AutoResetStopwatch();
             clock.Start();
             return clock;
         }

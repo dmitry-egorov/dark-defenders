@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DarkDefenders.Domain.Clocks;
 using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.RigidBodies.Events;
 using DarkDefenders.Domain.Worlds;
@@ -12,22 +13,25 @@ namespace DarkDefenders.Domain.RigidBodies
 {
     public class RigidBodyFactory : RootFactory<RigidBodyId, RigidBody, RigidBodyCreated>
     {
+        private readonly IRepository<ClockId, Clock> _clockRepository;
         private readonly IRepository<WorldId, World> _worldRepository;
 
-        public RigidBodyFactory(IRepository<RigidBodyId, RigidBody> repository, IRepository<WorldId, World> worldRepository) : base(repository)
+        public RigidBodyFactory(IRepository<RigidBodyId, RigidBody> repository, IRepository<ClockId, Clock> clockRepository, IRepository<WorldId, World> worldRepository) : base(repository)
         {
+            _clockRepository = clockRepository;
             _worldRepository = worldRepository;
         }
 
-        public IEnumerable<IDomainEvent> CreateRigidBody(RigidBodyId id, WorldId worldId, Momentum initialMomentum, Vector position, RigidBodyProperties properties)
+        public IEnumerable<IDomainEvent> CreateRigidBody(RigidBodyId id, ClockId clockId, WorldId worldId, Momentum initialMomentum, Vector position, RigidBodyProperties properties)
         {
             AssertDoesntExist(id);
 
-            return new RigidBodyCreated(id, worldId, position, initialMomentum, properties).EnumerateOnce();
+            return new RigidBodyCreated(id, clockId, worldId, position, initialMomentum, properties).EnumerateOnce();
         }
 
         protected override RigidBody Handle(RigidBodyCreated created)
         {
+            var clock = _clockRepository.GetById(created.ClockId);
             var world = _worldRepository.GetById(created.WorldId);
             var rigidBodyId = created.RootId;
             var initialMomentum = created.Momentum;
@@ -36,7 +40,7 @@ namespace DarkDefenders.Domain.RigidBodies
             var radius = created.Properties.BoundingBoxRadius;
             var boundingBox = new Box(created.Position, radius, radius);
 
-            return new RigidBody(rigidBodyId, world, initialMomentum, mass, topHorizontalMomentum, boundingBox);
+            return new RigidBody(rigidBodyId, clock, world, initialMomentum, mass, topHorizontalMomentum, boundingBox);
         }
     }
 }

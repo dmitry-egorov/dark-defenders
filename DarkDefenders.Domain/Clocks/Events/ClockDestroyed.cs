@@ -1,11 +1,12 @@
 ﻿using DarkDefenders.Domain.Events;
 using Infrastructure.DDDES.Implementations.Domain;
 
-namespace DarkDefenders.Domain.Worlds.Events
+namespace DarkDefenders.Domain.Clocks.Events
 {
-    public class WorldDestroyed: Destroyed<WorldId, World, WorldDestroyed>, IDomainEvent
+    public class ClockDestroyed : Destroyed<ClockId, Clock, ClockDestroyed>, IDomainEvent
     {
-        public WorldDestroyed(WorldId rootId) : base(rootId)
+        public ClockDestroyed(ClockId rootId)
+            : base(rootId)
         {
         }
 

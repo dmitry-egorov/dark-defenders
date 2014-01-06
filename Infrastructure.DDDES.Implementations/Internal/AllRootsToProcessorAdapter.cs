@@ -20,7 +20,7 @@ namespace Infrastructure.DDDES.Implementations.Internal
             _rootCommandProcessor.ProcessAll(command);
         }
 
-        public void DoAndCommit(Func<TRoot, IEnumerable<TDomainEvent>> command)
+        public void Commit(Func<TRoot, IEnumerable<TDomainEvent>> command)
         {
             try
             {

@@ -39,10 +39,11 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Clock.cs" />
+    <Compile Include="AutoResetStopwatch.cs" />
+    <Compile Include="Button.cs" />
     <Compile Include="ConsoleRenderer.cs" />
     <Compile Include="PeriodicExecutor.cs" />
-    <Compile Include="Toggle.cs" />
+    <Compile Include="OnOffSwitch.cs" />
     <Compile Include="ViewModels\GameViewModel.cs" />
     <Compile Include="TimeFiller.cs" />
     <Compile Include="PerformanceCounter.cs" />
@@ -94,6 +95,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="WorldsData\world2.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WorldsData\world3-work.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WorldsData\world3.bmp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
