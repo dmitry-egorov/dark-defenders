@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DarkDefenders.Domain.Clocks;
 using DarkDefenders.Domain.Creatures;
 using DarkDefenders.Domain.Events;
+using DarkDefenders.Domain.Heroes;
 using DarkDefenders.Domain.Other;
 using DarkDefenders.Domain.Worlds.Events;
 using Infrastructure.DDDES;
@@ -16,10 +17,12 @@ namespace DarkDefenders.Domain.Worlds
     {
         private readonly CreatureFactory _creatureFactory;
         private readonly IRepository<ClockId, Clock> _clockRepository;
+        private readonly HeroFactory _heroFactory;
 
-        public WorldFactory(IRepository<WorldId, World> repository, IRepository<ClockId, Clock> clockRepository, CreatureFactory creatureFactory) : base(repository)
+        public WorldFactory(IRepository<WorldId, World> repository, IRepository<ClockId, Clock> clockRepository, CreatureFactory creatureFactory, HeroFactory heroFactory) : base(repository)
         {
             _creatureFactory = creatureFactory;
+            _heroFactory = heroFactory;
             _clockRepository = clockRepository;
         }
 
@@ -42,7 +45,7 @@ namespace DarkDefenders.Domain.Worlds
 
             var clock = _clockRepository.GetById(creationEvent.ClockId);
 
-            return new World(worldId, clock, _creatureFactory, terrain, spawnPosition, playersAvatarProperties, heroesSpawnPosition, heroesSpawnCooldown, heroesCreatureProperties);
+            return new World(worldId, clock, _creatureFactory, terrain, spawnPosition, playersAvatarProperties, heroesSpawnPosition, heroesSpawnCooldown, heroesCreatureProperties, _heroFactory);
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
-using DarkDefenders.Domain.Creatures;
 using DarkDefenders.Domain.Events;
+using DarkDefenders.Domain.Heroes;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Util;
 
@@ -9,30 +9,30 @@ namespace DarkDefenders.Domain.Worlds.Events
     public class HeroesSpawned : EventBase<WorldId, HeroesSpawned>, IWorldEvent
     {
         public TimeSpan Time { get; private set; }
-        public CreatureId CreatureId { get; private set; }
+        public HeroId HeroId { get; private set; }
 
-        public HeroesSpawned(WorldId worldId, TimeSpan time, CreatureId creatureId)
+        public HeroesSpawned(WorldId worldId, TimeSpan time, HeroId heroId)
             : base(worldId)
         {
-            CreatureId = creatureId;
+            HeroId = heroId;
             Time = time;
         }
 
         protected override string ToStringInternal()
         {
-            return "Heroes spawned: {0}, {1}, {2}".FormatWith(RootId, Time, CreatureId);
+            return "Heroes spawned: {0}, {1}, {2}".FormatWith(RootId, Time, HeroId);
         }
 
         protected override bool EventEquals(HeroesSpawned other)
         {
             return Time.Equals(other.Time)
-                && CreatureId.Equals(other.CreatureId);
+                && HeroId.Equals(other.HeroId);
         }
 
         protected override int GetEventHashCode()
         {
             var hashCode = Time.GetHashCode();
-            hashCode = (hashCode * 397) ^ CreatureId.GetHashCode();
+            hashCode = (hashCode * 397) ^ HeroId.GetHashCode();
             return hashCode;
         }
 

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using DarkDefenders.Domain;
 using DarkDefenders.Domain.Clocks.Events;
 using DarkDefenders.Domain.Creatures;
 using DarkDefenders.Domain.Events;
+using DarkDefenders.Domain.Heroes.Events;
 using DarkDefenders.Domain.Other;
 using DarkDefenders.Domain.Creatures.Events;
 using DarkDefenders.Domain.Projectiles.Events;
@@ -53,14 +55,7 @@ namespace DarkDefenders.Console.ViewModels
 
         public void Recieve(HeroesSpawned heroesSpawned)
         {
-            var rigidBodyId = _rigidBodyIdsMap[heroesSpawned.CreatureId];
-
-            var vm = _rigidBodyMap[rigidBodyId];
-
-            vm.SetAsHero();
-
-            _totalHeroesSpawned++;
-            RenderHeroesSpawned();
+            
         }
 
         public void Recieve(PlayerAvatarSpawned playerAvatarSpawned)
@@ -97,6 +92,23 @@ namespace DarkDefenders.Console.ViewModels
 
         public void Recieve(ProjectileDestroyed projectileCreated)
         {
+        }
+
+        public void Recieve(HeroCreated heroCreated)
+        {
+            var rigidBodyId = _rigidBodyIdsMap[heroCreated.CreatureId];
+
+            var vm = _rigidBodyMap[rigidBodyId];
+
+            vm.SetAsHero();
+
+            _totalHeroesSpawned++;
+            RenderHeroesCount();
+        }
+
+        public void Recieve(HeroDestroyed heroDestroyed)
+        {
+            
         }
 
         public void Recieve(RigidBodyCreated rigidBodyCreated)
@@ -210,7 +222,7 @@ namespace DarkDefenders.Console.ViewModels
             }
         }
 
-        private void RenderHeroesSpawned()
+        private void RenderHeroesCount()
         {
             _consoleRenderer.Render(60, 0, "     ");
             _consoleRenderer.Render(60, 0, _totalHeroesSpawned.ToString(CultureInfo.InvariantCulture));

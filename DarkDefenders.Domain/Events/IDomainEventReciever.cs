@@ -1,6 +1,7 @@
 ﻿using DarkDefenders.Domain.Clocks;
 using DarkDefenders.Domain.Clocks.Events;
 using DarkDefenders.Domain.Creatures.Events;
+using DarkDefenders.Domain.Heroes.Events;
 using DarkDefenders.Domain.Projectiles.Events;
 using DarkDefenders.Domain.RigidBodies.Events;
 using DarkDefenders.Domain.Worlds.Events;
@@ -19,5 +20,7 @@ namespace DarkDefenders.Domain.Events
         void Recieve(RigidBodyDestroyed rigidBodyDestroyed);
         void Recieve(ProjectileCreated projectileCreated);
         void Recieve(ProjectileDestroyed projectileCreated);
+        void Recieve(HeroCreated heroCreated);
+        void Recieve(HeroDestroyed heroDestroyed);
     }
 }

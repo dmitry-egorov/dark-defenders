@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using DarkDefenders.Domain.Clocks;
 using DarkDefenders.Domain.Creatures;
 using DarkDefenders.Domain.Events;
+using DarkDefenders.Domain.Heroes;
 using DarkDefenders.Domain.Other;
 using DarkDefenders.Domain.Worlds.Events;
 using Infrastructure.DDDES.Implementations.Domain;
@@ -29,20 +30,20 @@ namespace DarkDefenders.Domain.Worlds
                 yield break;
             }
 
-            var events = SpawnHero();
+            var heroId = new HeroId();
+
+            var events = SpawnHero(heroId);
 
             foreach (var e in events) { yield return e; }
+
+            yield return new HeroesSpawned(Id, _clock.GetCurrentTime(), heroId);
         }
 
-        public IEnumerable<IDomainEvent> SpawnHero()
+        public IEnumerable<IDomainEvent> SpawnHero(HeroId heroId)
         {
-            var heroCreatureId = new CreatureId();
-
-            var events = _creatureFactory.Create(heroCreatureId, _clock.Id, Id, _heroesSpawnPosition, _heroesCreatureProperties);
+            var events = _heroFactory.Create(heroId, _clock.Id, Id, _heroesSpawnPosition, _heroesCreatureProperties);
 
             foreach (var e in events) { yield return e; }
-
-            yield return new HeroesSpawned(Id, _clock.GetCurrentTime(), heroCreatureId);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -71,12 +72,14 @@ namespace DarkDefenders.Domain.Worlds
                 CreatureProperties playerAvatarProperties, 
                 Vector heroesSpawnPosition, 
                 TimeSpan heroesSpawnCooldown, 
-                CreatureProperties heroesCreatureProperties
+                CreatureProperties heroesCreatureProperties, 
+                HeroFactory heroFactory
             ) : base(id)
         {
             _creatureFactory = creatureFactory;
             _heroesSpawnPosition = heroesSpawnPosition;
             _heroesCreatureProperties = heroesCreatureProperties;
+            _heroFactory = heroFactory;
             _playerAvatarProperties = playerAvatarProperties;
 
             _terrain = terrain;
@@ -96,5 +99,6 @@ namespace DarkDefenders.Domain.Worlds
         private readonly Cooldown _heroSpawnCooldown;
         private readonly Vector _heroesSpawnPosition;
         private readonly CreatureProperties _heroesCreatureProperties;
+        private readonly HeroFactory _heroFactory;
     }
 }

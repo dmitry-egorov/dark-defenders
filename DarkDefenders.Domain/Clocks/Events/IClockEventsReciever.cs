@@ -1,7 +1,4 @@
-﻿using DarkDefenders.Domain.Clocks.Events;
-using DarkDefenders.Domain.Worlds.Events;
-
-namespace DarkDefenders.Domain.Clocks
+﻿namespace DarkDefenders.Domain.Clocks.Events
 {
     public interface IClockEventsReciever
     {

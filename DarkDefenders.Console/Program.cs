@@ -6,6 +6,7 @@ using DarkDefenders.Domain;
 using DarkDefenders.Domain.Clocks;
 using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.Files;
+using DarkDefenders.Domain.Heroes;
 using DarkDefenders.Domain.Other;
 using DarkDefenders.Domain.Creatures;
 using DarkDefenders.Domain.Projectiles;
@@ -55,14 +56,17 @@ namespace DarkDefenders.Console
 
             var clockId = new ClockId();
             var worldId = new WorldId();
-            InitializeDomain(processor, clockId, worldId);
+            var avatarCreatureId = new CreatureId();
+
+            InitializeDomain(processor, clockId, worldId, avatarCreatureId);
+
             var clock = processor.CreateRootAdapter<Clock>(clockId);
             var world = processor.CreateRootAdapter<World>(worldId);
+            var avatar = processor.CreateRootAdapter<Creature>(avatarCreatureId);
 
-
-            var avatar = CreateAvatar(processor, world);
             var rigidBodies = processor.CreateRootsAdapter<RigidBody>();
             var projectiles = processor.CreateRootsAdapter<Projectile>();
+            var heroes = processor.CreateRootsAdapter<Hero>();
 
             var keyBoardExecutor = new PeriodicExecutor(_keyboardUpdatePeriod);
             var fpsCounter = new PerformanceCounter();
@@ -82,7 +86,8 @@ namespace DarkDefenders.Console
                 rigidBodies.Commit(x => x.UpdateMomentum());
                 rigidBodies.Commit(x => x.UpdatePosition());
                 projectiles.Commit(x => x.CheckForHit());
-                //world.Commit(x => x.SpawnHeroes());
+                heroes.Commit(x => x.Think());
+                world.Commit(x => x.SpawnHeroes());
 
                 creatureStateExecutor.Tick(elapsed, renderer.RenderCreatureState);
                 fpsCounter.Tick(elapsed, renderer.RenderFps);
@@ -101,20 +106,14 @@ namespace DarkDefenders.Console
             return processor;
         }
 
-        private static void InitializeDomain(ICommandProcessor<IDomainEvent> processor, ClockId clockId, WorldId worldId)
+        private static void InitializeDomain(ICommandProcessor<IDomainEvent> processor, ClockId clockId, WorldId worldId, CreatureId creatureId)
         {
             var map = LoadTerrain();
 
             processor.CommitCreation<ClockFactory>(t => t.Create(clockId));
             processor.CommitCreation<WorldFactory>(t => t.Create(worldId, clockId, map, _playersSpawnPosition, _playersAvatarProperties, _heroesSpawnPosition, _heroesSpawnCooldown, _heroesCreatureProperties));
-        }
 
-        private static IRootAdapter<Creature, IDomainEvent> CreateAvatar(ICommandProcessor<IDomainEvent> processor, IRootAdapter<World, IDomainEvent> world)
-        {
-            var creatureId = new CreatureId();
-            world.Commit(x => x.SpawnPlayerAvatar(creatureId));
-
-            return processor.CreateRootAdapter<Creature>(creatureId);
+            processor.Commit<World>(worldId, x => x.SpawnPlayerAvatar(creatureId));
         }
 
         private static Map<Tile> LoadTerrain()
@@ -152,7 +151,7 @@ namespace DarkDefenders.Console
                 avatar.Do(x => x.Fire());
             }
 
-            _spawnHeroButton.State(NativeKeyboard.IsKeyDown(Keys.H), () => world.Do(x => x.SpawnHero()));
+            _spawnHeroButton.State(NativeKeyboard.IsKeyDown(Keys.H), () => world.Do(x => x.SpawnHero(new HeroId())));
 
             unitOfWork.Commit();
 

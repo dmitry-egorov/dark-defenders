@@ -42,6 +42,13 @@
     <Compile Include="Clocks\Events\IClockEventsReciever.cs" />
     <Compile Include="Configurator.cs" />
     <Compile Include="Creatures\CreatureProperties.cs" />
+    <Compile Include="Heroes\Events\HeroDestroyed.cs" />
+    <Compile Include="Heroes\Events\HeroCreated.cs" />
+    <Compile Include="Heroes\Hero.cs" />
+    <Compile Include="Heroes\HeroId.cs" />
+    <Compile Include="Heroes\Events\IHeroEvent.cs" />
+    <Compile Include="Heroes\Events\IHeroEventsReciever.cs" />
+    <Compile Include="Heroes\HeroFactory.cs" />
     <Compile Include="RigidBodies\RigidBodyProperties.cs" />
     <Compile Include="Events\IDomainEvent.cs" />
     <Compile Include="Events\IDomainEventReciever.cs" />

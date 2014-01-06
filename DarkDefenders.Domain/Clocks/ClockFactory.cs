@@ -15,6 +15,7 @@ namespace DarkDefenders.Domain.Clocks
         public IEnumerable<IDomainEvent> Create(ClockId clockId)
         {
             AssertDoesntExist(clockId);
+
             yield return new ClockCreated(clockId);
         }
 
