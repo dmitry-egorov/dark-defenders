@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using DarkDefenders.Domain.Clocks;
 using DarkDefenders.Domain.Events;
+using DarkDefenders.Domain.Other;
 using DarkDefenders.Domain.RigidBodies.Events;
-using DarkDefenders.Domain.Worlds;
+using DarkDefenders.Domain.Terrains;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
-using Infrastructure.Math.Physics;
+using Infrastructure.Physics;
 using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.RigidBodies
@@ -19,28 +20,26 @@ namespace DarkDefenders.Domain.RigidBodies
 
         public Vector Position { get { return _boundingBox.Center; } }
 
-        public IEnumerable<IDomainEvent> UpdateMomentum()
+        public IEnumerable<IDomainEvent> UpdatePhysics()
         {
-            if (_isTouchingTheGround && _momentumIsZero && _externalForceIsZero)
+            Momentum momentum;
+            var momentumUpdated = TryUpdateMomentum(out momentum);
+
+            Vector position;
+            var positionUpdated = TryUpdatePosition(momentum, out position);
+
+            if (momentumUpdated && positionUpdated)
             {
-                yield break;
+                yield return new AcceleratedAndMoved(Id, momentum, position);
             }
-
-            var newMomentum = GetNewMomentum();
-
-            yield return new Accelerated(Id, newMomentum);
-        }
-
-        public IEnumerable<IDomainEvent> UpdatePosition()
-        {
-            if (_momentumIsZero)
+            else if(momentumUpdated)
             {
-                yield break;
+                yield return new Accelerated(Id, momentum);
             }
-
-            var newPosition = GetNewPosition();
-
-            yield return new Moved(Id, newPosition);
+            else if(positionUpdated)
+            {
+                yield return new Moved(Id, position);
+            }
         }
 
         public IEnumerable<IDomainEvent> AddMomentum(Momentum additionalMomentum)
@@ -70,6 +69,30 @@ namespace DarkDefenders.Domain.RigidBodies
             yield return new RigidBodyDestroyed(Id);
         }
 
+        public void Recieve(Accelerated accelerated)
+        {
+            var newMomentum = accelerated.NewMomentum;
+            SetNewMomentum(newMomentum);
+        }
+
+        public void Recieve(Moved moved)
+        {
+            SetNewPosition(moved.NewPosition);
+        }
+
+        public void Recieve(ExternalForceChanged externalForceChanged)
+        {
+            _externalForce = externalForceChanged.ExternalForce;
+
+            PrepareForceIsZero();
+        }
+
+        public void Recieve(AcceleratedAndMoved acceleratedAndMoved)
+        {
+            SetNewMomentum(acceleratedAndMoved.NewMomentum);
+            SetNewPosition(acceleratedAndMoved.NewPosition);
+        }
+
         public bool IsInTheAir()
         {
             return !_isTouchingTheGround;
@@ -87,7 +110,17 @@ namespace DarkDefenders.Domain.RigidBodies
             return momentumSign != 0 && momentumSign != Math.Sign(vector.X);
         }
 
-        public bool IsTouchingAWall()
+        public bool IsTouchingAWallToTheLeft()
+        {
+            return _isTouchingAWallToTheLeft;
+        }
+
+        public bool IsTouchingAWallToTheRight()
+        {
+            return _isTouchingAWallToTheRight;
+        }
+
+        public bool IsTouchingAnyWalls()
         {
             return _isTouchingAWallToTheRight
                 || _isTouchingAWallToTheLeft
@@ -95,32 +128,58 @@ namespace DarkDefenders.Domain.RigidBodies
                 || _isTouchingTheGround;
         }
 
-        public void Recieve(Moved moved)
+        public bool AreOpeningsNextTo(Direction direction, int heightStart, int heightEnd)
         {
-            _boundingBox = _boundingBox.ChangePosition(moved.NewPosition);
+            var x = BoundSlotX(direction);
+            var y = Level();
 
-            PrepareTouching();
+            return _terrain.AnyOpenWallsAt(Axis.Vertical, y + heightStart, y + heightEnd, x);
         }
 
-        public void Recieve(Accelerated accelerated)
+        public int Level()
         {
-            _momentum = accelerated.NewMomentum;
-
-            PrepareMomentumIsZero();
+            return (_boundingBox.Center.Y - _boundingBox.HeightRadius).TolerantFloor().ToInt();
         }
 
-        public void Recieve(ExternalForceChanged externalForceChanged)
+        public int NextSlotX(Direction direction)
         {
-            _externalForce = externalForceChanged.ExternalForce;
+            switch (direction)
+            {
+                case Direction.Left:
+                    return SlotToTheLeftX();
+                case Direction.Right:
+                    return SlotToTheRightX();
+                default:
+                    throw new ArgumentOutOfRangeException("direction");
+            }
+        }
 
-            PrepareForceIsZero();
+        public int SlotToTheRightX()
+        {
+            var right = _boundingBox.Center.X + _boundingBox.WidthRadius;
+
+            return right.NextInteger().ToInt();
+        }
+
+        public int SlotToTheLeftX()
+        {
+            var right = _boundingBox.Center.X - _boundingBox.WidthRadius;
+
+            return right.TolerantFloor().ToInt() - 1;
+        }
+
+        public int SlotYUnder()
+        {
+            var bottom = _boundingBox.Center.Y - _boundingBox.HeightRadius;
+
+            return bottom.PrevInteger().ToInt();
         }
 
         internal RigidBody
         (
             RigidBodyId id, 
             Clock clock, 
-            World world, 
+            Terrain terrain, 
             Momentum initialMomentum, 
             double mass, 
             double topHorizontalMomentum, 
@@ -128,7 +187,7 @@ namespace DarkDefenders.Domain.RigidBodies
         ) 
             : base(id)
         {
-            _world = world;
+            _terrain = terrain;
 
             _momentum = initialMomentum;
             _topHorizontalMomentum = topHorizontalMomentum;
@@ -143,12 +202,72 @@ namespace DarkDefenders.Domain.RigidBodies
             PrepareForceIsZero();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool TryUpdateMomentum(out Momentum newMomentum)
+        {
+            if (_isTouchingTheGround && _momentumIsZero && _externalForceIsZero)
+            {
+                newMomentum = _momentum;
+                return false;
+            }
+
+            var elapsed = _clock.GetElapsedSeconds();
+
+            var force = GetForce(elapsed);
+
+            if (force.NotEqualsZero())
+            {
+                newMomentum = _momentum + force * elapsed;
+
+                newMomentum = LimitTopMomentum(newMomentum);
+            }
+            else
+            {
+                newMomentum = _momentum;
+            }
+
+            newMomentum = LimitMomentumByTerrain(newMomentum);
+
+            return !newMomentum.Equals(_momentum);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool TryUpdatePosition(Momentum momentum, out Vector newPosition)
+        {
+            if (momentum.EqualsZero())
+            {
+                newPosition = _boundingBox.Center;
+                return false;
+            }
+
+            var elapsedSeconds = _clock.GetElapsedSeconds();
+
+            var positionChange = momentum * elapsedSeconds * (1.0 / _mass);
+
+            newPosition = ApplyPositionChange(positionChange);
+            return true;
+        }
+
+        private void SetNewMomentum(Momentum newMomentum)
+        {
+            _momentum = newMomentum;
+
+            PrepareMomentumIsZero();
+        }
+
+        private void SetNewPosition(Vector newPosition)
+        {
+            _boundingBox = _boundingBox.ChangePosition(newPosition);
+
+            PrepareTouching();
+        }
+
         private void PrepareTouching()
         {
-            _isTouchingAWallToTheRight = IsTouchingAWallToTheRight();
-            _isTouchingAWallToTheLeft = IsTouchingAWallToTheLeft();
-            _isTouchingTheCeiling = IsTouchingTheCeiling();
-            _isTouchingTheGround = IsTouchingTheGround();
+            _isTouchingAWallToTheRight = CalculateIsTouchingAWallToTheRight();
+            _isTouchingAWallToTheLeft = CalculateIsTouchingAWallToTheLeft();
+            _isTouchingTheCeiling = CalculateIsTouchingTheCeiling();
+            _isTouchingTheGround = CalculateIsTouchingTheGround();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -161,33 +280,6 @@ namespace DarkDefenders.Domain.RigidBodies
         private void PrepareForceIsZero()
         {
             _externalForceIsZero = _externalForce.EqualsZero();
-        }
-
-        private Vector GetNewPosition()
-        {
-            var elapsedSeconds = _clock.GetElapsedSeconds();
-
-            var positionChange = _momentum * elapsedSeconds * (1.0 / _mass);
-
-            return ApplyPositionChange(positionChange);
-        }
-
-        private Momentum GetNewMomentum()
-        {
-            var elapsed = _clock.GetElapsedSeconds();
-
-            var force = GetForce(elapsed);
-
-            var newMomentum = _momentum;
-
-            if (force.NotEqualsZero())
-            {
-                newMomentum += force * elapsed;
-
-                newMomentum = LimitTopMomentum(newMomentum);
-            }
-
-            return LimitMomentumByTerrain(newMomentum);
         }
 
         private Force GetForce(Seconds elapsedSeconds)
@@ -281,56 +373,32 @@ namespace DarkDefenders.Domain.RigidBodies
             return Vector.XY(px, py).ToMomentum();
         }
 
-        private bool IsTouchingAWallToTheLeft()
+        private bool CalculateIsTouchingAWallToTheLeft()
         {
-            var center = _boundingBox.Center;
-            var widthRadius = _boundingBox.WidthRadius;
-            var heightRadius = _boundingBox.HeightRadius;
+            var x = LeftBoundSlotX();
 
-            var left = center.X - widthRadius;
-
-            var x = left.PrevInteger().ToInt();
-
-            return IsTouchingWallsAt(Axis.Vertical, center.Y, heightRadius, x);
+            return IsTouchingWallsAt(Axis.Vertical, _boundingBox.Center.Y, _boundingBox.HeightRadius, x);
         }
 
-        private bool IsTouchingAWallToTheRight()
+        private bool CalculateIsTouchingAWallToTheRight()
         {
-            var center = _boundingBox.Center;
-            var widthRadius = _boundingBox.WidthRadius;
-            var heightRadius = _boundingBox.HeightRadius;
+            var x = RightBoundSlotX();
 
-            var right = center.X + widthRadius;
-
-            var x = right.TolerantFloor().ToInt();
-
-            return IsTouchingWallsAt(Axis.Vertical, center.Y, heightRadius, x);
+            return IsTouchingWallsAt(Axis.Vertical, _boundingBox.Center.Y, _boundingBox.HeightRadius, x);
         }
 
-        private bool IsTouchingTheGround()
+        private bool CalculateIsTouchingTheGround()
         {
-            var center = _boundingBox.Center;
-            var heightRadius = _boundingBox.HeightRadius;
-            var widthRadius = _boundingBox.WidthRadius;
+            var y = BottomBoundSlotY();
 
-            var bottom = center.Y - heightRadius;
-
-            var y = bottom.PrevInteger().ToInt();
-
-            return IsTouchingWallsAt(Axis.Horizontal, center.X, widthRadius, y);
+            return IsTouchingWallsAt(Axis.Horizontal, _boundingBox.Center.X, _boundingBox.WidthRadius, y);
         }
 
-        private bool IsTouchingTheCeiling()
+        private bool CalculateIsTouchingTheCeiling()
         {
-            var center = _boundingBox.Center;
-            var heightRadius = _boundingBox.HeightRadius;
-            var widthRadius = _boundingBox.WidthRadius;
+            var y = TopBoundSlotY();
 
-            var top = center.Y + heightRadius;
-
-            var y = top.TolerantFloor().ToInt();
-
-            return IsTouchingWallsAt(Axis.Horizontal, center.X, widthRadius, y);
+            return IsTouchingWallsAt(Axis.Horizontal, _boundingBox.Center.X, _boundingBox.WidthRadius, y);
         }
 
         private Vector ApplyPositionChange(Vector positionDelta)
@@ -420,11 +488,56 @@ namespace DarkDefenders.Domain.RigidBodies
             var start = (mainCenter - radius).TolerantFloor().ToInt();
             var end = (mainCenter + radius).PrevInteger().ToInt();
 
-            return _world.AnySolidWallsAt(axis, start, end, other);
+            return _terrain.AnySolidWallsAt(axis, start, end, other);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private int BottomBoundSlotY()
+        {
+            var bottom = _boundingBox.Center.Y - _boundingBox.HeightRadius;
+
+            return bottom.PrevInteger().ToInt();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private int TopBoundSlotY()
+        {
+            var top = _boundingBox.Center.Y + _boundingBox.HeightRadius;
+
+            return top.TolerantFloor().ToInt();
+        }
+
+        private int BoundSlotX(Direction direction)
+        {
+            switch (direction)
+            {
+                case Direction.Left:
+                    return LeftBoundSlotX();
+                case Direction.Right:
+                    return RightBoundSlotX();
+                default:
+                    throw new ArgumentOutOfRangeException("direction");
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private int LeftBoundSlotX()
+        {
+            var left = _boundingBox.Center.X - _boundingBox.WidthRadius;
+
+            return left.PrevInteger().ToInt();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private int RightBoundSlotX()
+        {
+            var right = _boundingBox.Center.X + _boundingBox.WidthRadius;
+
+            return right.TolerantFloor().ToInt();
         }
 
         private readonly Clock _clock;
-        private readonly World _world;
+        private readonly Terrain _terrain;
 
         private readonly double _mass;
         private readonly double _topHorizontalMomentum;

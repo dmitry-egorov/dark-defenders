@@ -14,27 +14,12 @@ namespace DarkDefenders.Domain.Creatures.Events
             Movement = movement;
         }
 
-        protected override string ToStringInternal()
-        {
-            return "Movement force changed: {0}, {1}".FormatWith(RootId, Movement);
-        }
-
-        protected override bool EventEquals(MovementChanged other)
-        {
-            return Movement.Equals(other.Movement);
-        }
-
-        protected override int GetEventHashCode()
-        {
-            return Movement.GetHashCode();
-        }
-
         public void ApplyTo(ICreatureEventsReciever reciever)
         {
             reciever.Recieve(this);
         }
 
-        public void Accept(IDomainEventReciever reciever)
+        public void ApplyTo(IDomainEventsReciever reciever)
         {
             reciever.Recieve(this);
         }

@@ -5,5 +5,6 @@ namespace DarkDefenders.Domain.RigidBodies.Events
         void Recieve(Moved moved);
         void Recieve(Accelerated accelerated);
         void Recieve(ExternalForceChanged externalForceChanged);
+        void Recieve(AcceleratedAndMoved acceleratedAndMoved);
     }
 }

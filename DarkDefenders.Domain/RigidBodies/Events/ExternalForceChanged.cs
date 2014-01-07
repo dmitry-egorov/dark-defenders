@@ -1,8 +1,6 @@
 ﻿using DarkDefenders.Domain.Events;
 using Infrastructure.DDDES.Implementations.Domain;
-using Infrastructure.Math;
-using Infrastructure.Math.Physics;
-using Infrastructure.Util;
+using Infrastructure.Physics;
 
 namespace DarkDefenders.Domain.RigidBodies.Events
 {
@@ -16,27 +14,12 @@ namespace DarkDefenders.Domain.RigidBodies.Events
             ExternalForce = externalForce;
         }
 
-        protected override string ToStringInternal()
-        {
-            return "External force changed: {0}, {1}".FormatWith(RootId, ExternalForce);
-        }
-
-        protected override bool EventEquals(ExternalForceChanged other)
-        {
-            return ExternalForce.Equals(other.ExternalForce);
-        }
-
-        protected override int GetEventHashCode()
-        {
-            return ExternalForce.GetHashCode();
-        }
-
         public void ApplyTo(IRigidBodyEventsReciever reciever)
         {
             reciever.Recieve(this);
         }
 
-        public void Accept(IDomainEventReciever reciever)
+        public void ApplyTo(IDomainEventsReciever reciever)
         {
             reciever.Recieve(this);
         }

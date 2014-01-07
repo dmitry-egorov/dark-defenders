@@ -32,7 +32,7 @@ namespace DarkDefenders.Domain.Projectiles
 
         private bool IsHit()
         {
-            return _rigidBody.IsTouchingAWall();
+            return _rigidBody.IsTouchingAnyWalls();
         }
 
         private readonly RigidBody _rigidBody;

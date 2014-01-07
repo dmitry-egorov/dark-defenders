@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using Infrastructure.Util;
 
 namespace Infrastructure.Math
 {
-    public struct Map<T>
+    public struct Map<T>: IEnumerable<T> 
         where T: struct 
     {
         public Dimensions Dimensions
@@ -111,9 +113,19 @@ namespace Infrastructure.Math
             }
         }
 
+        public override string ToString()
+        {
+            return "Map of " + typeof(T).Name;
+        }
+
         public bool Equals(Map<T> other)
         {
             return _dimensions.Equals(other._dimensions) && _data.AllEquals(other._data);
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return ((IEnumerable<T>)_data).GetEnumerator();
         }
 
         public override bool Equals(object obj)
@@ -128,6 +140,11 @@ namespace Infrastructure.Math
             {
                 return (_dimensions.GetHashCode()*397) ^ _data.AllHashCode();
             }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
 
         private bool IsNotWithinDimensions(int x, int y)

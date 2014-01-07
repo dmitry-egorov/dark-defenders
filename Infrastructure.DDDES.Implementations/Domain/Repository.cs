@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Infrastructure.DDDES.Implementations.Domain.Exceptions;
-using Infrastructure.Util.Structures;
+using Infrastructure.Util.Collections;
 
 namespace Infrastructure.DDDES.Implementations.Domain
 {

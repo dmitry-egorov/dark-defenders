@@ -1,8 +1,7 @@
 ﻿using DarkDefenders.Domain.Events;
-using DarkDefenders.Domain.Heroes;
 using Infrastructure.DDDES.Implementations.Domain;
 
-namespace DarkDefenders.Domain
+namespace DarkDefenders.Domain.Heroes.Events
 {
     public class HeroDestroyed : Destroyed<HeroId, Hero, HeroDestroyed>, IDomainEvent
     {
@@ -11,7 +10,7 @@ namespace DarkDefenders.Domain
         {
         }
 
-        public void Accept(IDomainEventReciever reciever)
+        public void ApplyTo(IDomainEventsReciever reciever)
         {
             reciever.Recieve(this);
         }

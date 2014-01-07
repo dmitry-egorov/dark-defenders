@@ -4,6 +4,6 @@ namespace DarkDefenders.Domain.Events
 {
     public interface IDomainEvent: IEvent
     {
-        void Accept(IDomainEventReciever reciever);
+        void ApplyTo(IDomainEventsReciever reciever);
     }
 }

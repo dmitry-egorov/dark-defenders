@@ -17,8 +17,8 @@ namespace DarkDefenders.Console
 
         public void InitializeScreen()
         {
-            System.Console.BufferWidth = System.Console.WindowWidth = _width;
-            System.Console.BufferHeight = System.Console.WindowHeight = _height;
+            System.Console.BufferWidth = System.Console.WindowWidth = Math.Max(_width, 80);
+            System.Console.BufferHeight = System.Console.WindowHeight = Math.Max(_height, 50);
 
             System.Console.CursorVisible = false;
         }

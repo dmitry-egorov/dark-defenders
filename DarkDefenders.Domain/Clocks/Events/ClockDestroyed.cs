@@ -10,7 +10,7 @@ namespace DarkDefenders.Domain.Clocks.Events
         {
         }
 
-        public void Accept(IDomainEventReciever reciever)
+        public void ApplyTo(IDomainEventsReciever reciever)
         {
             reciever.Recieve(this);
         }

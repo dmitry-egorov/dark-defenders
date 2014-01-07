@@ -32,6 +32,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Clocks\Clock.cs" />
@@ -42,6 +43,7 @@
     <Compile Include="Clocks\Events\IClockEventsReciever.cs" />
     <Compile Include="Configurator.cs" />
     <Compile Include="Creatures\CreatureProperties.cs" />
+    <Compile Include="Heroes\States\Deciding.cs" />
     <Compile Include="Heroes\Events\HeroDestroyed.cs" />
     <Compile Include="Heroes\Events\HeroCreated.cs" />
     <Compile Include="Heroes\Hero.cs" />
@@ -49,9 +51,16 @@
     <Compile Include="Heroes\Events\IHeroEvent.cs" />
     <Compile Include="Heroes\Events\IHeroEventsReciever.cs" />
     <Compile Include="Heroes\HeroFactory.cs" />
+    <Compile Include="Heroes\StateChanged.cs" />
+    <Compile Include="Heroes\States\Falling.cs" />
+    <Compile Include="Heroes\States\HeroStateFactory.cs" />
+    <Compile Include="Heroes\States\IHeroState.cs" />
+    <Compile Include="Heroes\States\Jumping.cs" />
+    <Compile Include="Heroes\States\Moving.cs" />
+    <Compile Include="RigidBodies\Events\AcceleratedAndMoved.cs" />
     <Compile Include="RigidBodies\RigidBodyProperties.cs" />
     <Compile Include="Events\IDomainEvent.cs" />
-    <Compile Include="Events\IDomainEventReciever.cs" />
+    <Compile Include="Events\IDomainEventsReciever.cs" />
     <Compile Include="Other\Cooldown.cs" />
     <Compile Include="Other\Tile.cs" />
     <Compile Include="Creatures\Events\CreatureFired.cs" />
@@ -84,12 +93,19 @@
     <Compile Include="RigidBodies\RigidBody.cs" />
     <Compile Include="RigidBodies\RigidBodyId.cs" />
     <Compile Include="Clocks\Events\ClockDestroyed.cs" />
+    <Compile Include="Terrains\Terrain.cs" />
+    <Compile Include="Terrains\TerrainFactory.cs" />
+    <Compile Include="Terrains\TerrainId.cs" />
+    <Compile Include="Terrains\Events\TerrainCreated.cs" />
+    <Compile Include="Terrains\Events\TerrainDestroyed.cs" />
+    <Compile Include="Terrains\Events\ITerrainEvent.cs" />
+    <Compile Include="Terrains\Events\ITerrainEventsReciever.cs" />
     <Compile Include="Worlds\Events\PlayerAvatarSpawned.cs" />
     <Compile Include="Worlds\Events\WorldDestroyed.cs" />
     <Compile Include="Worlds\Events\WorldCreated.cs" />
     <Compile Include="Worlds\Events\IWorldEvent.cs" />
     <Compile Include="Worlds\Events\IWorldEventsReciever.cs" />
-    <Compile Include="Worlds\Events\HeroesSpawned.cs" />
+    <Compile Include="Worlds\Events\HeroSpawned.cs" />
     <Compile Include="Worlds\World.cs" />
     <Compile Include="Worlds\WorldFactory.cs" />
     <Compile Include="Worlds\WorldId.cs" />
@@ -107,6 +123,10 @@
     <ProjectReference Include="..\Infrastructure.Math\Infrastructure.Math.csproj">
       <Project>{9DA761FD-492C-4BF7-A50D-10930664021D}</Project>
       <Name>Infrastructure.Math</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Physics\Infrastructure.Physics.csproj">
+      <Project>{305E7C2A-4803-47CD-84B8-5C9DF6134395}</Project>
+      <Name>Infrastructure.Physics</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Util\Infrastructure.Util.csproj">
       <Project>{0B407BC3-7B5B-431A-96E7-A41F25AB27BE}</Project>

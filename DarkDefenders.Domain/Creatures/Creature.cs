@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using DarkDefenders.Domain.Clocks;
 using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.Other;
 using DarkDefenders.Domain.Creatures.Events;
 using DarkDefenders.Domain.Projectiles;
 using DarkDefenders.Domain.RigidBodies;
-using DarkDefenders.Domain.Worlds;
+using DarkDefenders.Domain.Terrains;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
-using Infrastructure.Math.Physics;
+using Infrastructure.Physics;
 
 namespace DarkDefenders.Domain.Creatures
 {
@@ -64,6 +65,20 @@ namespace DarkDefenders.Domain.Creatures
             yield return new CreatureFired(Id, currentTime);
         }
 
+        public IEnumerable<IDomainEvent> InvertMovement()
+        {
+            return SetMovement(_movement.Other());
+        }
+
+        public IEnumerable<IDomainEvent> Kill()
+        {
+            yield return new CreatureDestroyed(Id);
+
+            var events = _rigidBody.Destroy();
+
+            foreach (var e in events) { yield return e; }
+        }
+
         public void Recieve(MovementChanged movementChanged)
         {
             _movement = movementChanged.Movement;
@@ -76,11 +91,74 @@ namespace DarkDefenders.Domain.Creatures
             _fireCooldown.SetLastActivationTime(creatureFired.Time);
         }
 
-        internal Creature(CreatureId id, ProjectileFactory projectileFactory, Clock clock, World world, RigidBody rigidBody, CreatureProperties properties) 
+        public bool IsInTheAir()
+        {
+            return _rigidBody.IsInTheAir();
+        }
+
+        public Point GetFallingFrom()
+        {
+            if (!_rigidBody.IsInTheAir())
+            {
+                throw new InvalidOperationException("Is not in the air");
+            }
+
+            var x = _rigidBody.NextSlotX(_movement.ToDirection().Other());
+            var y = _rigidBody.SlotYUnder();
+
+            return new Point(x, y);
+        }
+
+        public bool IsMovingIntoAWall()
+        {
+            switch (_movement)
+            {
+                case Movement.Stop:
+                    return false;
+                case Movement.Left:
+                    return _rigidBody.IsTouchingAWallToTheLeft();
+                case Movement.Right:
+                    return _rigidBody.IsTouchingAWallToTheRight();
+                default:
+                    throw new InvalidOperationException("Invalid movement state.");
+            }
+        }
+
+        public bool CanJumpOver()
+        {
+            //TODO: depends on parameters
+            var maxJumpHeight = 2;
+
+            return _rigidBody.AreOpeningsNextTo(_movement.ToDirection(), 1, maxJumpHeight);
+        }
+
+        public bool CanMoveBackwardsAfterFall(Point fallenFrom)
+        {
+            var yStart = _rigidBody.Level();
+            var yEnd = Math.Min(fallenFrom.Y, yStart + 2);
+
+            var direction = _movement.ToDirection().Other();
+
+            var xStart = _rigidBody.NextSlotX(direction);
+            var xEnd = fallenFrom.X;
+            var sign = direction.GetXIncrement();
+
+            for (var x = xStart; (xEnd - x)*sign >= 0 ; x += sign)
+            {
+                if(!_terrain.AnyOpenWallsAt(Axis.Vertical, yStart, yEnd, x))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        internal Creature(CreatureId id, ProjectileFactory projectileFactory, Clock clock, Terrain terrain, RigidBody rigidBody, CreatureProperties properties) 
             : base(id)
         {
             
-            _world = world;
+            _terrain = terrain;
             _rigidBody = rigidBody;
             _clock = clock;
             _projectileFactory = projectileFactory;
@@ -156,7 +234,7 @@ namespace DarkDefenders.Domain.Creatures
 
             var projectileId = new ProjectileId();
 
-            return _projectileFactory.Create(projectileId, _clock.Id, _world.Id, projectilePosition, _projectileMomentum);
+            return _projectileFactory.Create(projectileId, _clock.Id, _terrain.Id, projectilePosition, _projectileMomentum);
         }
 
         private Momentum GetProjectileMomentum()
@@ -195,7 +273,7 @@ namespace DarkDefenders.Domain.Creatures
 
         private readonly ProjectileFactory _projectileFactory;
         private readonly Clock _clock;
-        private readonly World _world;
+        private readonly Terrain _terrain;
         private readonly RigidBody _rigidBody;
         private readonly Cooldown _fireCooldown;
 

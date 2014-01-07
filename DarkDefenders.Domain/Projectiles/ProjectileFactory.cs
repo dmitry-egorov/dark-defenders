@@ -4,11 +4,11 @@ using DarkDefenders.Domain.Clocks;
 using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.Projectiles.Events;
 using DarkDefenders.Domain.RigidBodies;
-using DarkDefenders.Domain.Worlds;
+using DarkDefenders.Domain.Terrains;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
-using Infrastructure.Math.Physics;
+using Infrastructure.Physics;
 
 namespace DarkDefenders.Domain.Projectiles
 {
@@ -23,25 +23,25 @@ namespace DarkDefenders.Domain.Projectiles
             _rigidBodyFactory = rigidBodyFactory;
         }
 
-        public IEnumerable<IDomainEvent> Create(ProjectileId projectileId, ClockId clockId, WorldId worldId, Vector position, Momentum momentum)
+        public IEnumerable<IDomainEvent> Create(ProjectileId projectileId, ClockId clockId, TerrainId terrainId, Vector position, Momentum momentum)
         {
             var rigidBodyId = new RigidBodyId();
 
-            var events = CreateProjectileRigidBody(rigidBodyId, clockId, worldId, position, momentum);
+            var events = CreateProjectileRigidBody(rigidBodyId, clockId, terrainId, position, momentum);
 
             foreach (var e in events) { yield return e; }
 
             yield return new ProjectileCreated(projectileId, rigidBodyId);
         }
 
-        private IEnumerable<IDomainEvent> CreateProjectileRigidBody(RigidBodyId rigidBodyId, ClockId clockId, WorldId worldId, Vector position, Momentum momentum)
+        private IEnumerable<IDomainEvent> CreateProjectileRigidBody(RigidBodyId rigidBodyId, ClockId clockId, TerrainId terrainId, Vector position, Momentum momentum)
         {
             var radius = Projectile.BoundingBoxRadius;
             var mass = Projectile.Mass;
             var topHorizontalMomentum = Math.Abs(momentum.Value.X);
             var properties = new RigidBodyProperties(radius, mass, topHorizontalMomentum);
 
-            return _rigidBodyFactory.CreateRigidBody(rigidBodyId, clockId, worldId, momentum, position, properties);
+            return _rigidBodyFactory.CreateRigidBody(rigidBodyId, clockId, terrainId, momentum, position, properties);
         }
 
         protected override Projectile Handle(ProjectileCreated creationEvent)

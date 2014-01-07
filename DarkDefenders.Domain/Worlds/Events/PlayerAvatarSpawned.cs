@@ -1,7 +1,6 @@
 using DarkDefenders.Domain.Creatures;
 using DarkDefenders.Domain.Events;
 using Infrastructure.DDDES.Implementations.Domain;
-using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.Worlds.Events
 {
@@ -15,22 +14,7 @@ namespace DarkDefenders.Domain.Worlds.Events
             CreatureId = creatureId;
         }
 
-        protected override string ToStringInternal()
-        {
-            return "Player's avatar spawned: {0}, {1}".FormatWith(RootId, CreatureId);
-        }
-
-        protected override bool EventEquals(PlayerAvatarSpawned other)
-        {
-            return CreatureId.Equals(other.CreatureId);
-        }
-
-        protected override int GetEventHashCode()
-        {
-            return CreatureId.GetHashCode();
-        }
-
-        public void Accept(IDomainEventReciever reciever)
+        public void ApplyTo(IDomainEventsReciever reciever)
         {
             reciever.Recieve(this);
         }

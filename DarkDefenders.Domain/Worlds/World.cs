@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using System.Collections.ObjectModel;
 using DarkDefenders.Domain.Clocks;
 using DarkDefenders.Domain.Creatures;
 using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.Heroes;
 using DarkDefenders.Domain.Other;
+using DarkDefenders.Domain.RigidBodies;
+using DarkDefenders.Domain.Terrains;
 using DarkDefenders.Domain.Worlds.Events;
+using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
+using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.Worlds
 {
@@ -16,7 +20,11 @@ namespace DarkDefenders.Domain.Worlds
     {
         public IEnumerable<IDomainEvent> SpawnPlayerAvatar(CreatureId creatureId)
         {
-            var events = _creatureFactory.Create(creatureId, _clock.Id, Id, _playersSpawnPosition, _playerAvatarProperties);
+            var rigidBodyId = new RigidBodyId();
+
+            var position = _random.From(_playersSpawnPositions);
+
+            var events = _creatureFactory.Create(creatureId, rigidBodyId, _clock.Id, _terrainId, position, _playerAvatarProperties);
 
             foreach (var e in events) { yield return e; }
 
@@ -35,26 +43,28 @@ namespace DarkDefenders.Domain.Worlds
             var events = SpawnHero(heroId);
 
             foreach (var e in events) { yield return e; }
-
-            yield return new HeroesSpawned(Id, _clock.GetCurrentTime(), heroId);
         }
 
-        public IEnumerable<IDomainEvent> SpawnHero(HeroId heroId)
+        public IEnumerable<IDomainEvent> SpawnHero()
         {
-            var events = _heroFactory.Create(heroId, _clock.Id, Id, _heroesSpawnPosition, _heroesCreatureProperties);
-
-            foreach (var e in events) { yield return e; }
+            var heroId = new HeroId();
+            return SpawnHero(heroId);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool AnySolidWallsAt(Axis axis, int mainStart, int mainEnd, int other)
+        public IEnumerable<IDomainEvent> KillAllHeroes()
         {
-            return _terrain.IsAnyAtLine(axis, mainStart, mainEnd, other, Tile.Solid);
+            var heroes = _heroRepository.GetAll().AsReadOnly();
+
+            foreach (var hero in heroes)
+            {
+                var events = hero.Kill();
+                foreach (var e in events) { yield return e; }
+            }
         }
 
-        public void Recieve(HeroesSpawned heroesSpawned)
+        public void Recieve(HeroSpawned heroSpawned)
         {
-            _heroSpawnCooldown.SetLastActivationTime(heroesSpawned.Time);
+            _heroSpawnCooldown.SetLastActivationTime(heroSpawned.Time);
         }
 
         public void Recieve(PlayerAvatarSpawned playerAvatarSpawned)
@@ -67,38 +77,52 @@ namespace DarkDefenders.Domain.Worlds
                 WorldId id, 
                 Clock clock, 
                 CreatureFactory creatureFactory, 
-                Map<Tile> terrain, 
-                Vector playersSpawnPosition, 
+                IEnumerable<Vector> playersSpawnPositions, 
                 CreatureProperties playerAvatarProperties, 
-                Vector heroesSpawnPosition, 
+                IEnumerable<Vector> heroesSpawnPositions, 
                 TimeSpan heroesSpawnCooldown, 
                 CreatureProperties heroesCreatureProperties, 
-                HeroFactory heroFactory
-            ) : base(id)
+                HeroFactory heroFactory, 
+                TerrainId terrainId, Random random, IRepository<HeroId, Hero> heroRepository) : base(id)
         {
             _creatureFactory = creatureFactory;
-            _heroesSpawnPosition = heroesSpawnPosition;
+            _heroesSpawnPositions = heroesSpawnPositions.AsReadOnly();
             _heroesCreatureProperties = heroesCreatureProperties;
             _heroFactory = heroFactory;
+            _terrainId = terrainId;
+            _random = random;
+            _heroRepository = heroRepository;
             _playerAvatarProperties = playerAvatarProperties;
 
-            _terrain = terrain;
-            _playersSpawnPosition = playersSpawnPosition;
+            _playersSpawnPositions = playersSpawnPositions.AsReadOnly();
 
             _clock = clock;
             _heroSpawnCooldown = new Cooldown(clock, heroesSpawnCooldown);
         }
 
+        private IEnumerable<IDomainEvent> SpawnHero(HeroId heroId)
+        {
+            var position = _random.From(_heroesSpawnPositions);
+
+            var events = _heroFactory.Create(heroId, _clock.Id, _terrainId, position, _heroesCreatureProperties);
+
+            foreach (var e in events) { yield return e; }
+
+            yield return new HeroSpawned(Id, _clock.GetCurrentTime(), heroId);
+        }
+
 
         private readonly CreatureFactory _creatureFactory;
+        private readonly IRepository<HeroId, Hero> _heroRepository;
 
-        private readonly Vector _playersSpawnPosition;
+        private readonly ReadOnlyCollection<Vector> _playersSpawnPositions;
         private readonly CreatureProperties _playerAvatarProperties;
-        private readonly Map<Tile> _terrain;
         private readonly Clock _clock;
         private readonly Cooldown _heroSpawnCooldown;
-        private readonly Vector _heroesSpawnPosition;
+        private readonly ReadOnlyCollection<Vector> _heroesSpawnPositions;
         private readonly CreatureProperties _heroesCreatureProperties;
         private readonly HeroFactory _heroFactory;
+        private readonly TerrainId _terrainId;
+        private readonly Random _random;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using DarkDefenders.Domain;
 using DarkDefenders.Domain.Clocks;
@@ -10,13 +11,15 @@ using DarkDefenders.Domain.Creatures;
 using DarkDefenders.Domain.Creatures.Events;
 using DarkDefenders.Domain.RigidBodies;
 using DarkDefenders.Domain.RigidBodies.Events;
+using DarkDefenders.Domain.Terrains;
+using DarkDefenders.Domain.Terrains.Events;
 using DarkDefenders.Domain.Worlds;
 using DarkDefenders.Domain.Worlds.Events;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations;
 using Infrastructure.DDDES.Implementations.Domain.Exceptions;
 using Infrastructure.Math;
-using Infrastructure.Math.Physics;
+using Infrastructure.Physics;
 using Infrastructure.Util;
 using NUnit.Framework;
 
@@ -45,20 +48,23 @@ namespace DarkDefenders.IntegrationTests
         public void Should_create_creature()
         {
             var spawnPosition = new Vector(0, 0);
+            var spawnPositions = spawnPosition.EnumerateOnce().AsReadOnly();
             var dimensions = new Dimensions(10, 10);
             var map = new Map<Tile>(dimensions, default(Tile));
 
             var clockId = CreateClock();
-            var worldId = CreateWorld(map, spawnPosition, clockId);
+            var terrainId = CreateTerrain(map);
+            var worldId = CreateWorld(spawnPositions, clockId, terrainId);
             var avatarId = CreateAvatar(worldId);
             var rigidBodyId = FindRigidBodyId();
 
             var expectedEvents = new IDomainEvent[]
             {
                 new ClockCreated(clockId), 
-                new WorldCreated(worldId, clockId, map, spawnPosition, _playerProperties, spawnPosition, TimeSpan.FromSeconds(1), _heroesProperties), 
-                new RigidBodyCreated(rigidBodyId, clockId, worldId, spawnPosition, Momentum.Zero, _playersRigidBodyProperties),
-                new CreatureCreated(avatarId, clockId, worldId, rigidBodyId, _playerProperties),
+                new TerrainCreated(terrainId, map), 
+                new WorldCreated(worldId, clockId, terrainId, spawnPositions, _playerProperties, spawnPositions, TimeSpan.FromSeconds(1), _heroesProperties), 
+                new RigidBodyCreated(rigidBodyId, clockId, terrainId, spawnPosition, Momentum.Zero, _playersRigidBodyProperties),
+                new CreatureCreated(avatarId, clockId, terrainId, rigidBodyId, _playerProperties),
                 new PlayerAvatarSpawned(worldId, avatarId)
             };
 
@@ -69,13 +75,15 @@ namespace DarkDefenders.IntegrationTests
         public void Should_create_and_set_desired_orientation_to_creature()
         {
             var spawnPosition = new Vector(0, 0);
+            var spawnPositions = spawnPosition.EnumerateOnce().AsReadOnly();
             var dimensions = new Dimensions(10, 10);
             var map = new Map<Tile>(dimensions, default(Tile));
             var desiredOrientation = Movement.Left;
             var externalForce = Vector.XY(-180, 0).ToForce();
 
             var clockId = CreateClock();
-            var worldId = CreateWorld(map, spawnPosition, clockId);
+            var terrainId = CreateTerrain(map);
+            var worldId = CreateWorld(spawnPositions, clockId, terrainId);
             var avatarId = CreateAvatar(worldId);
             var rigidBodyId = FindRigidBodyId();
 
@@ -84,13 +92,15 @@ namespace DarkDefenders.IntegrationTests
             var expectedEvents = new IDomainEvent[]
             {
                 new ClockCreated(clockId), 
-                new WorldCreated(worldId, clockId, map, spawnPosition, _playerProperties, spawnPosition, TimeSpan.FromSeconds(1), _heroesProperties), 
-                new RigidBodyCreated(rigidBodyId, clockId, worldId, spawnPosition, Momentum.Zero, _playersRigidBodyProperties),
-                new CreatureCreated(avatarId, clockId, worldId, rigidBodyId, _playerProperties),
+                new TerrainCreated(terrainId, map), 
+                new WorldCreated(worldId, clockId, terrainId, spawnPositions, _playerProperties, spawnPositions, TimeSpan.FromSeconds(1), _heroesProperties), 
+                new RigidBodyCreated(rigidBodyId, clockId, terrainId, spawnPosition, Momentum.Zero, _playersRigidBodyProperties),
+                new CreatureCreated(avatarId, clockId, terrainId, rigidBodyId, _playerProperties),
                 new PlayerAvatarSpawned(worldId, avatarId),
                 new MovementChanged(avatarId, desiredOrientation), 
                 new ExternalForceChanged(rigidBodyId, externalForce), 
             };
+
             _eventListener.AssertEvents(expectedEvents);
         }
 
@@ -98,6 +108,7 @@ namespace DarkDefenders.IntegrationTests
         public void Should_create_and_set_desired_orientation_to_creature_and_move_creature_on_update()
         {
             var spawnPosition = new Vector(50, 0.4);
+            var spawnPositions = spawnPosition.EnumerateOnce().AsReadOnly();
             var dimensions = new Dimensions(100, 100);
             var map = new Map<Tile>(dimensions, default(Tile));
             map.Fill(Tile.Open);
@@ -109,7 +120,8 @@ namespace DarkDefenders.IntegrationTests
             var newPosition = Vector.XY(49.928, 0.4);
 
             var clockId = CreateClock();
-            var worldId = CreateWorld(map, spawnPosition, clockId);
+            var terrainId = CreateTerrain(map);
+            var worldId = CreateWorld(spawnPositions, clockId, terrainId);
             var avatarId = CreateAvatar(worldId);
             var rigidBodyId = FindRigidBodyId();
 
@@ -119,9 +131,10 @@ namespace DarkDefenders.IntegrationTests
             var expectedEvents = new IDomainEvent[]
             {
                 new ClockCreated(clockId), 
-                new WorldCreated(worldId, clockId, map, spawnPosition, _playerProperties, spawnPosition, TimeSpan.FromSeconds(1), _heroesProperties), 
-                new RigidBodyCreated(rigidBodyId, clockId, worldId, spawnPosition, Momentum.Zero, _playersRigidBodyProperties),
-                new CreatureCreated(avatarId, clockId, worldId, rigidBodyId, _playerProperties),
+                new TerrainCreated(terrainId, map), 
+                new WorldCreated(worldId, clockId, terrainId, spawnPositions, _playerProperties, spawnPositions, TimeSpan.FromSeconds(1), _heroesProperties), 
+                new RigidBodyCreated(rigidBodyId, clockId, terrainId, spawnPosition, Momentum.Zero, _playersRigidBodyProperties),
+                new CreatureCreated(avatarId, clockId, terrainId, rigidBodyId, _playerProperties),
                 new PlayerAvatarSpawned(worldId, avatarId), 
                 new MovementChanged(avatarId, desiredOrientation),
                 new ExternalForceChanged(rigidBodyId, externalForce), 
@@ -174,8 +187,7 @@ namespace DarkDefenders.IntegrationTests
         private void UpdateAll(TimeSpan elapsed)
         {
             _commandProcessor.CommitAll<Clock>(root => root.UpdateTime(elapsed));
-            _commandProcessor.CommitAll<RigidBody>(root => root.UpdateMomentum());
-            _commandProcessor.CommitAll<RigidBody>(root => root.UpdatePosition());
+            _commandProcessor.CommitAll<RigidBody>(root => root.UpdatePhysics());
         }
 
         private CreatureId CreateAvatar(WorldId worldId)
@@ -187,18 +199,27 @@ namespace DarkDefenders.IntegrationTests
             return creatureId;
         }
 
-        private WorldId CreateWorld(Map<Tile> map, Vector spawnPosition, ClockId clockId)
+        private TerrainId CreateTerrain(Map<Tile> map)
+        {
+            var terrainId = new TerrainId();
+
+            _commandProcessor.CommitCreation<TerrainFactory>(x => x.Create(terrainId, map));
+
+            return terrainId;
+        }
+
+        private WorldId CreateWorld(ReadOnlyCollection<Vector> spawnPositions, ClockId clockId, TerrainId terrainId)
         {
             var worldId = new WorldId();
 
-            CreateWorld(worldId, map, spawnPosition, clockId);
+            CreateWorld(worldId, spawnPositions, clockId, terrainId);
 
             return worldId;
         }
 
-        private void CreateWorld(WorldId worldId, Map<Tile> map, Vector spawnPosition, ClockId clockId)
+        private void CreateWorld(WorldId worldId, ReadOnlyCollection<Vector> spawnPositions, ClockId clockId, TerrainId terrainId)
         {
-            _commandProcessor.CommitCreation<WorldFactory>(f => f.Create(worldId, clockId, map, spawnPosition, _playerProperties, spawnPosition, TimeSpan.FromSeconds(1), _heroesProperties));
+            _commandProcessor.CommitCreation<WorldFactory>(f => f.Create(worldId, clockId, terrainId, spawnPositions, _playerProperties, spawnPositions, TimeSpan.FromSeconds(1), _heroesProperties));
         }
 
         private void CreateAvatar(CreatureId creatureId, WorldId worldId)

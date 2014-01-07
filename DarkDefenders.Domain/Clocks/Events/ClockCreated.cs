@@ -1,6 +1,5 @@
 using DarkDefenders.Domain.Events;
 using Infrastructure.DDDES.Implementations.Domain;
-using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.Clocks.Events
 {
@@ -10,22 +9,9 @@ namespace DarkDefenders.Domain.Clocks.Events
         {
         }
 
-        protected override string ToStringInternal()
-        {
-            return "Clock created: {0}".FormatWith(RootId);
-        }
+        
 
-        protected override bool EventEquals(ClockCreated other)
-        {
-            return true;
-        }
-
-        protected override int GetEventHashCode()
-        {
-            return 1;
-        }
-
-        public void Accept(IDomainEventReciever reciever)
+        public void ApplyTo(IDomainEventsReciever reciever)
         {
             reciever.Recieve(this);
         }

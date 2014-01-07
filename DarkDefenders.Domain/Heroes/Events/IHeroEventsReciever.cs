@@ -2,5 +2,6 @@
 {
     public interface IHeroEventsReciever
     {
+        void Recieve(StateChanged stateChanged);
     }
 }

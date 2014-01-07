@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Infrastructure.Util.Structures
+namespace Infrastructure.Util.Collections
 {
     public class FastList<T>: IEnumerable<T>
     {

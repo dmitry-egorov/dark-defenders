@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace Infrastructure.Math.Physics
+namespace Infrastructure.Physics
 {
     public struct Seconds
     {

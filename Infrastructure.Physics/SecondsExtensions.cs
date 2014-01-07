@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Infrastructure.Math.Physics
+namespace Infrastructure.Physics
 {
     public static class SecondsExtensions
     {

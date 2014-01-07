@@ -14,15 +14,5 @@ namespace Infrastructure.DDDES.Implementations.Domain
         {
             return "Root {0} destroyed: {1}".FormatWith(typeof(TRoot).Name, RootId);
         }
-
-        protected override bool EventEquals(TDestoryedEvent other)
-        {
-            return true;
-        }
-
-        protected override int GetEventHashCode()
-        {
-            return 1;
-        }
     }
 }

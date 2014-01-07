@@ -1,28 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using DarkDefenders.Domain;
 using DarkDefenders.Domain.Clocks.Events;
 using DarkDefenders.Domain.Creatures;
 using DarkDefenders.Domain.Events;
+using DarkDefenders.Domain.Heroes;
 using DarkDefenders.Domain.Heroes.Events;
 using DarkDefenders.Domain.Other;
 using DarkDefenders.Domain.Creatures.Events;
 using DarkDefenders.Domain.Projectiles.Events;
 using DarkDefenders.Domain.RigidBodies;
 using DarkDefenders.Domain.RigidBodies.Events;
+using DarkDefenders.Domain.Terrains.Events;
 using DarkDefenders.Domain.Worlds.Events;
 using Infrastructure.DDDES;
 using Infrastructure.Math;
-using Infrastructure.Math.Physics;
+using Infrastructure.Physics;
 
 namespace DarkDefenders.Console.ViewModels
 {
-    internal class GameViewModel : IEventsListener<IDomainEvent>, IDomainEventReciever
+    internal class GameViewModel : IEventsListener<IDomainEvent>, IDomainEventsReciever
     {
         public void Recieve(IDomainEvent domainEvent)
         {
-            domainEvent.Accept(this);
+            domainEvent.ApplyTo(this);
         }
 
         public void Recieve(ClockCreated clockCreated)
@@ -37,10 +38,20 @@ namespace DarkDefenders.Console.ViewModels
 
         public void Recieve(WorldCreated worldCreated)
         {
-            _map = worldCreated.Map;
+            
+        }
+
+        public void Recieve(TerrainCreated terrainCreated)
+        {
+            _map = terrainCreated.Map;
 
             SetViewPort();
             RenderWorld();
+        }
+
+        public void Recieve(TerrainDestroyed terrainDestroyed)
+        {
+            throw new NotImplementedException();
         }
 
         public void Recieve(WorldDestroyed worldDestroyed)
@@ -53,7 +64,7 @@ namespace DarkDefenders.Console.ViewModels
 
         }
 
-        public void Recieve(HeroesSpawned heroesSpawned)
+        public void Recieve(HeroSpawned heroSpawned)
         {
             
         }
@@ -62,7 +73,7 @@ namespace DarkDefenders.Console.ViewModels
         {
             var rigidBodyId = _rigidBodyIdsMap[playerAvatarSpawned.CreatureId];
 
-            var vm = _rigidBodyMap[rigidBodyId];
+            var vm = _viewModelsMap[rigidBodyId];
 
             vm.SetAsPlayersAvatar();
 
@@ -86,7 +97,7 @@ namespace DarkDefenders.Console.ViewModels
 
         public void Recieve(ProjectileCreated projectileCreated)
         {
-            var vm = _rigidBodyMap[projectileCreated.RigidBodyId];
+            var vm = _viewModelsMap[projectileCreated.RigidBodyId];
             vm.SetAsProjectile();
         }
 
@@ -98,7 +109,7 @@ namespace DarkDefenders.Console.ViewModels
         {
             var rigidBodyId = _rigidBodyIdsMap[heroCreated.CreatureId];
 
-            var vm = _rigidBodyMap[rigidBodyId];
+            var vm = _viewModelsMap[rigidBodyId];
 
             vm.SetAsHero();
 
@@ -108,50 +119,79 @@ namespace DarkDefenders.Console.ViewModels
 
         public void Recieve(HeroDestroyed heroDestroyed)
         {
-            
+            _totalHeroesSpawned--;
+            RenderHeroesCount();
         }
 
         public void Recieve(RigidBodyCreated rigidBodyCreated)
         {
             var creatureViewModel = new RigidBodyViewModel(_map, _consoleRenderer);
-            _rigidBodyMap.Add(rigidBodyCreated.RootId, creatureViewModel);
+            _viewModelsMap.Add(rigidBodyCreated.RootId, creatureViewModel);
 
             creatureViewModel.Recieve(rigidBodyCreated);
         }
 
         public void Recieve(RigidBodyDestroyed rigidBodyDestroyed)
         {
-            var vm = _rigidBodyMap[rigidBodyDestroyed.RootId];
+            var vm = _viewModelsMap[rigidBodyDestroyed.RootId];
             vm.Remove();
-            _rigidBodyMap.Remove(rigidBodyDestroyed.RootId);
+            _viewModelsMap.Remove(rigidBodyDestroyed.RootId);
         }
 
         public void Recieve(CreatureDestroyed creatureDestroyed)
         {
-            throw new NotImplementedException();
+
         }
 
         public void Recieve(Moved moved)
         {
-            if (moved.RootId == _playersRigidBodyId)
+            var rigidBodyId = moved.RootId;
+            var newPosition = moved.NewPosition;
+
+            SetNewPosition(rigidBodyId, newPosition);
+        }
+
+        private void SetNewPosition(RigidBodyId rigidBodyId, Vector newPosition)
+        {
+            if (rigidBodyId == _playersRigidBodyId)
             {
-                _lastCreaturePosition = moved.NewPosition;
+                _lastCreaturePosition = newPosition;
             }
 
-            var viewModel = _rigidBodyMap[moved.RootId];
-            viewModel.Recieve(moved);
+            var viewModel = _viewModelsMap[rigidBodyId];
+
+            viewModel.SetNewPosition(newPosition);
         }
 
         public void Recieve(Accelerated creatureAccelerated)
         {
-            if (creatureAccelerated.RootId == _playersRigidBodyId)
+            var rigidBodyId = creatureAccelerated.RootId;
+            var newMomentum = creatureAccelerated.NewMomentum;
+
+            SetNewMomentum(rigidBodyId, newMomentum);
+        }
+
+        private void SetNewMomentum(RigidBodyId rigidBodyId, Momentum newMomentum)
+        {
+            if (rigidBodyId == _playersRigidBodyId)
             {
-                _lastCreatureMomentum = creatureAccelerated.NewMomentum;
+                _lastCreatureMomentum = newMomentum;
             }
+        }
+
+        public void Recieve(AcceleratedAndMoved acceleratedAndMoved)
+        {
+            SetNewMomentum(acceleratedAndMoved.RootId, acceleratedAndMoved.NewMomentum);
+            SetNewPosition(acceleratedAndMoved.RootId, acceleratedAndMoved.NewPosition);
         }
 
         public void Recieve(ExternalForceChanged externalForceChanged)
         {
+        }
+
+        public void Recieve(StateChanged stateChanged)
+        {
+            
         }
 
         public void RenderFps(double fps, long totalFrames)
@@ -174,16 +214,18 @@ namespace DarkDefenders.Console.ViewModels
             RenderMomentum();
         }
 
+        public void RenderCreatures()
+        {
+            foreach (var vm in _viewModelsMap.Values)
+            {
+                vm.Render();
+            }
+        }
+
         private void SetViewPort()
         {
             _consoleRenderer = new ConsoleRenderer(_map.Dimensions.Width + 2, _map.Dimensions.Height + 2);
             _consoleRenderer.InitializeScreen();
-        }
-
-        private void RenderMovementForce(MovementChanged movementChanged)
-        {
-            var text = "d: " + movementChanged.Movement;
-            _consoleRenderer.RenderFloatRight(text, 3, 8, _map.Dimensions.Width + 2);
         }
 
         private void RenderPosition()
@@ -229,7 +271,7 @@ namespace DarkDefenders.Console.ViewModels
         }
 
         private ConsoleRenderer _consoleRenderer;
-        private readonly Dictionary<RigidBodyId, RigidBodyViewModel> _rigidBodyMap = new Dictionary<RigidBodyId, RigidBodyViewModel>();
+        private readonly Dictionary<RigidBodyId, RigidBodyViewModel> _viewModelsMap = new Dictionary<RigidBodyId, RigidBodyViewModel>();
         private readonly Dictionary<CreatureId, RigidBodyId> _rigidBodyIdsMap = new Dictionary<CreatureId, RigidBodyId>();
 
         private Momentum _lastCreatureMomentum = Momentum.Zero;

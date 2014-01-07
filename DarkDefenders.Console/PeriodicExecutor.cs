@@ -16,13 +16,11 @@ namespace DarkDefenders.Console
         {
             _totalElapsed += elapsed;
 
-            if (_totalElapsed < _executionPeriod)
+            while (_totalElapsed >= _executionPeriod)
             {
-                return;
+                _totalElapsed -= _executionPeriod;
+                action();
             }
-
-            _totalElapsed -= _executionPeriod;
-            action();
         }
     }
 }

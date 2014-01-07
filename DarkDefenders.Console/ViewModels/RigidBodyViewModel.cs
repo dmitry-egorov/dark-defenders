@@ -1,4 +1,5 @@
 using System;
+using System.Configuration;
 using System.Drawing;
 using DarkDefenders.Domain.Other;
 using DarkDefenders.Domain.RigidBodies.Events;
@@ -17,6 +18,7 @@ namespace DarkDefenders.Console.ViewModels
         public void SetAsPlayersAvatar()
         {
             SetType('@', ConsoleColor.Cyan);
+            _renderImmediately = true;
         }
 
         public void SetAsHero()
@@ -27,6 +29,38 @@ namespace DarkDefenders.Console.ViewModels
         public void SetAsProjectile()
         {
             SetType('*', ConsoleColor.Cyan);
+            _renderImmediately = true;
+        }
+
+        public void Render()
+        {
+            if (_renderImmediately)
+            {
+                return;
+            }
+
+            RenderInternal();
+        }
+
+        private void RenderInternal()
+        {
+            if (!_character.HasValue || !_color.HasValue)
+            {
+                throw new InvalidOperationException("Rigid body type not set");
+            }
+
+            var newRenderingPosition = _currentPosition;
+
+            if (newRenderingPosition == _lastRenderingPosition)
+            {
+                return;
+            }
+
+            var transformedPosition = Transform(newRenderingPosition);
+            _consoleRenderer.Render(transformedPosition, _character.Value, _color.Value);
+            Remove();
+
+            _lastRenderingPosition = newRenderingPosition;
         }
 
         public void Recieve(RigidBodyCreated rigidBodyCreated)
@@ -34,44 +68,37 @@ namespace DarkDefenders.Console.ViewModels
             var position = rigidBodyCreated.Position;
             var point = position.ToPoint();
 
-            _lastPosition = point;
-            _transformedLastPosition = Transform(point);
+            _currentPosition = point;
         }
 
-        public void Recieve(Moved moved)
+        public void SetNewPosition(Vector newPosition)
         {
-            if (!_character.HasValue || !_color.HasValue)
+            _currentPosition = newPosition.ToPoint();
+            if (_renderImmediately)
             {
-                throw new InvalidOperationException("Rigid body type not set");
+                RenderInternal();
             }
-
-            var newPosition = moved.NewPosition.ToPoint();
-            var position = Transform(newPosition);
-
-            if (position == _transformedLastPosition)
-            {
-                return;
-            }
-
-            _consoleRenderer.Render(position, _character.Value, _color.Value);
-            Remove();
-
-            _lastPosition = newPosition;
-            _transformedLastPosition = position;
         }
 
         public void Remove()
         {
-            var c = _map[_lastPosition] == Tile.Solid ? '?' : '·';
+            var position = _lastRenderingPosition;
 
-            _consoleRenderer.Render(_transformedLastPosition, c, ConsoleColor.DarkGray);
+            var c = _map[position] == Tile.Solid ? '?' : '·';
+
+            var transformedPosition = Transform(position);
+
+            _consoleRenderer.Render(transformedPosition, c, ConsoleColor.DarkGray);
         }
 
         private void SetType(char character, ConsoleColor color)
         {
             _character = character;
             _color = color;
-            _consoleRenderer.Render(_transformedLastPosition, _character.Value, _color.Value);
+            if (_renderImmediately)
+            {
+                RenderInternal();
+            }
         }
 
         private Point Transform(Point position)
@@ -87,9 +114,10 @@ namespace DarkDefenders.Console.ViewModels
         private readonly Map<Tile> _map;
         private readonly ConsoleRenderer _consoleRenderer;
 
-        private Point _transformedLastPosition;
         private char? _character;
         private ConsoleColor? _color;
-        private Point _lastPosition;
+        private Point _currentPosition;
+        private Point _lastRenderingPosition;
+        private bool _renderImmediately;
     }
 }

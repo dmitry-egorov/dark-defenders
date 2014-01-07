@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using DarkDefenders.Domain.Clocks.Events;
 using Infrastructure.DDDES.Implementations.Domain;
-using Infrastructure.Math.Physics;
+using Infrastructure.Physics;
 
 namespace DarkDefenders.Domain.Clocks
 {

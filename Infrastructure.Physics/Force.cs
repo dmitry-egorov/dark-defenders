@@ -1,16 +1,17 @@
 ﻿using System.Runtime.CompilerServices;
+using Infrastructure.Math;
 
-namespace Infrastructure.Math.Physics
+namespace Infrastructure.Physics
 {
-    public struct Momentum
+    public struct Force
     {
-        public static Momentum Zero = Vector.Zero.ToMomentum();
-        public static Momentum Left = Vector.Left.ToMomentum();
-        public static Momentum Right = Vector.Right.ToMomentum();
+        public static Force Zero = Vector.Zero.ToForce();
+        public static Force Left = Vector.Left.ToForce();
+        public static Force Right = Vector.Right.ToForce();
 
         public Vector Value { get; private set; }
 
-        public Momentum(Vector value)
+        public Force(Vector value)
             : this()
         {
             Value = value;
@@ -28,7 +29,7 @@ namespace Infrastructure.Math.Physics
             return Value.EqualsZero();
         }
 
-        public bool Equals(Momentum other)
+        public bool Equals(Force other)
         {
             return Value.Equals(other.Value);
         }
@@ -36,7 +37,7 @@ namespace Infrastructure.Math.Physics
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
-            return obj is Momentum && Equals((Momentum)obj);
+            return obj is Force && Equals((Force) obj);
         }
 
         public override int GetHashCode()
@@ -49,19 +50,24 @@ namespace Infrastructure.Math.Physics
             return Value.ToString();
         }
 
-        public static Momentum operator +(Momentum arg1, Momentum arg2)
+        public static Force operator +(Force arg1, Force arg2)
         {
-            return new Momentum(arg1.Value + arg2.Value);
+            return new Force(arg1.Value + arg2.Value);
         }
 
-        public static Momentum operator -(Momentum arg1, Momentum arg2)
+        public static Force operator -(Force arg1, Force arg2)
         {
-            return new Momentum(arg1.Value - arg2.Value);
+            return new Force(arg1.Value - arg2.Value);
         }
 
-        public static Vector operator *(Momentum arg1, Seconds seconds)
+        public static Force operator *(Force arg1, double coeffiecient)
         {
-            return arg1.Value * seconds.Value;
+            return new Force(arg1.Value * coeffiecient);
+        }
+
+        public static Momentum operator *(Force arg1, Seconds coeffiecient)
+        {
+            return new Momentum(arg1.Value * coeffiecient.Value);
         }
     }
 }

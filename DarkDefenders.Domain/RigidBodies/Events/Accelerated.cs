@@ -1,7 +1,6 @@
 using DarkDefenders.Domain.Events;
 using Infrastructure.DDDES.Implementations.Domain;
-using Infrastructure.Math.Physics;
-using Infrastructure.Util;
+using Infrastructure.Physics;
 
 namespace DarkDefenders.Domain.RigidBodies.Events
 {
@@ -15,27 +14,12 @@ namespace DarkDefenders.Domain.RigidBodies.Events
             NewMomentum = newMomentum;
         }
 
-        protected override string ToStringInternal()
-        {
-            return "RigidBody accelerated: {0} {1}".FormatWith(RootId, NewMomentum);
-        }
-
-        protected override bool EventEquals(Accelerated other)
-        {
-            return NewMomentum.Equals(other.NewMomentum);
-        }
-
-        protected override int GetEventHashCode()
-        {
-            return NewMomentum.GetHashCode();
-        }
-
         public void ApplyTo(IRigidBodyEventsReciever reciever)
         {
             reciever.Recieve(this);
         }
 
-        public void Accept(IDomainEventReciever reciever)
+        public void ApplyTo(IDomainEventsReciever reciever)
         {
             reciever.Recieve(this);
         }

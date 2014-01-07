@@ -1,4 +1,6 @@
-﻿namespace Infrastructure.Math.Physics
+﻿using Infrastructure.Math;
+
+namespace Infrastructure.Physics
 {
     public static class ForceExtensions
     {

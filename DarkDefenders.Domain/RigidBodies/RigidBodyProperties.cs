@@ -2,7 +2,7 @@
 
 namespace DarkDefenders.Domain.RigidBodies
 {
-    public class RigidBodyProperties : ValueObject<RigidBodyProperties>
+    public class RigidBodyProperties : SlowValueObject<RigidBodyProperties>
     {
         public double BoundingBoxRadius { get; private set; }
         public double Mass { get; private set; }
@@ -13,26 +13,6 @@ namespace DarkDefenders.Domain.RigidBodies
             BoundingBoxRadius = boundingBoxRadius;
             Mass = mass;
             TopHorizontalMomentum = topHorizontalMomentum;
-        }
-
-        protected override string ToStringInternal()
-        {
-            return "{0}, {1}, {2}".FormatWith(BoundingBoxRadius, Mass, TopHorizontalMomentum);
-        }
-
-        protected override bool EqualsInternal(RigidBodyProperties other)
-        {
-            return BoundingBoxRadius.Equals(other.BoundingBoxRadius)
-                && Mass.Equals(other.Mass)
-                && TopHorizontalMomentum.Equals(other.TopHorizontalMomentum);
-        }
-
-        protected override int GetHashCodeInternal()
-        {
-            var hashCode = BoundingBoxRadius.GetHashCode();
-            hashCode = (hashCode * 397) ^ Mass.GetHashCode();
-            hashCode = (hashCode * 397) ^ TopHorizontalMomentum.GetHashCode();
-            return hashCode;
         }
     }
 }

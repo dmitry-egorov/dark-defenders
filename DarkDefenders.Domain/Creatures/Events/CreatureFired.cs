@@ -1,7 +1,6 @@
 ﻿using System;
 using DarkDefenders.Domain.Events;
 using Infrastructure.DDDES.Implementations.Domain;
-using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.Creatures.Events
 {
@@ -14,27 +13,12 @@ namespace DarkDefenders.Domain.Creatures.Events
             Time = time;
         }
 
-        protected override string ToStringInternal()
-        {
-            return "Creature fired: {0}, {1}".FormatWith(RootId, Time);
-        }
-
-        protected override bool EventEquals(CreatureFired other)
-        {
-            return Time.Equals(other.Time);
-        }
-
-        protected override int GetEventHashCode()
-        {
-            return Time.GetHashCode();
-        }
-
         public void ApplyTo(ICreatureEventsReciever reciever)
         {
             reciever.Recieve(this);
         }
 
-        public void Accept(IDomainEventReciever reciever)
+        public void ApplyTo(IDomainEventsReciever reciever)
         {
             reciever.Recieve(this);
         }

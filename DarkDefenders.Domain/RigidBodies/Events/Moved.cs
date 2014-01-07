@@ -1,7 +1,6 @@
 using DarkDefenders.Domain.Events;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
-using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.RigidBodies.Events
 {
@@ -19,22 +18,7 @@ namespace DarkDefenders.Domain.RigidBodies.Events
             reciever.Recieve(this);
         }
 
-        protected override string ToStringInternal()
-        {
-            return "RigidBody moved: {0} {1}".FormatWith(RootId, NewPosition);
-        }
-
-        protected override bool EventEquals(Moved other)
-        {
-            return NewPosition.Equals(other.NewPosition);
-        }
-
-        protected override int GetEventHashCode()
-        {
-            return NewPosition.GetHashCode();
-        }
-
-        public void Accept(IDomainEventReciever reciever)
+        public void ApplyTo(IDomainEventsReciever reciever)
         {
             reciever.Recieve(this);
         }
