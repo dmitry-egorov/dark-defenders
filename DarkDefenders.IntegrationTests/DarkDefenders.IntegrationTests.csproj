@@ -35,6 +35,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Practices.Unity">
+      <HintPath>..\packages\Unity.3.0.1304.1\lib\Net45\Microsoft.Practices.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Configuration">
+      <HintPath>..\packages\Unity.3.0.1304.1\lib\Net45\Microsoft.Practices.Unity.Configuration.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
@@ -57,9 +63,9 @@
       <Project>{27F91716-3957-49C9-94BB-8AA160BF96AA}</Project>
       <Name>DarkDefenders.Domain</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.DDDES.Implementations\Infrastructure.DDDES.Implementations.csproj">
-      <Project>{5E4CA423-37F5-4B6A-B00C-0ADC06EC0378}</Project>
-      <Name>Infrastructure.DDDES.Implementations</Name>
+    <ProjectReference Include="..\DarkDefenders.Dtos\DarkDefenders.Dtos.csproj">
+      <Project>{26A20BD4-CC76-4E2E-BA4C-89E919E308B5}</Project>
+      <Name>DarkDefenders.Dtos</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.DDDES\Infrastructure.DDDES.csproj">
       <Project>{457CCF4D-7E52-4A7F-867C-13BAC32E13F0}</Project>

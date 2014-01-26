@@ -39,7 +39,7 @@ namespace Infrastructure.Util
         /// <param name="enumerable"><see cref="IEnumerable{T}"/> to concatinate to.</param>
         /// <param name="element">Element to concatinate</param>
         /// <returns><see cref="IEnumerable{T}"/> containing elements of original <see cref="IEnumerable{T}"/> and the <paramref name="element"/> at the end.</returns>
-        public static IEnumerable<T> Concat<T>(this IEnumerable<T> enumerable, T element)
+        public static IEnumerable<T> ConcatItem<T>(this IEnumerable<T> enumerable, T element)
         {
             foreach (var item in enumerable)
             {

@@ -30,88 +30,80 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="JetBrains.Annotations, Version=6.1.0.0, Culture=neutral, PublicKeyToken=3f033448d4bb5376, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\JetBrains.Annotations.7.0\lib\net45\JetBrains.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity">
+      <HintPath>..\packages\Unity.3.0.1304.1\lib\Net45\Microsoft.Practices.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Configuration">
+      <HintPath>..\packages\Unity.3.0.1304.1\lib\Net45\Microsoft.Practices.Unity.Configuration.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Clocks\Clock.cs" />
-    <Compile Include="Clocks\Events\ClockCreated.cs" />
-    <Compile Include="Clocks\ClockFactory.cs" />
-    <Compile Include="Clocks\ClockId.cs" />
-    <Compile Include="Clocks\Events\IClockEvent.cs" />
-    <Compile Include="Clocks\Events\IClockEventsReciever.cs" />
+    <Compile Include="Entities\Heroes\Events\HeroDestroyed.cs" />
+    <Compile Include="Entities\RigidBodies\RigidBody.cs" />
+    <Compile Include="Interfaces\IWorld.cs" />
+    <Compile Include="Interfaces\IPlayer.cs" />
+    <Compile Include="Interfaces\IGame.cs" />
+    <Compile Include="Infrastructure\Destroyed.cs" />
+    <Compile Include="Infrastructure\DomainEvent.cs" />
+    <Compile Include="Entities\Clocks\Events\ClockCreated.cs" />
+    <Compile Include="Entities\Clocks\ClockFactory.cs" />
+    <Compile Include="Entities\Creatures\Events\CreatureDestroyed.cs" />
+    <Compile Include="Adapters\GameAdapter.cs" />
+    <Compile Include="Entities\Clocks\Clock.cs" />
     <Compile Include="Configurator.cs" />
-    <Compile Include="Creatures\CreatureProperties.cs" />
-    <Compile Include="Heroes\States\Deciding.cs" />
-    <Compile Include="Heroes\Events\HeroDestroyed.cs" />
-    <Compile Include="Heroes\Events\HeroCreated.cs" />
-    <Compile Include="Heroes\Hero.cs" />
-    <Compile Include="Heroes\HeroId.cs" />
-    <Compile Include="Heroes\Events\IHeroEvent.cs" />
-    <Compile Include="Heroes\Events\IHeroEventsReciever.cs" />
-    <Compile Include="Heroes\HeroFactory.cs" />
-    <Compile Include="Heroes\StateChanged.cs" />
-    <Compile Include="Heroes\States\Falling.cs" />
-    <Compile Include="Heroes\States\HeroStateFactory.cs" />
-    <Compile Include="Heroes\States\IHeroState.cs" />
-    <Compile Include="Heroes\States\Jumping.cs" />
-    <Compile Include="Heroes\States\Moving.cs" />
-    <Compile Include="RigidBodies\Events\AcceleratedAndMoved.cs" />
-    <Compile Include="RigidBodies\RigidBodyProperties.cs" />
-    <Compile Include="Events\IDomainEvent.cs" />
-    <Compile Include="Events\IDomainEventsReciever.cs" />
-    <Compile Include="Other\Cooldown.cs" />
-    <Compile Include="Other\Tile.cs" />
-    <Compile Include="Creatures\Events\CreatureFired.cs" />
-    <Compile Include="Projectiles\Events\ProjectileDestroyed.cs" />
-    <Compile Include="Other\Direction.cs" />
-    <Compile Include="Other\Movement.cs" />
-    <Compile Include="Creatures\Events\CreatureDestroyed.cs" />
-    <Compile Include="Creatures\CreatureFactory.cs" />
-    <Compile Include="Creatures\Events\ICreatureEvent.cs" />
-    <Compile Include="Creatures\Events\ICreatureEventsReciever.cs" />
-    <Compile Include="Creatures\Events\CreatureCreated.cs" />
-    <Compile Include="Creatures\Events\MovementChanged.cs" />
-    <Compile Include="Creatures\CreatureId.cs" />
-    <Compile Include="Creatures\Creature.cs" />
-    <Compile Include="Projectiles\Events\IProjectileEvent.cs" />
-    <Compile Include="Projectiles\Events\IProjectileEventsReciever.cs" />
-    <Compile Include="Projectiles\ProjectileFactory.cs" />
-    <Compile Include="Projectiles\ProjectileId.cs" />
-    <Compile Include="Projectiles\Events\ProjectileCreated.cs" />
-    <Compile Include="Projectiles\Projectile.cs" />
+    <Compile Include="Entities\Creatures\Events\CreatureCreated.cs" />
+    <Compile Include="Entities\Heroes\Events\HeroCreated.cs" />
+    <Compile Include="Entities\Heroes\States\Deciding.cs" />
+    <Compile Include="Entities\Heroes\Hero.cs" />
+    <Compile Include="Entities\Heroes\HeroFactory.cs" />
+    <Compile Include="Entities\Heroes\Events\StateChanged.cs" />
+    <Compile Include="Entities\Heroes\States\Falling.cs" />
+    <Compile Include="Entities\Heroes\States\HeroStateFactory.cs" />
+    <Compile Include="Entities\Heroes\States\IHeroState.cs" />
+    <Compile Include="Entities\Heroes\States\Jumping.cs" />
+    <Compile Include="Entities\Heroes\States\Moving.cs" />
+    <Compile Include="Entities\Projectiles\Events\ProjectileDestroyed.cs" />
+    <Compile Include="Entities\Projectiles\Events\ProjectileCreated.cs" />
+    <Compile Include="Entities\RigidBodies\Events\AcceleratedAndMoved.cs" />
+    <Compile Include="Entities\RigidBodies\Events\RigidBodyCreated.cs" />
+    <Compile Include="Entities\RigidBodies\Events\RigidBodyDestroyed.cs" />
+    <Compile Include="Entities\Other\Cooldown.cs" />
+    <Compile Include="Entities\Creatures\Events\Fired.cs" />
+    <Compile Include="Entities\Creatures\CreatureFactory.cs" />
+    <Compile Include="Entities\Creatures\Events\MovementChanged.cs" />
+    <Compile Include="Entities\Creatures\Creature.cs" />
+    <Compile Include="Entities\Projectiles\ProjectileFactory.cs" />
+    <Compile Include="Entities\Projectiles\Projectile.cs" />
+    <Compile Include="Entities\Worlds\Events\PlayerAvatarSpawned.cs" />
+    <Compile Include="Adapters\PlayerAdapter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RigidBodies\Events\RigidBodyDestroyed.cs" />
-    <Compile Include="RigidBodies\RigidBodyFactory.cs" />
-    <Compile Include="RigidBodies\Events\Accelerated.cs" />
-    <Compile Include="RigidBodies\Events\RigidBodyCreated.cs" />
-    <Compile Include="RigidBodies\Events\Moved.cs" />
-    <Compile Include="RigidBodies\Events\IRigidBodyEvent.cs" />
-    <Compile Include="RigidBodies\Events\IRigidBodyEventsReciever.cs" />
-    <Compile Include="RigidBodies\Events\ExternalForceChanged.cs" />
-    <Compile Include="RigidBodies\RigidBody.cs" />
-    <Compile Include="RigidBodies\RigidBodyId.cs" />
-    <Compile Include="Clocks\Events\ClockDestroyed.cs" />
-    <Compile Include="Terrains\Terrain.cs" />
-    <Compile Include="Terrains\TerrainFactory.cs" />
-    <Compile Include="Terrains\TerrainId.cs" />
-    <Compile Include="Terrains\Events\TerrainCreated.cs" />
-    <Compile Include="Terrains\Events\TerrainDestroyed.cs" />
-    <Compile Include="Terrains\Events\ITerrainEvent.cs" />
-    <Compile Include="Terrains\Events\ITerrainEventsReciever.cs" />
-    <Compile Include="Worlds\Events\PlayerAvatarSpawned.cs" />
-    <Compile Include="Worlds\Events\WorldDestroyed.cs" />
-    <Compile Include="Worlds\Events\WorldCreated.cs" />
-    <Compile Include="Worlds\Events\IWorldEvent.cs" />
-    <Compile Include="Worlds\Events\IWorldEventsReciever.cs" />
-    <Compile Include="Worlds\Events\HeroSpawned.cs" />
-    <Compile Include="Worlds\World.cs" />
-    <Compile Include="Worlds\WorldFactory.cs" />
-    <Compile Include="Worlds\WorldId.cs" />
-    <Compile Include="Clocks\Events\ClockTimeUpdated.cs" />
+    <Compile Include="Entities\RigidBodies\RigidBodyFactory.cs" />
+    <Compile Include="Entities\RigidBodies\Events\Accelerated.cs" />
+    <Compile Include="Entities\RigidBodies\Events\Moved.cs" />
+    <Compile Include="Entities\RigidBodies\Events\ExternalForceChanged.cs" />
+    <Compile Include="Entities\Terrains\Terrain.cs" />
+    <Compile Include="Entities\Terrains\Events\TerrainCreated.cs" />
+    <Compile Include="Entities\Terrains\TerrainFactory.cs" />
+    <Compile Include="Entities\Worlds\Events\HeroSpawnActivationTimeChanged.cs" />
+    <Compile Include="Entities\Worlds\Events\SpawnHeroesChanged.cs" />
+    <Compile Include="Entities\Clocks\Events\TimeChanged.cs" />
+    <Compile Include="Entities\Worlds\World.cs" />
+    <Compile Include="Entities\Worlds\Events\WorldCreated.cs" />
+    <Compile Include="Entities\Worlds\WorldFactory.cs" />
+    <Compile Include="Adapters\WorldAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DarkDefenders.Dtos\DarkDefenders.Dtos.csproj">
+      <Project>{26A20BD4-CC76-4E2E-BA4C-89E919E308B5}</Project>
+      <Name>DarkDefenders.Dtos</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Infrastructure.DDDES.Implementations\Infrastructure.DDDES.Implementations.csproj">
       <Project>{5E4CA423-37F5-4B6A-B00C-0ADC06EC0378}</Project>
       <Name>Infrastructure.DDDES.Implementations</Name>
@@ -127,6 +119,10 @@
     <ProjectReference Include="..\Infrastructure.Physics\Infrastructure.Physics.csproj">
       <Project>{305E7C2A-4803-47CD-84B8-5C9DF6134395}</Project>
       <Name>Infrastructure.Physics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Unity\Infrastructure.Unity.csproj">
+      <Project>{3CE8AEC8-8016-4431-ACCD-564E0DF56FE6}</Project>
+      <Name>Infrastructure.Unity</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Util\Infrastructure.Util.csproj">
       <Project>{0B407BC3-7B5B-431A-96E7-A41F25AB27BE}</Project>

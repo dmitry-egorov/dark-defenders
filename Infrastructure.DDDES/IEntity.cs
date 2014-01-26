@@ -1,7 +1,7 @@
-namespace Infrastructure.DDDES
+﻿namespace Infrastructure.DDDES
 {
     public interface IEntity<out TId>
     {
-        TId Id { get; }
+        TId GetGlobalId();
     }
 }

@@ -1,8 +1,7 @@
 using System;
-using System.Configuration;
 using System.Drawing;
-using DarkDefenders.Domain.Other;
-using DarkDefenders.Domain.RigidBodies.Events;
+using DarkDefenders.Dtos.Entities.RigidBodies;
+using DarkDefenders.Dtos.Other;
 using Infrastructure.Math;
 
 namespace DarkDefenders.Console.ViewModels
@@ -63,9 +62,9 @@ namespace DarkDefenders.Console.ViewModels
             _lastRenderingPosition = newRenderingPosition;
         }
 
-        public void Recieve(RigidBodyCreated rigidBodyCreated)
+        public void Recieve(RigidBodyCreatedDto rigidBodyCreated)
         {
-            var position = rigidBodyCreated.Position;
+            var position = rigidBodyCreated.Properties.Position;
             var point = position.ToPoint();
 
             _currentPosition = point;

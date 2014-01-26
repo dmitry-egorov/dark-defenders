@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.30110.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DarkDefenders.IntegrationTests", "DarkDefenders.IntegrationTests\DarkDefenders.IntegrationTests.csproj", "{B7E1B313-A76C-4BAC-88B1-A09BCA57641D}"
 EndProject
@@ -24,6 +24,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Math.Tests", "Infrastructure.Math.Tests\Infrastructure.Math.Tests.csproj", "{CDD0E2E5-BCEE-4603-92C3-29858B205B20}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Physics", "Infrastructure.Physics\Infrastructure.Physics.csproj", "{305E7C2A-4803-47CD-84B8-5C9DF6134395}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Unity", "Infrastructure.Unity\Infrastructure.Unity.csproj", "{3CE8AEC8-8016-4431-ACCD-564E0DF56FE6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DarkDefenders.Dtos", "DarkDefenders.Dtos\DarkDefenders.Dtos.csproj", "{26A20BD4-CC76-4E2E-BA4C-89E919E308B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +75,14 @@ Global
 		{305E7C2A-4803-47CD-84B8-5C9DF6134395}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{305E7C2A-4803-47CD-84B8-5C9DF6134395}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{305E7C2A-4803-47CD-84B8-5C9DF6134395}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CE8AEC8-8016-4431-ACCD-564E0DF56FE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CE8AEC8-8016-4431-ACCD-564E0DF56FE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CE8AEC8-8016-4431-ACCD-564E0DF56FE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CE8AEC8-8016-4431-ACCD-564E0DF56FE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26A20BD4-CC76-4E2E-BA4C-89E919E308B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26A20BD4-CC76-4E2E-BA4C-89E919E308B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26A20BD4-CC76-4E2E-BA4C-89E919E308B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26A20BD4-CC76-4E2E-BA4C-89E919E308B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -82,5 +94,6 @@ Global
 		{5E4CA423-37F5-4B6A-B00C-0ADC06EC0378} = {BC354A87-095F-4CB1-AACF-2611A8A79612}
 		{CDD0E2E5-BCEE-4603-92C3-29858B205B20} = {BC354A87-095F-4CB1-AACF-2611A8A79612}
 		{305E7C2A-4803-47CD-84B8-5C9DF6134395} = {BC354A87-095F-4CB1-AACF-2611A8A79612}
+		{3CE8AEC8-8016-4431-ACCD-564E0DF56FE6} = {BC354A87-095F-4CB1-AACF-2611A8A79612}
 	EndGlobalSection
 EndGlobal

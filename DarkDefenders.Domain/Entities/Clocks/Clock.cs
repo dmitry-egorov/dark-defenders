@@ -1,0 +1,46 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using DarkDefenders.Domain.Entities.Clocks.Events;
+using DarkDefenders.Dtos.Entities.Clocks;
+using Infrastructure.DDDES;
+using Infrastructure.DDDES.Implementations.Domain;
+using Infrastructure.Physics;
+
+namespace DarkDefenders.Domain.Entities.Clocks
+{
+    internal class Clock: Entity<ClockId>
+    {
+        private Seconds _elapsedSeconds;
+        private TimeSpan _currentTime;
+
+        public Clock()
+        {
+            _currentTime = TimeSpan.Zero;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public TimeSpan GetCurrentTime()
+        {
+            return _currentTime;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Seconds GetElapsedSeconds()
+        {
+            return _elapsedSeconds;
+        }
+
+        public IEnumerable<IEvent> UpdateTime(TimeSpan elapsed)
+        {
+            var newTime = _currentTime + elapsed;
+            yield return new TimeChanged(this, newTime);
+        }
+
+        internal void SetNewTime(TimeSpan newTime)
+        {
+            _elapsedSeconds = (newTime - _currentTime).ToSeconds();
+            _currentTime = newTime;
+        }
+    }
+}

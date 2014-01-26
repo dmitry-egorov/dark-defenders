@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using DarkDefenders.Domain.Other;
+using DarkDefenders.Dtos.Other;
 using Infrastructure.Math;
 using Infrastructure.Util;
 

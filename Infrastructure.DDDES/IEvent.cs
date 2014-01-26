@@ -2,6 +2,7 @@
 {
     public interface IEvent
     {
-        Identity RootId { get; }
+        void Apply();
+        object ToDto();
     }
 }

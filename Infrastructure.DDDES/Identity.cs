@@ -9,6 +9,11 @@ namespace Infrastructure.DDDES
 
         private readonly long _value;
 
+        public static void Reset()
+        {
+            Interlocked.Exchange(ref _currentIdValue, 0L);
+        }
+
         protected Identity()
         {
             _value = Interlocked.Increment(ref _currentIdValue);

@@ -18,7 +18,7 @@
             }
         }
 
-        public void Recieve(TDomainEvent domainEvent)
+        public void Recieve(TDomainEvent entityEvent)
         {
             _totalCount += 1;
         }

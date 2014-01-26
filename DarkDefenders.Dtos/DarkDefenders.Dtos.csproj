@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{26A20BD4-CC76-4E2E-BA4C-89E919E308B5}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DarkDefenders.Dtos</RootNamespace>
+    <AssemblyName>DarkDefenders.Dtos</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Entities\Clocks\ClockId.cs" />
+    <Compile Include="Entities\Creatures\CreatureId.cs" />
+    <Compile Include="Entities\Heroes\HeroId.cs" />
+    <Compile Include="Entities\Projectiles\ProjectileId.cs" />
+    <Compile Include="Entities\RigidBodies\AcceleratedAndMovedDto.cs" />
+    <Compile Include="Entities\RigidBodies\AcceleratedDto.cs" />
+    <Compile Include="Entities\Clocks\ClockCreatedDto.cs" />
+    <Compile Include="Entities\Creatures\CreatureCreatedDto.cs" />
+    <Compile Include="Entities\Creatures\CreatureDestroyedDto.cs" />
+    <Compile Include="Entities\RigidBodies\ExternalForceChangedDto.cs" />
+    <Compile Include="Entities\Creatures\FiredDto.cs" />
+    <Compile Include="Entities\Heroes\HeroCreatedDto.cs" />
+    <Compile Include="Entities\Heroes\HeroDestroyedDto.cs" />
+    <Compile Include="Entities\RigidBodies\RigidBodyId.cs" />
+    <Compile Include="Entities\RigidBodies\RigidBodyInitialProperties.cs" />
+    <Compile Include="Entities\Terrains\TerrainId.cs" />
+    <Compile Include="Entities\Worlds\HeroSpawnActivationTimeChangedDto.cs" />
+    <Compile Include="Entities\RigidBodies\MovedDto.cs" />
+    <Compile Include="Entities\Creatures\MovementChangedDto.cs" />
+    <Compile Include="Entities\Worlds\PlayerAvatarSpawnedDto.cs" />
+    <Compile Include="Entities\Projectiles\ProjectileCreatedDto.cs" />
+    <Compile Include="Entities\Projectiles\ProjectileDestroyedDto.cs" />
+    <Compile Include="Entities\RigidBodies\RigidBodyCreatedDto.cs" />
+    <Compile Include="Entities\RigidBodies\RigidBodyDestroyedDto.cs" />
+    <Compile Include="Entities\Worlds\SpawnHeroesChangedDto.cs" />
+    <Compile Include="Entities\Heroes\StateChangedDto.cs" />
+    <Compile Include="Entities\Terrains\TerrainCreatedDto.cs" />
+    <Compile Include="Entities\Clocks\TimeChangedDto.cs" />
+    <Compile Include="Entities\Worlds\WorldCreatedDto.cs" />
+    <Compile Include="Entities\Worlds\WorldId.cs" />
+    <Compile Include="Entities\Worlds\WorldProperties.cs" />
+    <Compile Include="HeroStateDto.cs" />
+    <Compile Include="Infrastructure\EventDto.cs" />
+    <Compile Include="Infrastructure\IEventDto.cs" />
+    <Compile Include="Infrastructure\IEventDtoReciever.cs" />
+    <Compile Include="Entities\Creatures\CreatureProperties.cs" />
+    <Compile Include="Other\Direction.cs" />
+    <Compile Include="Other\Movement.cs" />
+    <Compile Include="Entities\RigidBodies\RigidBodyProperties.cs" />
+    <Compile Include="Other\Tile.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Infrastructure.DDDES\Infrastructure.DDDES.csproj">
+      <Project>{457CCF4D-7E52-4A7F-867C-13BAC32E13F0}</Project>
+      <Name>Infrastructure.DDDES</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Math\Infrastructure.Math.csproj">
+      <Project>{9DA761FD-492C-4BF7-A50D-10930664021D}</Project>
+      <Name>Infrastructure.Math</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Physics\Infrastructure.Physics.csproj">
+      <Project>{305E7C2A-4803-47CD-84B8-5C9DF6134395}</Project>
+      <Name>Infrastructure.Physics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Util\Infrastructure.Util.csproj">
+      <Project>{0B407BC3-7B5B-431A-96E7-A41F25AB27BE}</Project>
+      <Name>Infrastructure.Util</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

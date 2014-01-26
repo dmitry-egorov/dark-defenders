@@ -1,7 +1,7 @@
 namespace Infrastructure.DDDES
 {
-    public interface IEventsListener<in TDomainEvent>
+    public interface IEventsListener<in TEventDto>
     {
-        void Recieve(TDomainEvent domainEvent);
+        void Recieve(TEventDto entityEvent);
     }
 }

@@ -13,10 +13,27 @@ namespace Infrastructure.Util
             var fields = GetFields();
             var values = fields
                 .Select(x => x.GetValue(this))
-                .Select(x => x.SafeToString())
+                .Select(GetStringOf)
                 .JoinBy(", ");
 
             return "{0}: {1}".FormatWith(name, values);
+        }
+
+        private static string GetStringOf(object o)
+        {
+            if (o == null)
+            {
+                return "";
+            }
+
+            var enumerable = o as IEnumerable;
+
+            if (enumerable != null)
+            {
+                return "[" + enumerable.Cast<object>().Select(GetStringOf).JoinBy(", ") + "]";
+            }
+
+            return o.ToString();
         }
 
         protected override int GetHashCodeInternal()

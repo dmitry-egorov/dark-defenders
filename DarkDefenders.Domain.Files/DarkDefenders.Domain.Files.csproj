@@ -40,9 +40,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DarkDefenders.Domain\DarkDefenders.Domain.csproj">
-      <Project>{27F91716-3957-49C9-94BB-8AA160BF96AA}</Project>
-      <Name>DarkDefenders.Domain</Name>
+    <ProjectReference Include="..\DarkDefenders.Dtos\DarkDefenders.Dtos.csproj">
+      <Project>{26A20BD4-CC76-4E2E-BA4C-89E919E308B5}</Project>
+      <Name>DarkDefenders.Dtos</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Math\Infrastructure.Math.csproj">
       <Project>{9DA761FD-492C-4BF7-A50D-10930664021D}</Project>

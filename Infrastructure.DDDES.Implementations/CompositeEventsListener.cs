@@ -19,11 +19,11 @@ namespace Infrastructure.DDDES.Implementations
             _listeners = linsteners.ShouldNotBeNull("listeners").AsReadOnly();
         }
 
-        public void Recieve(TDomainEvent domainEvent)
+        public void Recieve(TDomainEvent entityEvent)
         {
             foreach (var linstener in _listeners)
             {
-                linstener.Recieve(domainEvent);
+                linstener.Recieve(entityEvent);
             }
         }
     }

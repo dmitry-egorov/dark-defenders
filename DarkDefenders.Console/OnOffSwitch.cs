@@ -22,9 +22,15 @@ namespace DarkDefenders.Console
 
         public void State(bool isPressed)
         {
+            State(isPressed, _ => {});
+        }
+
+        public void State(bool isPressed, Action<bool> onToggled)
+        {
             _button.State(isPressed, () =>
             {
                 _isOn = !_isOn;
+                onToggled(_isOn);
             });
         }
 

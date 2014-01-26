@@ -3,25 +3,23 @@ using System.IO;
 using System.Windows.Forms;
 using DarkDefenders.Console.ViewModels;
 using DarkDefenders.Domain;
-using DarkDefenders.Domain.Clocks;
-using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.Files;
-using DarkDefenders.Domain.Heroes;
-using DarkDefenders.Domain.Other;
-using DarkDefenders.Domain.Creatures;
-using DarkDefenders.Domain.Projectiles;
-using DarkDefenders.Domain.RigidBodies;
-using DarkDefenders.Domain.Terrains;
-using DarkDefenders.Domain.Worlds;
+using DarkDefenders.Domain.Interfaces;
+using DarkDefenders.Dtos.Entities.Creatures;
+using DarkDefenders.Dtos.Entities.RigidBodies;
+using DarkDefenders.Dtos.Entities.Worlds;
+using DarkDefenders.Dtos.Infrastructure;
+using DarkDefenders.Dtos.Other;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations;
 using Infrastructure.Util;
+using Microsoft.Practices.Unity;
 
 namespace DarkDefenders.Console
 {
     static class Program
     {
-        private const int MaxFps = 100;
+        private const int MaxFps = 60;
 
 //        private const string WorldFileName = "simpleWorld3.txt";
 //        private const string WorldFileName = "world1.bmp";
@@ -59,7 +57,7 @@ namespace DarkDefenders.Console
         private static readonly PerformanceCounter _fpsCounter = new PerformanceCounter();
         private static readonly PerformanceCounter _eventsCounter = new PerformanceCounter();
 
-        private static readonly Button _spawnHeroButton = new Button();
+        private static readonly OnOffSwitch _spawnHeroOnOffSwitch = new OnOffSwitch(true);
         private static readonly Button _killHeroesButton = new Button();
 
         private static readonly TimeFiller _timeFiller = new TimeFiller(_minFrameElapsed);
@@ -70,41 +68,26 @@ namespace DarkDefenders.Console
         {
             var renderer = new GameViewModel();
 
-            var counter = new CountingEventsListener<IDomainEvent>();
+            var counter = new CountingEventsListener<IEventDto>();
 
-            var composite = new CompositeEventsListener<IDomainEvent>(renderer, counter);
+            var composite = new CompositeEventsListener<IEventDto>(renderer, counter);
 
-            var processor = CreateAndConfigureProcessor(composite);
 
-            var clockId = new ClockId();
-            var worldId = new WorldId();
-            var avatarCreatureId = new CreatureId();
+            var game = CreateGame(composite);
+            var world = InitializeGame(game);
 
-            InitializeDomain(processor, clockId, worldId, avatarCreatureId);
-
-            var clock = processor.CreateRootAdapter<Clock>(clockId);
-            var world = processor.CreateRootAdapter<World>(worldId);
-            var avatar = processor.CreateRootAdapter<Creature>(avatarCreatureId);
-
-            var rigidBodies = processor.CreateRootsAdapter<RigidBody>();
-            var projectiles = processor.CreateRootsAdapter<Projectile>();
-            var heroes = processor.CreateRootsAdapter<Hero>();
-
+            var player = world.AddPlayer();
             var stopwatch = AutoResetStopwatch.StartNew();
             _timeFiller.Start();
 
             while (!_escape)
             {
                 var elapsed = stopwatch.ElapsedSinceLastCall.LimitTo(_elapsedLimit);
-                
-                _keyBoardExecutor.Tick(elapsed, () => ProcessKeyboard(world, avatar, processor));
 
-                clock.Commit(x => x.UpdateTime(elapsed));
-                rigidBodies.Commit(x => x.UpdatePhysics());
-                projectiles.Commit(x => x.CheckForHit());
-                heroes.Commit(x => x.Think());
-                _heroSpawnSwitch.WhenOn(() => world.Commit(x => x.SpawnHeroes()));
-                _testHeroSpawnExecutor.Tick(elapsed, () => world.Commit(x => x.SpawnHero()));
+                game.Update(elapsed);
+
+                _keyBoardExecutor.Tick(elapsed, () => ProcessKeyboard(game, player, world));
+                _testHeroSpawnExecutor.Tick(elapsed, world.SpawnHero);
 
                 _heroRenderingExecutor.Tick(elapsed, renderer.RenderCreatures);
                 _statsRenderingExecutor.Tick(elapsed, renderer.RenderCreatureState);
@@ -115,25 +98,22 @@ namespace DarkDefenders.Console
             }
         }
 
-        private static ICommandProcessor<IDomainEvent> CreateAndConfigureProcessor(IEventsListener<IDomainEvent> eventsListener)
+        private static IWorld InitializeGame(IGame game)
         {
-            var processor = new CommandProcessor<IDomainEvent>(eventsListener);
-
-            processor.ConfigureDomain();
-
-            return processor;
-        }
-
-        private static void InitializeDomain(ICommandProcessor<IDomainEvent> processor, ClockId clockId, WorldId worldId, CreatureId creatureId)
-        {
-            var terrainId = new TerrainId();
             var terrainData = LoadTerrain();
 
-            processor.CommitCreation<ClockFactory>(t => t.Create(clockId));
-            processor.CommitCreation<TerrainFactory>(t => t.Create(terrainId, terrainData.Map));
-            processor.CommitCreation<WorldFactory>(t => t.Create(worldId, clockId, terrainId, terrainData.PlayerSpawns, _playersAvatarProperties, terrainData.HeroSpawns, _heroesSpawnCooldown, _heroesCreatureProperties));
+            var worldProperties = new WorldProperties(terrainData.PlayerSpawns, _playersAvatarProperties, terrainData.HeroSpawns, _heroesSpawnCooldown, _heroesCreatureProperties);
 
-            processor.Commit<World>(worldId, x => x.SpawnPlayerAvatar(creatureId));
+            return game.Initialize(terrainData.Map, worldProperties);
+        }
+
+        private static IGame CreateGame(IEventsListener<IEventDto> eventsListener)
+        {
+            var container = new UnityContainer();
+            container.RegisterInstance(eventsListener);
+            container.RegisterDomain();
+
+            return container.ResolveGame();
         }
 
         private static TerrainData LoadTerrain()
@@ -144,37 +124,35 @@ namespace DarkDefenders.Console
             return TerrainLoader.LoadFromFile(path);
         }
 
-        private static void ProcessKeyboard(IRootAdapter<World, IDomainEvent> world, IRootAdapter<Creature, IDomainEvent> avatar, IUnitOfWork unitOfWork)
+        private static void ProcessKeyboard(IGame game, IPlayer player, IWorld world)
         {
             var leftIsPressed = NativeKeyboard.IsKeyDown(Keys.Left);
             var rightIsPressed = NativeKeyboard.IsKeyDown(Keys.Right);
             if (leftIsPressed && !rightIsPressed)
             {
-                avatar.Do(x => x.SetMovement(Movement.Left));
+                player.ChangeMovement(Movement.Left);
             }
             else if (rightIsPressed && !leftIsPressed)
             {
-                avatar.Do(x => x.SetMovement(Movement.Right));
+                player.ChangeMovement(Movement.Right);
             }
             else
             {
-                avatar.Do(x => x.SetMovement(Movement.Stop));
+                player.ChangeMovement(Movement.Stop);
             }
 
             if (NativeKeyboard.IsKeyDown(Keys.Up))
             {
-                avatar.Do(x => x.Jump());
+                player.Jump();
             }
 
             if (NativeKeyboard.IsKeyDown(Keys.LControlKey) || NativeKeyboard.IsKeyDown(Keys.RControlKey))
             {
-                avatar.Do(x => x.Fire());
+                player.Fire();
             }
 
-            _spawnHeroButton.State(NativeKeyboard.IsKeyDown(Keys.H), () => world.Do(x => x.SpawnHero()));
-            _killHeroesButton.State(NativeKeyboard.IsKeyDown(Keys.K), () => world.Do(x => x.KillAllHeroes()));
-
-            unitOfWork.Commit();
+            _spawnHeroOnOffSwitch.State(NativeKeyboard.IsKeyDown(Keys.H), world.ChangeSpawnHeroes);
+            _killHeroesButton.State(NativeKeyboard.IsKeyDown(Keys.K), game.KillAllHeroes);
 
             _heroSpawnSwitch.State(NativeKeyboard.IsKeyDown(Keys.S));
             _limitFpsSwitch.State(NativeKeyboard.IsKeyDown(Keys.L));
