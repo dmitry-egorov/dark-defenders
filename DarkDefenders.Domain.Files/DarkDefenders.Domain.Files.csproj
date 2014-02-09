@@ -44,10 +44,6 @@
       <Project>{27F91716-3957-49C9-94BB-8AA160BF96AA}</Project>
       <Name>DarkDefenders.Domain</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.Data\Infrastructure.Data.csproj">
-      <Project>{96099472-811A-440D-85D2-5F0F44E09EE8}</Project>
-      <Name>Infrastructure.Data</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Math\Infrastructure.Math.csproj">
       <Project>{9DA761FD-492C-4BF7-A50D-10930664021D}</Project>
       <Name>Infrastructure.Math</Name>

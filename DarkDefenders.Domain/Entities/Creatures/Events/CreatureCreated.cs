@@ -3,9 +3,8 @@ using DarkDefenders.Domain.Entities.Clocks;
 using DarkDefenders.Domain.Entities.RigidBodies;
 using DarkDefenders.Domain.Entities.Terrains;
 using DarkDefenders.Domain.Factories;
-using Infrastructure.Data;
+using DarkDefenders.Domain.Infrastructure;
 using Infrastructure.DDDES;
-using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Entities.Creatures.Events
 {
@@ -29,14 +28,14 @@ namespace DarkDefenders.Domain.Entities.Creatures.Events
             _rigidBody = rigidBody;
         }
 
-        protected override object CreateData(IdentityOf<Creature> id)
-        {
-            return new CreatureCreatedData(id, _rigidBody.Item.Id, _properties);
-        }
-
         protected override Creature Create()
         {
             return new Creature(_storage, _projectileFactory, _clockContainer.Item, _terrainContainer.Item, _rigidBody.Item, _properties);
+        }
+
+        protected override void Accept(IEventsReciever reciever, IdentityOf<Creature> id)
+        {
+            reciever.CreatureCreated(id, _rigidBody.Item.Id);
         }
     }
 }

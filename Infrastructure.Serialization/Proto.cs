@@ -21,6 +21,7 @@ namespace Infrastructure.Serialization
                 return ProtoBuf.Serializer.Deserialize<T>(stream);
             }
         }
+
         public static long Serialize<T>(T instance, byte[] buffer)
         {
             using (var stream = new MemoryStream(buffer))

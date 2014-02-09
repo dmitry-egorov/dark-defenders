@@ -4,7 +4,6 @@ using DarkDefenders.Domain.Data.Entities.RigidBodies;
 using DarkDefenders.Domain.Entities.Projectiles;
 using DarkDefenders.Domain.Entities.Projectiles.Events;
 using DarkDefenders.Domain.Entities.RigidBodies;
-using Infrastructure.Data;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
@@ -41,7 +40,7 @@ namespace DarkDefenders.Domain.Factories
             var mass = Projectile.Mass;
             var topHorizontalMomentum = Math.Abs(momentum.Value.X);
             var properties = new RigidBodyProperties((float) radius, (float) mass, (float) topHorizontalMomentum);
-            var rigidBodyInitialProperties = new RigidBodyInitialProperties(momentum.ToData(), position.ToData(), properties);
+            var rigidBodyInitialProperties = new RigidBodyInitialProperties(momentum, position, properties);
 
             return _rigidBodyFactory.Create(rigidBodyInitialProperties);
         }

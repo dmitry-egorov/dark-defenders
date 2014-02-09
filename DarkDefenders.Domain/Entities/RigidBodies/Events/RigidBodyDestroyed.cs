@@ -1,5 +1,5 @@
-using DarkDefenders.Domain.Data.Entities.RigidBodies;
-using Infrastructure.Data;
+using DarkDefenders.Domain.Infrastructure;
+
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 
@@ -11,9 +11,9 @@ namespace DarkDefenders.Domain.Entities.RigidBodies.Events
         {
         }
 
-        protected override object CreateData(IdentityOf<RigidBody> id)
+        protected override void Accept(IEventsReciever reciever, IdentityOf<RigidBody> id)
         {
-            return new RigidBodyDestroyedData(id);
+            reciever.RigidBodyDestroyed(id);
         }
     }
 }

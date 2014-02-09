@@ -1,7 +1,5 @@
-﻿using DarkDefenders.Domain.Data.Entities.Heroes;
-using Infrastructure.Data;
+﻿using DarkDefenders.Domain.Infrastructure;
 using Infrastructure.DDDES;
-using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Entities.Heroes.Events
 {
@@ -11,9 +9,9 @@ namespace DarkDefenders.Domain.Entities.Heroes.Events
         {
         }
 
-        protected override object CreateData(IdentityOf<Hero> id)
+        protected override void Accept(IEventsReciever reciever, IdentityOf<Hero> id)
         {
-            return new HeroDestroyedData(id);
+            reciever.HeroDestroyed();
         }
     }
 }

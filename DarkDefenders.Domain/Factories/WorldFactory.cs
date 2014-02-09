@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using DarkDefenders.Domain.Data.Entities.Worlds;
 using DarkDefenders.Domain.Entities.Clocks;
 using DarkDefenders.Domain.Entities.Worlds;
 using DarkDefenders.Domain.Entities.Worlds.Events;

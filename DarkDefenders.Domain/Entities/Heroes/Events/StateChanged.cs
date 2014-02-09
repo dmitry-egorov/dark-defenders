@@ -1,12 +1,10 @@
-﻿using DarkDefenders.Domain.Data.Entities.Heroes;
-using DarkDefenders.Domain.Entities.Heroes.States;
-using Infrastructure.Data;
+﻿using DarkDefenders.Domain.Entities.Heroes.States;
+using DarkDefenders.Domain.Infrastructure;
 using Infrastructure.DDDES;
-using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Entities.Heroes.Events
 {
-    internal class StateChanged : Event<Hero>
+    internal class StateChanged : EventOf<Hero>
     {
         private readonly IHeroState _state;
 
@@ -15,14 +13,13 @@ namespace DarkDefenders.Domain.Entities.Heroes.Events
             _state = state;
         }
 
+        protected override void Accept(IEventsReciever reciever, IdentityOf<Hero> id)
+        {
+        }
+
         protected override void Apply(Hero hero)
         {
             hero.SetState(_state);
-        }
-
-        protected override object CreateData(IdentityOf<Hero> id)
-        {
-            return new StateChangedData(id, _state.GetData());
         }
     }
 }

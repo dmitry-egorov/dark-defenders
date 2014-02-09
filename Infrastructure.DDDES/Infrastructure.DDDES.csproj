@@ -35,8 +35,11 @@
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IAcceptorOf.cs" />
     <Compile Include="IContainer.cs" />
     <Compile Include="ICreation.cs" />
+    <Compile Include="IdentityOf.cs" />
+    <Compile Include="IdentityValueGenerator.cs" />
     <Compile Include="IEntity.cs" />
     <Compile Include="IEventsProcessor.cs" />
     <Compile Include="IEvent.cs" />
@@ -45,12 +48,6 @@
     <Compile Include="IStorage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RepositoryExtensions.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Infrastructure.Data\Infrastructure.Data.csproj">
-      <Project>{96099472-811A-440D-85D2-5F0F44E09EE8}</Project>
-      <Name>Infrastructure.Data</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,10 +1,9 @@
 ﻿using System;
-using Infrastructure.Data;
 using Infrastructure.Util;
 
 namespace Infrastructure.DDDES.Implementations.Domain
 {
-    public abstract class Created<TEntity> : IEvent
+    public abstract class Created<TEntity, TReciever> : IEvent, IAcceptorOf<TReciever> 
         where TEntity : IEntity<TEntity>
     {
         private readonly Lazy<TEntity> _lazyRoot;
@@ -23,10 +22,9 @@ namespace Infrastructure.DDDES.Implementations.Domain
             _storage.Store(entity);
         }
 
-        public object GetData()
+        public void Accept(TReciever reciever)
         {
-            var id = _lazyRoot.Value.Id;
-            return CreateData(id);
+            Accept(reciever, _lazyRoot.Value.Id);
         }
 
         public override string ToString()
@@ -35,7 +33,6 @@ namespace Infrastructure.DDDES.Implementations.Domain
         }
 
         protected abstract TEntity Create();
-
-        protected abstract object CreateData(IdentityOf<TEntity> id);
+        protected abstract void Accept(TReciever reciever, IdentityOf<TEntity> id);
     }
 }

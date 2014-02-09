@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using DarkDefenders.Domain;
 using DarkDefenders.Domain.Data.Entities.Creatures;
 using DarkDefenders.Domain.Data.Entities.RigidBodies;
-using DarkDefenders.Domain.Data.Entities.Worlds;
+using DarkDefenders.Domain.Entities.Worlds;
 using DarkDefenders.Domain.Files;
 using DarkDefenders.Domain.Interfaces;
 using Infrastructure.Runtime;
@@ -38,7 +38,7 @@ namespace DarkDefenders.ConsoleServer
 
         static void Main()
         {
-            var networkBroadcaster = new EventsDataBroadcaster(10000);
+            var networkBroadcaster = new EventsDataBroadcaster();
 
             var game = GameFactory.Create(networkBroadcaster);
 
@@ -48,7 +48,7 @@ namespace DarkDefenders.ConsoleServer
 
             var stopwatch = new AutoResetStopwatch();
 
-            var loopRunner = new LoopRunner(60, () => Frame(stopwatch, game, networkBroadcaster));
+            var loopRunner = new LoopRunner(60, () => Frame(stopwatch, game));
 
             var gameTask = Task.Factory.StartNew(() => Run(stopwatch, loopRunner), TaskCreationOptions.LongRunning);
 
@@ -63,15 +63,13 @@ namespace DarkDefenders.ConsoleServer
             loopRunner.Run();
         }
 
-        private static void Frame(AutoResetStopwatch stopwatch, IGame game, EventsDataBroadcaster eventsDataBroadcaster)
+        private static void Frame(AutoResetStopwatch stopwatch, IGame game)
         {
             var elapsed = stopwatch.ElapsedSinceLastCall.LimitTo(_elapsedLimit);
 
-            game.Update(elapsed);
-
             ExecuteCommands();
 
-            eventsDataBroadcaster.Broadcast();
+            game.Update(elapsed);
         }
 
         private static void ExecuteCommands()

@@ -7,6 +7,6 @@ namespace DarkDefenders.Domain.Entities.Heroes.States
     internal interface IHeroState
     {
         IEnumerable<IEvent> Update();
-        HeroStateData GetData();
+        HeroState GetData();
     }
 }

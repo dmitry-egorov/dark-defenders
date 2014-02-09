@@ -1,13 +1,11 @@
-using DarkDefenders.Domain.Data.Entities.RigidBodies;
-using Infrastructure.Data;
+using DarkDefenders.Domain.Infrastructure;
 using Infrastructure.DDDES;
-using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
 using Infrastructure.Physics;
 
 namespace DarkDefenders.Domain.Entities.RigidBodies.Events
 {
-    internal class AcceleratedAndMoved : Event<RigidBody>
+    internal class AcceleratedAndMoved : EventOf<RigidBody>
     {
         private readonly Vector _newPosition;
         private readonly Momentum _newMomentum;
@@ -19,15 +17,15 @@ namespace DarkDefenders.Domain.Entities.RigidBodies.Events
             _newPosition = newPosition;
         }
 
-        protected override void Apply(RigidBody rigidBody)
+        protected override void Accept(IEventsReciever reciever, IdentityOf<RigidBody> id)
         {
-            rigidBody.SetNewMomentum(_newMomentum);
-            rigidBody.SetNewPosition(_newPosition);
+            reciever.Moved(id, _newPosition);
         }
 
-        protected override object CreateData(IdentityOf<RigidBody> id)
+        protected override void Apply(RigidBody rigidBody)
         {
-            return new AcceleratedAndMovedData(id, _newPosition.ToData(), _newMomentum.ToData());
+            rigidBody.Accelerated(_newMomentum);
+            rigidBody.SetNewPosition(_newPosition);
         }
     }
 }

@@ -1,9 +1,9 @@
 ﻿using DarkDefenders.Domain.Data.Entities.RigidBodies;
 using DarkDefenders.Domain.Entities.Clocks;
 using DarkDefenders.Domain.Entities.Terrains;
-using Infrastructure.Data;
+using DarkDefenders.Domain.Infrastructure;
+
 using Infrastructure.DDDES;
-using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Entities.RigidBodies.Events
 {
@@ -23,14 +23,14 @@ namespace DarkDefenders.Domain.Entities.RigidBodies.Events
             _rigidBodyInitialProperties = rigidBodyInitialProperties;
         }
 
-        protected override object CreateData(IdentityOf<RigidBody> id)
-        {
-            return new RigidBodyCreatedData(id, _rigidBodyInitialProperties);
-        }
-
         protected override RigidBody Create()
         {
             return new RigidBody(_storage, _clockContainer, _terrainContainer, _rigidBodyInitialProperties);
+        }
+
+        protected override void Accept(IEventsReciever reciever, IdentityOf<RigidBody> id)
+        {
+            reciever.RigidBodyCreated(id, _rigidBodyInitialProperties.Position);
         }
     }
 }

@@ -52,9 +52,9 @@ namespace DarkDefenders.Domain.Entities.RigidBodies
 
             var radius = properties.Properties.BoundingBoxRadius;
 
-            _momentum = properties.InitialMomentum.ToMomentum();
+            _momentum = properties.InitialMomentum;
             _topHorizontalMomentum = properties.Properties.TopHorizontalMomentum;
-            _boundingBox = new Box(properties.Position.ToVector(), radius, radius);
+            _boundingBox = new Box(properties.Position, radius, radius);
             _storage = storage;
             _clockContainer = clockContainer;
             _externalForce = Force.Zero;
@@ -250,7 +250,7 @@ namespace DarkDefenders.Domain.Entities.RigidBodies
             return true;
         }
 
-        public void SetNewMomentum(Momentum newMomentum)
+        public void Accelerated(Momentum newMomentum)
         {
             _momentum = newMomentum;
 

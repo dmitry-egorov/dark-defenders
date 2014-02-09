@@ -1,6 +1,4 @@
-﻿using Infrastructure.Data;
-
-namespace Infrastructure.DDDES.Implementations.Domain
+﻿namespace Infrastructure.DDDES.Implementations.Domain
 {
     public abstract class Entity<TEntity> : IEntity<TEntity>
     {

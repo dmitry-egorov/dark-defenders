@@ -39,9 +39,9 @@ namespace DarkDefenders.Domain.Entities.Heroes.States
             yield return _factory.CreateMovingEvent();
         }
 
-        public HeroStateData GetData()
+        public HeroState GetData()
         {
-            return HeroStateData.Deciding;
+            return HeroState.Deciding;
         }
     }
 }

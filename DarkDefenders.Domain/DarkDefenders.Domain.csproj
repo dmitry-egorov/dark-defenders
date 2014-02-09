@@ -49,41 +49,21 @@
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data\Entities\Clocks\ClockCreatedData.cs" />
-    <Compile Include="Data\Entities\Clocks\TimeChangedData.cs" />
-    <Compile Include="Data\Entities\Creatures\CreatureCreatedData.cs" />
-    <Compile Include="Data\Entities\Creatures\CreatureDestroyedData.cs" />
-    <Compile Include="Data\Entities\Creatures\CreatureProperties.cs" />
-    <Compile Include="Data\Entities\Creatures\FiredData.cs" />
-    <Compile Include="Data\Entities\Creatures\MovementChangedData.cs" />
-    <Compile Include="Data\Entities\Heroes\HeroCreatedData.cs" />
-    <Compile Include="Data\Entities\Heroes\HeroDestroyedData.cs" />
-    <Compile Include="Data\Entities\Heroes\HeroStateData.cs" />
-    <Compile Include="Data\Entities\Heroes\StateChangedData.cs" />
-    <Compile Include="Data\Entities\Projectiles\ProjectileCreatedData.cs" />
-    <Compile Include="Data\Entities\Projectiles\ProjectileDestroyedData.cs" />
-    <Compile Include="Data\Entities\RigidBodies\AcceleratedAndMovedData.cs" />
-    <Compile Include="Data\Entities\RigidBodies\AcceleratedData.cs" />
-    <Compile Include="Data\Entities\RigidBodies\ExternalForceChangedData.cs" />
-    <Compile Include="Data\Entities\RigidBodies\MovedData.cs" />
-    <Compile Include="Data\Entities\RigidBodies\RigidBodyCreatedData.cs" />
-    <Compile Include="Data\Entities\RigidBodies\RigidBodyDestroyedData.cs" />
-    <Compile Include="Data\Entities\RigidBodies\RigidBodyInitialProperties.cs" />
-    <Compile Include="Data\Entities\RigidBodies\RigidBodyProperties.cs" />
-    <Compile Include="Data\Entities\Terrains\TerrainCreatedData.cs" />
-    <Compile Include="Data\Entities\Worlds\HeroSpawnActivationTimeChangedData.cs" />
-    <Compile Include="Data\Entities\Worlds\PlayerAvatarSpawnedData.cs" />
-    <Compile Include="Data\Entities\Worlds\SpawnHeroesChangedData.cs" />
-    <Compile Include="Data\Entities\Worlds\WorldCreatedData.cs" />
-    <Compile Include="Data\Entities\Worlds\WorldProperties.cs" />
+    <Compile Include="Entities\Creatures\CreatureProperties.cs" />
+    <Compile Include="Entities\Heroes\HeroState.cs" />
+    <Compile Include="Entities\RigidBodies\RigidBodyInitialProperties.cs" />
+    <Compile Include="Entities\RigidBodies\RigidBodyProperties.cs" />
+    <Compile Include="Entities\Worlds\WorldProperties.cs" />
     <Compile Include="GameFactory.cs" />
-    <Compile Include="Data\Infrastructure\EventDataBase.cs" />
-    <Compile Include="Data\Infrastructure\IEventDataReciever.cs" />
-    <Compile Include="Data\Other\Direction.cs" />
-    <Compile Include="Data\Other\DirectionExtensions.cs" />
-    <Compile Include="Data\Other\Movement.cs" />
-    <Compile Include="Data\Other\MovementExtensions.cs" />
-    <Compile Include="Data\Other\Tile.cs" />
+    <Compile Include="Infrastructure\Created.cs" />
+    <Compile Include="Infrastructure\Destroyed.cs" />
+    <Compile Include="Infrastructure\EventOf.cs" />
+    <Compile Include="Infrastructure\IEventsReciever.cs" />
+    <Compile Include="Other\Direction.cs" />
+    <Compile Include="Other\DirectionExtensions.cs" />
+    <Compile Include="Other\Movement.cs" />
+    <Compile Include="Other\MovementExtensions.cs" />
+    <Compile Include="Other\Tile.cs" />
     <Compile Include="Entities\Heroes\Events\HeroDestroyed.cs" />
     <Compile Include="Entities\RigidBodies\RigidBody.cs" />
     <Compile Include="Interfaces\IWorld.cs" />
@@ -137,10 +117,6 @@
     <Compile Include="Adapters\WorldAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Infrastructure.Data\Infrastructure.Data.csproj">
-      <Project>{96099472-811A-440D-85D2-5F0F44E09EE8}</Project>
-      <Name>Infrastructure.Data</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Infrastructure.DDDES.Implementations\Infrastructure.DDDES.Implementations.csproj">
       <Project>{5E4CA423-37F5-4B6A-B00C-0ADC06EC0378}</Project>
       <Name>Infrastructure.DDDES.Implementations</Name>

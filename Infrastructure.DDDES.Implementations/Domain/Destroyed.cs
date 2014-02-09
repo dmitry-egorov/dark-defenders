@@ -1,10 +1,8 @@
-using Infrastructure.Data;
 using Infrastructure.Util;
 
 namespace Infrastructure.DDDES.Implementations.Domain
 {
-
-    public abstract class Destroyed<TEntity> : Event<TEntity> 
+    public abstract class Destroyed<TEntity, TReciever> : EventOf<TEntity, TReciever> 
         where TEntity : IEntity<TEntity>
     {
         private readonly IdentityOf<TEntity> _rootId;

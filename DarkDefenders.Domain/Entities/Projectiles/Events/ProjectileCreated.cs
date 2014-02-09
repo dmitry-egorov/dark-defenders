@@ -1,8 +1,6 @@
-using DarkDefenders.Domain.Data.Entities.Projectiles;
 using DarkDefenders.Domain.Entities.RigidBodies;
-using Infrastructure.Data;
+using DarkDefenders.Domain.Infrastructure;
 using Infrastructure.DDDES;
-using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Entities.Projectiles.Events
 {
@@ -22,11 +20,9 @@ namespace DarkDefenders.Domain.Entities.Projectiles.Events
             return new Projectile(_storage, _rigidBody.Item);
         }
 
-        protected override object CreateData(IdentityOf<Projectile> id)
+        protected override void Accept(IEventsReciever reciever, IdentityOf<Projectile> id)
         {
-            var rigidBodyId = _rigidBody.Item.Id;
-
-            return new ProjectileCreatedData(id, rigidBodyId);
+            reciever.ProjectileCreated(_rigidBody.Item.Id);
         }
     }
 }

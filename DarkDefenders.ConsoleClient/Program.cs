@@ -1,7 +1,5 @@
 ﻿using System;
 using DarkDefenders.ConsoleClient.ViewModels;
-using DarkDefenders.Domain.Data.Infrastructure;
-using Infrastructure.DDDES.Implementations;
 using Infrastructure.Runtime;
 using Infrastructure.Util;
 using Button = Infrastructure.Runtime.Button;
@@ -33,9 +31,9 @@ namespace DarkDefenders.ConsoleClient
         {
             var renderer = new GameViewModel();
 
-            var counter = new CountingEventsListener<EventDataBase>();
+            var counter = new CountingEventsListener();
 
-            var composite = new CompositeEventsListener<EventDataBase>(renderer, counter);
+            var composite = new CompositeEventsListener(renderer, counter);
 
             var eventDataListener = new EventDataListener(composite);
 
@@ -48,7 +46,7 @@ namespace DarkDefenders.ConsoleClient
             loopRunner.Run();
         }
 
-        private static void Frame(AutoResetStopwatch stopwatch, GameViewModel renderer, CountingEventsListener<EventDataBase> counter, EventDataListener eventDataListener)
+        private static void Frame(AutoResetStopwatch stopwatch, GameViewModel renderer, CountingEventsListener counter, EventDataListener eventDataListener)
         {
             var elapsed = stopwatch.ElapsedSinceLastCall.LimitTo(_elapsedLimit);
 

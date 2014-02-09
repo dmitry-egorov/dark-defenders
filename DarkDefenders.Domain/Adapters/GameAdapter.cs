@@ -1,5 +1,4 @@
 ﻿using System;
-using DarkDefenders.Domain.Data.Entities.Worlds;
 using DarkDefenders.Domain.Data.Other;
 using DarkDefenders.Domain.Entities.Clocks;
 using DarkDefenders.Domain.Entities.Heroes;
@@ -8,11 +7,12 @@ using DarkDefenders.Domain.Entities.RigidBodies;
 using DarkDefenders.Domain.Entities.Terrains;
 using DarkDefenders.Domain.Entities.Worlds;
 using DarkDefenders.Domain.Factories;
+using DarkDefenders.Domain.Infrastructure;
 using DarkDefenders.Domain.Interfaces;
 using Infrastructure.DDDES;
+using Infrastructure.DDDES.Implementations;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
-using Infrastructure.Util;
 using JetBrains.Annotations;
 
 namespace DarkDefenders.Domain.Adapters
@@ -20,7 +20,7 @@ namespace DarkDefenders.Domain.Adapters
     [UsedImplicitly]
     internal class GameAdapter : IGame
     {
-        private readonly IEventsProcessor _processor;
+        private readonly EventsProcessor<IEventsReciever> _processor;
 
         private readonly FactoryAdapter<Clock, ClockFactory> _clockFactory;
         private readonly FactoryAdapter<Terrain, TerrainFactory> _terrainFactory;
@@ -34,7 +34,7 @@ namespace DarkDefenders.Domain.Adapters
         private EntityAdapter<Clock> _clock;
 
 
-        public GameAdapter(IEventsProcessor processor, ClockFactory clockFactory, TerrainFactory terrainFactory, WorldFactory worldFactory, IContainer<World> worldContainer, IRepository<Hero> heroRepository, IRepository<RigidBody> rigidBodyRepository, IRepository<Projectile> projectileRepository, IContainer<Clock> clockContainer)
+        public GameAdapter(EventsProcessor<IEventsReciever> processor, ClockFactory clockFactory, TerrainFactory terrainFactory, WorldFactory worldFactory, IContainer<World> worldContainer, IRepository<Hero> heroRepository, IRepository<RigidBody> rigidBodyRepository, IRepository<Projectile> projectileRepository, IContainer<Clock> clockContainer)
         {
             _processor = processor;
             _clockFactory = new FactoryAdapter<Clock, ClockFactory>(clockFactory, _processor);
@@ -53,7 +53,7 @@ namespace DarkDefenders.Domain.Adapters
             _terrainFactory.Commit(x => x.Create(map, mapId));
             _world = _worldFactory.Commit(x => x.Create(worldProperties));
 
-            return new WorldAdapter(_processor, _world);
+            return new WorldAdapter(_world);
         }
         public void Update(TimeSpan elapsed)
         {
@@ -62,6 +62,8 @@ namespace DarkDefenders.Domain.Adapters
             _projectiles.Commit(x => x.CheckForHit());
             _world.Commit(x => x.SpawnHeroes());
             _heroes.Commit(x => x.Think());
+
+            _processor.Broadcast();
         }
 
         public void KillAllHeroes()

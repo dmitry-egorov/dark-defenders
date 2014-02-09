@@ -1,12 +1,11 @@
-using DarkDefenders.Domain.Data.Entities.RigidBodies;
-using Infrastructure.Data;
+using DarkDefenders.Domain.Infrastructure;
+
 using Infrastructure.DDDES;
-using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
 
 namespace DarkDefenders.Domain.Entities.RigidBodies.Events
 {
-    internal class Moved : Event<RigidBody>
+    internal class Moved : EventOf<RigidBody>
     {
         private readonly Vector _newPosition;
 
@@ -15,14 +14,14 @@ namespace DarkDefenders.Domain.Entities.RigidBodies.Events
             _newPosition = newPosition;
         }
 
+        protected override void Accept(IEventsReciever reciever, IdentityOf<RigidBody> id)
+        {
+            reciever.Moved(id, _newPosition);
+        }
+
         protected override void Apply(RigidBody rigidBody)
         {
             rigidBody.SetNewPosition(_newPosition);
-        }
-
-        protected override object CreateData(IdentityOf<RigidBody> id)
-        {
-            return new MovedData(id, _newPosition.ToData());
         }
     }
 }

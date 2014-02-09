@@ -1,7 +1,5 @@
-﻿using DarkDefenders.Domain.Data.Entities.Projectiles;
-using Infrastructure.Data;
+﻿using DarkDefenders.Domain.Infrastructure;
 using Infrastructure.DDDES;
-using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Entities.Projectiles.Events
 {
@@ -12,9 +10,8 @@ namespace DarkDefenders.Domain.Entities.Projectiles.Events
         {
         }
 
-        protected override object CreateData(IdentityOf<Projectile> id)
+        protected override void Accept(IEventsReciever reciever, IdentityOf<Projectile> id)
         {
-            return new ProjectileDestroyedData(id);
         }
     }
 }

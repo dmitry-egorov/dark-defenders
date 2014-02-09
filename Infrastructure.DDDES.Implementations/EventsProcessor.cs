@@ -1,14 +1,18 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using Infrastructure.Util;
 using JetBrains.Annotations;
 
 namespace Infrastructure.DDDES.Implementations
 {
     [UsedImplicitly]
-    public class EventsProcessor<TEventData> : IEventsProcessor
+    public class EventsProcessor<TReciever> : IEventsProcessor
     {
-        private readonly IEventsListener<TEventData> _listener;
+        private readonly Queue<IAcceptorOf<TReciever>> _queue = new Queue<IAcceptorOf<TReciever>>();
 
-        public EventsProcessor(IEventsListener<TEventData> listener)
+        private readonly IEventsListener<TReciever> _listener;
+
+        public EventsProcessor(IEventsListener<TReciever> listener)
         {
             _listener = listener;
         }
@@ -18,8 +22,15 @@ namespace Infrastructure.DDDES.Implementations
             foreach (var e in events)
             {
                 e.Apply();
-                _listener.Recieve((TEventData) e.GetData());
+                _queue.Enqueue((IAcceptorOf<TReciever>) e);
             }
+        }
+
+        public void Broadcast()
+        {
+            var events = _queue.DequeueAll().ToList();
+
+            _listener.Recieve(events);
         }
     }
 }

@@ -1,12 +1,10 @@
-﻿using DarkDefenders.Domain.Data.Entities.RigidBodies;
-using Infrastructure.Data;
+﻿using DarkDefenders.Domain.Infrastructure;
 using Infrastructure.DDDES;
-using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Physics;
 
 namespace DarkDefenders.Domain.Entities.RigidBodies.Events
 {
-    internal class ExternalForceChanged : Event<RigidBody>
+    internal class ExternalForceChanged : EventOf<RigidBody>
     {
         private readonly Force _externalForce;
 
@@ -15,14 +13,13 @@ namespace DarkDefenders.Domain.Entities.RigidBodies.Events
             _externalForce = externalForce;
         }
 
+        protected override void Accept(IEventsReciever reciever, IdentityOf<RigidBody> id)
+        {
+        }
+
         protected override void Apply(RigidBody rigidBody)
         {
             rigidBody.SetExternalForce(_externalForce);
-        }
-
-        protected override object CreateData(IdentityOf<RigidBody> id)
-        {
-            return new ExternalForceChangedData(id, _externalForce);
         }
     }
 }

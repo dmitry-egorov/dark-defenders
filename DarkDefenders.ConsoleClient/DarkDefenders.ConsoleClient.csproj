@@ -52,6 +52,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CompositeEventsListener.cs" />
+    <Compile Include="CountingEventsListener.cs" />
     <Compile Include="Renderer\ConsoleRenderer.cs" />
     <Compile Include="EventDataListener.cs" />
     <Compile Include="KeyboardState.cs" />
@@ -112,13 +114,13 @@
       <Project>{9660C753-8246-4AE8-84B2-6DA809FF9ACB}</Project>
       <Name>DarkDefenders.Domain.Files</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DarkDefenders.Domain.Serialization\DarkDefenders.Domain.Serialization.csproj">
+      <Project>{DFA440DE-826F-4CEE-919E-61EEB14AA7FA}</Project>
+      <Name>DarkDefenders.Domain.Serialization</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DarkDefenders.Domain\DarkDefenders.Domain.csproj">
       <Project>{27F91716-3957-49C9-94BB-8AA160BF96AA}</Project>
       <Name>DarkDefenders.Domain</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.Data\Infrastructure.Data.csproj">
-      <Project>{96099472-811a-440d-85d2-5f0f44e09ee8}</Project>
-      <Name>Infrastructure.Data</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.DDDES.Implementations\Infrastructure.DDDES.Implementations.csproj">
       <Project>{5E4CA423-37F5-4B6A-B00C-0ADC06EC0378}</Project>

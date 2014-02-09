@@ -29,11 +29,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Runtime", "I
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DarkDefenders.ConsoleServer", "DarkDefenders.ConsoleServer\DarkDefenders.ConsoleServer.csproj", "{C631954C-19D6-42BA-A52C-B8978D8C7E64}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Data", "Infrastructure.Data\Infrastructure.Data.csproj", "{96099472-811A-440D-85D2-5F0F44E09EE8}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DarkDefenders.ConsoleClient", "DarkDefenders.ConsoleClient\DarkDefenders.ConsoleClient.csproj", "{0D7EFF7B-4069-4E36-BC5E-D0CF128DAC9F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Serialization", "Infrastructure.Serialization\Infrastructure.Serialization.csproj", "{75E3B4B6-49F0-4064-967F-3C125C7CE19D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DarkDefenders.Domain.Serialization", "DarkDefenders.Domain.Serialization\DarkDefenders.Domain.Serialization.csproj", "{DFA440DE-826F-4CEE-919E-61EEB14AA7FA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -89,10 +89,6 @@ Global
 		{C631954C-19D6-42BA-A52C-B8978D8C7E64}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C631954C-19D6-42BA-A52C-B8978D8C7E64}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C631954C-19D6-42BA-A52C-B8978D8C7E64}.Release|Any CPU.Build.0 = Release|Any CPU
-		{96099472-811A-440D-85D2-5F0F44E09EE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{96099472-811A-440D-85D2-5F0F44E09EE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{96099472-811A-440D-85D2-5F0F44E09EE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{96099472-811A-440D-85D2-5F0F44E09EE8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0D7EFF7B-4069-4E36-BC5E-D0CF128DAC9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0D7EFF7B-4069-4E36-BC5E-D0CF128DAC9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D7EFF7B-4069-4E36-BC5E-D0CF128DAC9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -101,6 +97,10 @@ Global
 		{75E3B4B6-49F0-4064-967F-3C125C7CE19D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75E3B4B6-49F0-4064-967F-3C125C7CE19D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{75E3B4B6-49F0-4064-967F-3C125C7CE19D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFA440DE-826F-4CEE-919E-61EEB14AA7FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFA440DE-826F-4CEE-919E-61EEB14AA7FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFA440DE-826F-4CEE-919E-61EEB14AA7FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFA440DE-826F-4CEE-919E-61EEB14AA7FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -114,7 +114,6 @@ Global
 		{305E7C2A-4803-47CD-84B8-5C9DF6134395} = {BC354A87-095F-4CB1-AACF-2611A8A79612}
 		{3CE8AEC8-8016-4431-ACCD-564E0DF56FE6} = {BC354A87-095F-4CB1-AACF-2611A8A79612}
 		{46C6CCD9-0683-4A63-82B8-D9C48D5A20C9} = {BC354A87-095F-4CB1-AACF-2611A8A79612}
-		{96099472-811A-440D-85D2-5F0F44E09EE8} = {BC354A87-095F-4CB1-AACF-2611A8A79612}
 		{75E3B4B6-49F0-4064-967F-3C125C7CE19D} = {BC354A87-095F-4CB1-AACF-2611A8A79612}
 	EndGlobalSection
 EndGlobal

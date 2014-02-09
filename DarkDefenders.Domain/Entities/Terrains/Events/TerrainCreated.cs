@@ -1,8 +1,7 @@
-﻿using DarkDefenders.Domain.Data.Entities.Terrains;
-using DarkDefenders.Domain.Data.Other;
-using Infrastructure.Data;
+﻿using DarkDefenders.Domain.Data.Other;
+using DarkDefenders.Domain.Infrastructure;
+
 using Infrastructure.DDDES;
-using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
 
 namespace DarkDefenders.Domain.Entities.Terrains.Events
@@ -23,9 +22,9 @@ namespace DarkDefenders.Domain.Entities.Terrains.Events
             return new Terrain(_map);
         }
 
-        protected override object CreateData(IdentityOf<Terrain> id)
+        protected override void Accept(IEventsReciever reciever, IdentityOf<Terrain> id)
         {
-            return new TerrainCreatedData(id, _mapId);
+            reciever.TerrainCreated(_mapId);
         }
     }
 }

@@ -48,9 +48,9 @@ namespace DarkDefenders.Domain.Entities.Heroes.States
             }
         }
 
-        public HeroStateData GetData()
+        public HeroState GetData()
         {
-            return HeroStateData.Moving;
+            return HeroState.Moving;
         }
     }
 }

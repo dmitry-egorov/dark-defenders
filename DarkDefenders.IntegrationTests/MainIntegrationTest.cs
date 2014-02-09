@@ -1,24 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using DarkDefenders.Domain;
-using DarkDefenders.Domain.Data.Entities.Clocks;
 using DarkDefenders.Domain.Data.Entities.Creatures;
 using DarkDefenders.Domain.Data.Entities.RigidBodies;
-using DarkDefenders.Domain.Data.Entities.Terrains;
-using DarkDefenders.Domain.Data.Entities.Worlds;
-using DarkDefenders.Domain.Data.Infrastructure;
 using DarkDefenders.Domain.Data.Other;
-using DarkDefenders.Domain.Entities.Clocks;
 using DarkDefenders.Domain.Entities.Creatures;
 using DarkDefenders.Domain.Entities.RigidBodies;
-using DarkDefenders.Domain.Entities.Terrains;
 using DarkDefenders.Domain.Entities.Worlds;
-using Infrastructure.Data;
+using DarkDefenders.Domain.Infrastructure;
 using Infrastructure.DDDES;
 using Infrastructure.Math;
-using Infrastructure.Physics;
 using Infrastructure.Util;
-using Microsoft.Practices.Unity;
+using Moq;
 using NUnit.Framework;
 
 namespace DarkDefenders.IntegrationTests
@@ -30,12 +23,9 @@ namespace DarkDefenders.IntegrationTests
         private const float TopHorizontalMomentum = 40.0f;
         private const float BoundingBoxRadius = 0.4f;
 
-        private static readonly VectorData _spawnPosition = new VectorData(50, 0.4f);
-
-        private readonly CreatureProperties _playerProperties;
+        private static readonly Vector _spawnPosition = new Vector(50, 0.4f);
 
         private readonly WorldProperties _worldProperties;
-        private readonly RigidBodyInitialProperties _rigidBodyInitialProperties;
 
         public MainIntegrationTest()
         {
@@ -45,11 +35,9 @@ namespace DarkDefenders.IntegrationTests
             var heroesProperties = new CreatureProperties(180.0f, 60.0f, heroesRigidBodyProperties);
             var playersSpawnPositions = _spawnPosition.EnumerateOnce().AsReadOnly();
             var heroesSpawnPositions = _spawnPosition.EnumerateOnce().AsReadOnly();
-            var rigidBodyProperties = new RigidBodyProperties(BoundingBoxRadius, Mass, TopHorizontalMomentum);
 
-            _playerProperties = new CreatureProperties(180.0f, 60.0f, playersRigidBodyProperties);
-            _worldProperties = new WorldProperties(playersSpawnPositions, _playerProperties, heroesSpawnPositions, heroesSpawnCooldown, heroesProperties);
-            _rigidBodyInitialProperties = new RigidBodyInitialProperties(Momentum.Zero.ToData(), _spawnPosition, rigidBodyProperties);
+            var playerProperties = new CreatureProperties(180.0f, 60.0f, playersRigidBodyProperties);
+            _worldProperties = new WorldProperties(playersSpawnPositions, playerProperties, heroesSpawnPositions, heroesSpawnCooldown, heroesProperties);
         }
 
         [Test]
@@ -59,64 +47,49 @@ namespace DarkDefenders.IntegrationTests
             var mapId = "mapId";
             var map = new Map<Tile>(dimensions, default(Tile));
             map.Fill(Tile.Open);
-            var desiredOrientation = Movement.Left;
-            var elapsed = TimeSpan.FromMilliseconds(20);
+            var elapsed = TimeSpan.FromMilliseconds(100);
 
-            var externalForce = Vector.XY(-180, 0).ToForce();
-            var newMomentum = Vector.XY(-3.6, 0).ToMomentum();
-            var newPosition = Vector.XY(49.928, 0.4);
+            var newPosition = Vector.XY(48.2, 0.400000005960464);
 
-            var eventsProcessor = new FakeEventsProcessor();
-            var container = new UnityContainer();
-            container.RegisterInstance<IEventsListener<EventDataBase>>(eventsProcessor);
-            container.RegisterDomain();
-            var game = container.ResolveGame();
+            var reciever = new Mock<IEventsReciever>(MockBehavior.Strict);
+
+            var expectedRigidBodyId = new IdentityOf<RigidBody>(4);
+            var expectedCreatureId = new IdentityOf<Creature>(5);
+
+            reciever.Setup(x => x.TerrainCreated(mapId));
+            reciever.Setup(x => x.RigidBodyCreated(expectedRigidBodyId, _spawnPosition));
+            reciever.Setup(x => x.CreatureCreated(expectedCreatureId, expectedRigidBodyId));
+            reciever.Setup(x => x.PlayerAvatarSpawned(expectedCreatureId));
+            reciever.Setup(x => x.Moved(expectedRigidBodyId, newPosition));
+
+            var eventsProcessor = new FakeEventsProcessor(reciever.Object);
+            var game = GameFactory.Create(eventsProcessor);
 
             var world = game.Initialize(mapId, map, _worldProperties);
             var avatar = world.AddPlayer();
 
             avatar.ChangeMovement(Movement.Left);
+
             game.Update(elapsed);
 
-            IdentityValueGenerator.Reset();
-
-            var expectedClockId = new IdentityOf<Clock>();
-            var expectedTerrainId = new IdentityOf<Terrain>();
-            var expectedWorldId = new IdentityOf<World>();
-            var expectedRigidBodyId = new IdentityOf<RigidBody>();
-            var expectedCreatureId = new IdentityOf<Creature>();
-
-            var expectedEvents = new EventDataBase[]
-            {
-                new ClockCreatedData(expectedClockId), 
-                new TerrainCreatedData(expectedTerrainId, mapId), 
-                new WorldCreatedData(expectedWorldId, _worldProperties),
-                new RigidBodyCreatedData(expectedRigidBodyId, _rigidBodyInitialProperties),
-                new CreatureCreatedData(expectedCreatureId, expectedRigidBodyId, _playerProperties),
-                new PlayerAvatarSpawnedData(expectedWorldId, expectedCreatureId), 
-                new MovementChangedData(expectedCreatureId, desiredOrientation),
-                new ExternalForceChangedData(expectedRigidBodyId, externalForce),
-                new TimeChangedData(expectedClockId, elapsed), 
-                new AcceleratedAndMovedData(expectedRigidBodyId, newPosition.ToData(), newMomentum.ToData()),
-            };
-
-            eventsProcessor.Assert(expectedEvents);
+            reciever.VerifyAll();
         }
 
-        private class FakeEventsProcessor : IEventsListener<EventDataBase>
+        private class FakeEventsProcessor : IEventsListener<IEventsReciever>
         {
-            private readonly List<EventDataBase> _events = new List<EventDataBase>();
+            private readonly IEventsReciever _reciever;
 
-            public void Recieve(EventDataBase @event)
+            public FakeEventsProcessor(IEventsReciever reciever)
             {
-                _events.Add(@event);
+                _reciever = reciever;
             }
 
-            public void Assert(EventDataBase[] expectedEvents)
+            public void Recieve(IEnumerable<IAcceptorOf<IEventsReciever>> events)
             {
-                var actualEvents = _events.ToArray();
-
-                CollectionAssert.AreEqual(expectedEvents, actualEvents);
+                foreach (var e in events)
+                {
+                    e.Accept(_reciever);
+                }
             }
         }
     }

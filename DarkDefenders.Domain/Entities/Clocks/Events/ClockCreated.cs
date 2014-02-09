@@ -1,7 +1,5 @@
-﻿using DarkDefenders.Domain.Data.Entities.Clocks;
-using Infrastructure.Data;
+﻿using DarkDefenders.Domain.Infrastructure;
 using Infrastructure.DDDES;
-using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Entities.Clocks.Events
 {
@@ -11,14 +9,14 @@ namespace DarkDefenders.Domain.Entities.Clocks.Events
         {
         }
 
-        protected override object CreateData(IdentityOf<Clock> clockId)
-        {
-            return new ClockCreatedData(clockId);
-        }
-
         protected override Clock Create()
         {
             return new Clock();
+        }
+
+        protected override void Accept(IEventsReciever reciever, IdentityOf<Clock> id)
+        {
+            
         }
     }
 }

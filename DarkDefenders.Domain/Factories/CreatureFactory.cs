@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using DarkDefenders.Domain.Data.Entities.Creatures;
-using DarkDefenders.Domain.Data.Entities.RigidBodies;
 using DarkDefenders.Domain.Entities.Clocks;
 using DarkDefenders.Domain.Entities.Creatures;
 using DarkDefenders.Domain.Entities.Creatures.Events;
+using DarkDefenders.Domain.Entities.RigidBodies;
 using DarkDefenders.Domain.Entities.Terrains;
-using Infrastructure.Data;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
@@ -44,7 +43,7 @@ namespace DarkDefenders.Domain.Factories
 
         private IEnumerable<IEvent> YielEvents(IStorage<Creature> storage, Vector spawnPosition, CreatureProperties properties)
         {
-            var rigidBodyInitialProperties = new RigidBodyInitialProperties(Momentum.Zero.ToData(), spawnPosition.ToData(), properties.RigidBodyProperties);
+            var rigidBodyInitialProperties = new RigidBodyInitialProperties(Momentum.Zero, spawnPosition, properties.RigidBodyProperties);
 
             var creation = _rigidBodyFactory.Create(rigidBodyInitialProperties);
 

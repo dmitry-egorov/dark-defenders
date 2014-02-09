@@ -45,8 +45,6 @@
   <ItemGroup>
     <Compile Include="DataExtensions.cs" />
     <Compile Include="ForceData.cs" />
-    <Compile Include="IdentityOf.cs" />
-    <Compile Include="IdentityValueGenerator.cs" />
     <Compile Include="MomentumData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VectorData.cs" />

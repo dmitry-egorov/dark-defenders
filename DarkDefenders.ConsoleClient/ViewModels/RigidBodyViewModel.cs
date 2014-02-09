@@ -63,10 +63,9 @@ namespace DarkDefenders.ConsoleClient.ViewModels
             _lastRenderingPosition = newRenderingPosition;
         }
 
-        public void Recieve(RigidBodyCreatedData rigidBodyCreated)
+        public void RigidBodyCreated(Vector position)
         {
-            var position = rigidBodyCreated.Properties.Position;
-            var point = position.ToVector().ToPoint();
+            var point = position.ToPoint();
 
             _currentPosition = point;
         }

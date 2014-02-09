@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using DarkDefenders.Domain.Data.Other;
-using Infrastructure.Data;
 using Infrastructure.Math;
 using Infrastructure.Util;
 
@@ -80,7 +79,7 @@ namespace DarkDefenders.Domain.Files
                 y++;
             }
 
-            return new TerrainData(map, playerSpawns.ToData(), heroSpawns.ToData());
+            return new TerrainData(map, playerSpawns, heroSpawns);
         }
 
         public static TerrainData LoadFromMonochromeBmp(string path)
@@ -125,7 +124,7 @@ namespace DarkDefenders.Domain.Files
                     }
                 }
 
-                return new TerrainData(map, playerSpawns.ToData(), heroSpawns.ToData());
+                return new TerrainData(map, playerSpawns, heroSpawns);
             }
         }
 

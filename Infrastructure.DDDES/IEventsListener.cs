@@ -1,7 +1,9 @@
+using System.Collections.Generic;
+
 namespace Infrastructure.DDDES
 {
-    public interface IEventsListener<in TEventData>
+    public interface IEventsListener<out TReciever>
     {
-        void Recieve(TEventData entityEvent);
+        void Recieve(IEnumerable<IAcceptorOf<TReciever>> entityEvents);
     }
 }

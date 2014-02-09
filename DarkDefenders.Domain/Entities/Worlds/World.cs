@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using DarkDefenders.Domain.Data.Entities.Creatures;
-using DarkDefenders.Domain.Data.Entities.Worlds;
 using DarkDefenders.Domain.Entities.Clocks;
 using DarkDefenders.Domain.Entities.Creatures;
 using DarkDefenders.Domain.Entities.Heroes;
 using DarkDefenders.Domain.Entities.Other;
 using DarkDefenders.Domain.Entities.Worlds.Events;
 using DarkDefenders.Domain.Factories;
-using Infrastructure.Data;
+
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
@@ -43,13 +42,13 @@ namespace DarkDefenders.Domain.Entities.Worlds
         )
         {
             _creatureFactory = creatureFactory;
-            _heroesSpawnPositions = properties.HeroesSpawnPositions.ToVectors().AsReadOnly();
+            _heroesSpawnPositions = properties.HeroesSpawnPositions.AsReadOnly();
             _heroesCreatureProperties = properties.HeroesCreatureProperties;
             _heroFactory = heroFactory;
             _random = random;
             _playersAvatarProperties = properties.PlayersAvatarProperties;
 
-            _playersSpawnPositions = properties.PlayersSpawnPositions.ToVectors().AsReadOnly();
+            _playersSpawnPositions = properties.PlayersSpawnPositions.AsReadOnly();
 
             _clock = clock;
             _heroSpawnCooldown = new Cooldown(clock, properties.HeroesSpawnCooldown);

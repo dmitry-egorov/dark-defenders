@@ -1,12 +1,9 @@
 using System;
-using DarkDefenders.Domain.Data.Entities.Worlds;
 using DarkDefenders.Domain.Entities.Clocks;
-using DarkDefenders.Domain.Entities.Creatures;
-using DarkDefenders.Domain.Entities.Heroes;
 using DarkDefenders.Domain.Factories;
-using Infrastructure.Data;
+using DarkDefenders.Domain.Infrastructure;
+
 using Infrastructure.DDDES;
-using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Entities.Worlds.Events
 {
@@ -38,14 +35,13 @@ namespace DarkDefenders.Domain.Entities.Worlds.Events
             _worldProperties = worldProperties;
         }
 
-        protected override object CreateData(IdentityOf<World> id)
-        {
-            return new WorldCreatedData(id, _worldProperties);
-        }
-
         protected override World Create()
         {
             return new World(_heroFactory, _creatureFactory, _clockContainer.Item, _random, _worldProperties);
+        }
+
+        protected override void Accept(IEventsReciever reciever, IdentityOf<World> id)
+        {
         }
     }
 }

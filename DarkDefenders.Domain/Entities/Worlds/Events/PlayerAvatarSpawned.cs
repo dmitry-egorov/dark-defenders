@@ -1,12 +1,11 @@
-using DarkDefenders.Domain.Data.Entities.Worlds;
 using DarkDefenders.Domain.Entities.Creatures;
-using Infrastructure.Data;
+using DarkDefenders.Domain.Infrastructure;
+
 using Infrastructure.DDDES;
-using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Entities.Worlds.Events
 {
-    internal class PlayerAvatarSpawned : Event<World>
+    internal class PlayerAvatarSpawned : EventOf<World>
     {
         private readonly IContainer<Creature> _creatureContainer;
 
@@ -15,14 +14,13 @@ namespace DarkDefenders.Domain.Entities.Worlds.Events
             _creatureContainer = creatureContainer;
         }
 
-        protected override void Apply(World world)
+        protected override void Accept(IEventsReciever reciever, IdentityOf<World> id)
         {
+            reciever.PlayerAvatarSpawned(_creatureContainer.Item.Id);
         }
 
-        protected override object CreateData(IdentityOf<World> id)
+        protected override void Apply(World world)
         {
-            var creatureId = _creatureContainer.Item.Id;
-            return new PlayerAvatarSpawnedData(id, creatureId);
         }
     }
 }

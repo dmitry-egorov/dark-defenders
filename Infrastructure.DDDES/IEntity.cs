@@ -1,6 +1,4 @@
-﻿using Infrastructure.Data;
-
-namespace Infrastructure.DDDES
+﻿namespace Infrastructure.DDDES
 {
     public interface IEntity<TEntity>
     {

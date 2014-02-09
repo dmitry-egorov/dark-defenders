@@ -2,32 +2,22 @@
 using System.Collections.Generic;
 using System.Globalization;
 using DarkDefenders.ConsoleClient.Renderer;
-using DarkDefenders.Domain.Data.Entities.Clocks;
-using DarkDefenders.Domain.Data.Entities.Creatures;
-using DarkDefenders.Domain.Data.Entities.Heroes;
-using DarkDefenders.Domain.Data.Entities.Projectiles;
-using DarkDefenders.Domain.Data.Entities.RigidBodies;
-using DarkDefenders.Domain.Data.Entities.Terrains;
-using DarkDefenders.Domain.Data.Entities.Worlds;
-using DarkDefenders.Domain.Data.Infrastructure;
 using DarkDefenders.Domain.Data.Other;
 using DarkDefenders.Domain.Entities.Creatures;
 using DarkDefenders.Domain.Entities.RigidBodies;
 using DarkDefenders.Domain.Files;
-using Infrastructure.Data;
+using DarkDefenders.Domain.Infrastructure;
 using Infrastructure.DDDES;
 using Infrastructure.Math;
-using Infrastructure.Physics;
 
 namespace DarkDefenders.ConsoleClient.ViewModels
 {
-    internal class GameViewModel : IEventsListener<EventDataBase>, IEventDataReciever
+    internal class GameViewModel : IEventsReciever
     {
         private IConsoleRenderer _consoleRenderer;
         private readonly Dictionary<IdentityOf<RigidBody>, RigidBodyViewModel> _viewModelsMap = new Dictionary<IdentityOf<RigidBody>, RigidBodyViewModel>();
         private readonly Dictionary<IdentityOf<Creature>, IdentityOf<RigidBody>> _rigidBodyIdsMap = new Dictionary<IdentityOf<Creature>, IdentityOf<RigidBody>>();
 
-        private Momentum _lastCreatureMomentum = Momentum.Zero;
         private Vector _lastCreaturePosition = Vector.Zero;
         private IdentityOf<RigidBody> _playersRigidBodyId;
         private Map<Tile> _map;
@@ -39,24 +29,9 @@ namespace DarkDefenders.ConsoleClient.ViewModels
             _consoleRenderer = new EmptyConsoleRenderer();
         }
 
-        public void Recieve(EventDataBase entityEvent)
+        public void TerrainCreated(string mapId)
         {
-            entityEvent.Accept(this);
-        }
-
-        public void Recieve(ClockCreatedData clockCreated)
-        {
-            
-        }
-
-        public void Recieve(WorldCreatedData worldCreated)
-        {
-            
-        }
-
-        public void Recieve(TerrainCreatedData terrainCreated)
-        {
-            var data = TerrainLoader.LoadFromFile(terrainCreated.MapId);
+            var data = TerrainLoader.LoadFromFile(mapId);
 
             _map = data.Map;
 
@@ -64,60 +39,47 @@ namespace DarkDefenders.ConsoleClient.ViewModels
             RenderWorld();
         }
 
-        public void Recieve(TimeChangedData clockTimeUpdated)
+        public void RigidBodyCreated(IdentityOf<RigidBody> id, Vector position)
         {
+            var creatureViewModel = new RigidBodyViewModel(_map, _consoleRenderer);
+            _viewModelsMap.Add(id, creatureViewModel);
 
+            creatureViewModel.RigidBodyCreated(position);
         }
 
-        public void Recieve(HeroSpawnActivationTimeChangedData heroSpawnActivationTimeChanged)
+        public void RigidBodyDestroyed(IdentityOf<RigidBody> id)
         {
-            
+            var vm = _viewModelsMap[id];
+            vm.Remove();
+            _viewModelsMap.Remove(id);
         }
 
-        public void Recieve(SpawnHeroesChangedData spawnHeroesChangedData)
+        public void Moved(IdentityOf<RigidBody> id, Vector newPosition)
         {
-            
+            var isPlayer = id == _playersRigidBodyId;
+            if (isPlayer)
+            {
+                _lastCreaturePosition = newPosition;
+            }
+
+            if (!isPlayer && !_creaturesRenderingEnabled)
+            {
+                return;
+            }
+
+            var viewModel = _viewModelsMap[id];
+
+            viewModel.SetNewPosition(newPosition);
         }
 
-        public void Recieve(PlayerAvatarSpawnedData playerAvatarSpawned)
+        public void CreatureCreated(IdentityOf<Creature> id, IdentityOf<RigidBody> rigidBodyId)
         {
-            var rigidBodyId = _rigidBodyIdsMap[playerAvatarSpawned.CreatureId];
-
-            var vm = _viewModelsMap[rigidBodyId];
-
-            vm.SetAsPlayersAvatar();
-
-            _playersRigidBodyId = rigidBodyId;
+            _rigidBodyIdsMap[id] = rigidBodyId;
         }
 
-        public void Recieve(CreatureCreatedData creatureCreated)
+        public void HeroCreated(IdentityOf<Creature> creatureId)
         {
-            _rigidBodyIdsMap[creatureCreated.CreatureId] = creatureCreated.RigidBodyId;
-        }
-
-        public void Recieve(MovementChangedData movementChanged)
-        {
-
-        }
-        
-        public void Recieve(FiredData fired)
-        {
-            
-        }
-
-        public void Recieve(ProjectileCreatedData projectileCreated)
-        {
-            var vm = _viewModelsMap[projectileCreated.RigidBodyId];
-            vm.SetAsProjectile();
-        }
-
-        public void Recieve(ProjectileDestroyedData projectileDestroyed)
-        {
-        }
-
-        public void Recieve(HeroCreatedData heroCreated)
-        {
-            var rigidBodyId = _rigidBodyIdsMap[heroCreated.CreatureId];
+            var rigidBodyId = _rigidBodyIdsMap[creatureId];
 
             var vm = _viewModelsMap[rigidBodyId];
 
@@ -127,63 +89,27 @@ namespace DarkDefenders.ConsoleClient.ViewModels
             RenderHeroesCount();
         }
 
-        public void Recieve(HeroDestroyedData heroDestroyedData)
+        public void HeroDestroyed()
         {
             _totalHeroesSpawned--;
             RenderHeroesCount();
         }
 
-        public void Recieve(RigidBodyCreatedData rigidBodyCreated)
+        public void PlayerAvatarSpawned(IdentityOf<Creature> creatureId)
         {
-            var creatureViewModel = new RigidBodyViewModel(_map, _consoleRenderer);
-            _viewModelsMap.Add(rigidBodyCreated.RigidBodyId, creatureViewModel);
+            var rigidBodyId = _rigidBodyIdsMap[creatureId];
 
-            creatureViewModel.Recieve(rigidBodyCreated);
-        }
-
-        public void Recieve(RigidBodyDestroyedData rigidBodyDestroyed)
-        {
-            var rigidBodyId = rigidBodyDestroyed.RigidBodyId;
             var vm = _viewModelsMap[rigidBodyId];
-            vm.Remove();
-            _viewModelsMap.Remove(rigidBodyId);
+
+            vm.SetAsPlayersAvatar();
+
+            _playersRigidBodyId = rigidBodyId;
         }
 
-        public void Recieve(CreatureDestroyedData creatureDestroyed)
+        public void ProjectileCreated(IdentityOf<RigidBody> rigidBodyId)
         {
-
-        }
-
-        public void Recieve(MovedData moved)
-        {
-            var rigidBodyId = moved.RigidBodyId;
-            var newPosition = moved.NewPosition.ToVector();
-
-            SetNewPosition(rigidBodyId, newPosition);
-        }
-
-        public void Recieve(AcceleratedData creatureAccelerated)
-        {
-            var rigidBodyId = creatureAccelerated.RigidBodyId;
-            var newMomentum = creatureAccelerated.NewMomentum.ToMomentum();
-
-            SetNewMomentum(rigidBodyId, newMomentum);
-        }
-
-        public void Recieve(AcceleratedAndMovedData acceleratedAndMoved)
-        {
-            var rigidBodyId = acceleratedAndMoved.RigidBodyId;
-            SetNewMomentum(rigidBodyId, acceleratedAndMoved.NewMomentum.ToMomentum());
-            SetNewPosition(rigidBodyId, acceleratedAndMoved.NewPosition.ToVector());
-        }
-
-        public void Recieve(ExternalForceChangedData externalForceChanged)
-        {
-        }
-
-        public void Recieve(StateChangedData stateChanged)
-        {
-            
+            var vm = _viewModelsMap[rigidBodyId];
+            vm.SetAsProjectile();
         }
 
         public void RenderFps(double fps, long totalFrames)
@@ -203,7 +129,6 @@ namespace DarkDefenders.ConsoleClient.ViewModels
         public void RenderCreatureState()
         {
             RenderPosition();
-            RenderMomentum();
         }
 
         public void RenderCreatures()
@@ -219,32 +144,6 @@ namespace DarkDefenders.ConsoleClient.ViewModels
             }
         }
 
-        private void SetNewPosition(IdentityOf<RigidBody> rigidBodyId, Vector newPosition)
-        {
-            var isPlayer = rigidBodyId == _playersRigidBodyId;
-            if (isPlayer)
-            {
-                _lastCreaturePosition = newPosition;
-            }
-
-            if (!isPlayer && !_creaturesRenderingEnabled)
-            {
-                return;
-            }
-
-            var viewModel = _viewModelsMap[rigidBodyId];
-
-            viewModel.SetNewPosition(newPosition);
-        }
-
-        private void SetNewMomentum(IdentityOf<RigidBody> rigidBodyId, Momentum newMomentum)
-        {
-            if (rigidBodyId == _playersRigidBodyId)
-            {
-                _lastCreatureMomentum = newMomentum;
-            }
-        }
-
         private void SetViewPort()
         {
             _consoleRenderer = new ConsoleRenderer(_map.Dimensions.Width + 2, _map.Dimensions.Height + 2);
@@ -256,13 +155,6 @@ namespace DarkDefenders.ConsoleClient.ViewModels
             var position = "p: " + _lastCreaturePosition.ToString("0.0");
             _consoleRenderer.Render(15, 0, "                ");
             _consoleRenderer.Render(15, 0, position);
-        }
-
-        private void RenderMomentum()
-        {
-            var text = "v: " + _lastCreatureMomentum.Value.ToString("0.0");
-            _consoleRenderer.Render(35, 0, "                  ");
-            _consoleRenderer.Render(35, 0, text);
         }
 
         private void RenderWorld()

@@ -1,10 +1,7 @@
 ﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Net.Sockets;
-using System.Threading.Tasks;
-using DarkDefenders.Domain.Data.Infrastructure;
-using Infrastructure.DDDES;
-using Infrastructure.Serialization;
+using DarkDefenders.Domain.Infrastructure;
+using DarkDefenders.Domain.Serialization;
 using Infrastructure.Util;
 
 namespace DarkDefenders.ConsoleClient
@@ -13,39 +10,31 @@ namespace DarkDefenders.ConsoleClient
     {
         private readonly UdpClient _client;
         private volatile bool _stopped;
-        private readonly ConcurrentQueue<EventDataBase> _queue = new ConcurrentQueue<EventDataBase>();
-        private readonly IEventsListener<EventDataBase> _reciever;
+        private readonly ConcurrentQueue<byte[]> _queue = new ConcurrentQueue<byte[]>();
+        private readonly EventsDeserializer _deserializer;
 
-        public EventDataListener(IEventsListener<EventDataBase> reciever)
+        public EventDataListener(IEventsReciever reciever)
         {
-            _reciever = reciever;
+            _deserializer = new EventsDeserializer(reciever);
             _client = new UdpClient(1337);
         }
 
-        public async Task ListenAsync()
+        public async void ListenAsync()
         {
             while (!_stopped)
             {
                 var data = await _client.ReceiveAsync();
-                Task.Run(() =>
-                {
-                    var events = data.Buffer.ProtoDeserializeAs<List<EventDataBase>>();
-
-                    foreach (var eventData in events)
-                    {
-                        _queue.Enqueue(eventData);
-                    }
-                });
+                _queue.Enqueue(data.Buffer);
             }
         }
 
         public void ProcessEvents()
         {
-            var events = _queue.DequeueAllCurrent().AsReadOnly();
+            var data = _queue.DequeueAllCurrent().AsReadOnly();
 
-            foreach (var eventData in events)
+            foreach (var eventData in data)
             {
-                _reciever.Recieve(eventData);
+                _deserializer.Deserialize(eventData);
             }
         }
 

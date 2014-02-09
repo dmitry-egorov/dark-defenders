@@ -1,12 +1,11 @@
 ﻿using System;
-using DarkDefenders.Domain.Data.Entities.Worlds;
-using Infrastructure.Data;
+using DarkDefenders.Domain.Infrastructure;
+
 using Infrastructure.DDDES;
-using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Entities.Worlds.Events
 {
-    internal class HeroSpawnActivationTimeChanged : Event<World>
+    internal class HeroSpawnActivationTimeChanged : EventOf<World>
     {
         private readonly TimeSpan _time;
 
@@ -15,14 +14,13 @@ namespace DarkDefenders.Domain.Entities.Worlds.Events
             _time = time;
         }
 
+        protected override void Accept(IEventsReciever reciever, IdentityOf<World> id)
+        {
+        }
+
         protected override void Apply(World world)
         {
             world.SetHeroSpawnActivationTime(_time);
-        }
-
-        protected override object CreateData(IdentityOf<World> id)
-        {
-            return new HeroSpawnActivationTimeChangedData(id, _time);
         }
     }
 }
