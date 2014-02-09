@@ -1,7 +1,9 @@
-﻿namespace Infrastructure.DDDES
+﻿using Infrastructure.Data;
+
+namespace Infrastructure.DDDES
 {
-    public interface IEntity<out TId>
+    public interface IEntity<TEntity>
     {
-        TId GetGlobalId();
+        IdentityOf<TEntity> Id { get; }
     }
 }

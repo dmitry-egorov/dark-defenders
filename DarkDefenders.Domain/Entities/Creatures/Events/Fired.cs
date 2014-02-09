@@ -1,11 +1,12 @@
 ﻿using System;
-using DarkDefenders.Domain.Infrastructure;
-using DarkDefenders.Dtos.Entities.Creatures;
-using DarkDefenders.Dtos.Infrastructure;
+using DarkDefenders.Domain.Data.Entities.Creatures;
+using Infrastructure.Data;
+using Infrastructure.DDDES;
+using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Entities.Creatures.Events
 {
-    internal class Fired: DomainEvent<Creature, CreatureId>
+    internal class Fired: Event<Creature>
     {
         private readonly TimeSpan _time;
 
@@ -19,9 +20,9 @@ namespace DarkDefenders.Domain.Entities.Creatures.Events
             creature.SetFireActivationTime(_time);
         }
 
-        protected override IEventDto CreateDto(CreatureId id)
+        protected override object CreateData(IdentityOf<Creature> id)
         {
-            return new FiredDto(id, _time);
+            return new FiredData(id, _time);
         }
     }
 }

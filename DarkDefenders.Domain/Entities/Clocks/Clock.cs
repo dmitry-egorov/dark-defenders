@@ -2,19 +2,18 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using DarkDefenders.Domain.Entities.Clocks.Events;
-using DarkDefenders.Dtos.Entities.Clocks;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Physics;
 
 namespace DarkDefenders.Domain.Entities.Clocks
 {
-    internal class Clock: Entity<ClockId>
+    public class Clock: Entity<Clock>
     {
         private Seconds _elapsedSeconds;
         private TimeSpan _currentTime;
 
-        public Clock()
+        internal Clock()
         {
             _currentTime = TimeSpan.Zero;
         }

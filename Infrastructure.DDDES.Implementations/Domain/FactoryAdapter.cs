@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Generic;
 
 namespace Infrastructure.DDDES.Implementations.Domain
 {
-    public class FactoryAdapter<TFactory>
+    public class FactoryAdapter<TEntity, TFactory>
     {
         private readonly TFactory _factory;
         private readonly IEventsProcessor _processor;
@@ -14,10 +13,13 @@ namespace Infrastructure.DDDES.Implementations.Domain
             _processor = processor;
         }
 
-        public void Commit(Func<TFactory, IEnumerable<IEvent>> command)
+        public EntityAdapter<TEntity> Commit(Func<TFactory, ICreation<TEntity>> command)
         {
-            var events = command(_factory);
-            _processor.Process(events);
+            var creation = command(_factory);
+
+            _processor.Process(creation);
+
+            return new EntityAdapter<TEntity>(creation, _processor);
         }
     }
 }

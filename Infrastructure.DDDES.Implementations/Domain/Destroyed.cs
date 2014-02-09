@@ -1,26 +1,27 @@
+using Infrastructure.Data;
 using Infrastructure.Util;
 
 namespace Infrastructure.DDDES.Implementations.Domain
 {
 
-    public abstract class Destroyed<TRoot, TId, TEventDto> : Event<TRoot, TId, TEventDto> 
-        where TRoot : IEntity<TId>
+    public abstract class Destroyed<TEntity> : Event<TEntity> 
+        where TEntity : IEntity<TEntity>
     {
-        private readonly TId _rootId;
-        private readonly IStorage<TRoot> _storage;
+        private readonly IdentityOf<TEntity> _rootId;
+        private readonly IStorage<TEntity> _storage;
 
-        protected Destroyed(TRoot root, IStorage<TRoot> storage) : base(root)
+        protected Destroyed(TEntity root, IStorage<TEntity> storage) : base(root)
         {
-            _rootId = root.GetGlobalId();
+            _rootId = root.Id;
             _storage = storage;
         }
 
         public override string ToString()
         {
-            return "Root {0} destroyed: {1}".FormatWith(typeof(TRoot).Name, _rootId);
+            return "Root {0} destroyed: {1}".FormatWith(typeof(TEntity).Name, _rootId);
         }
 
-        protected override void Apply(TRoot root)
+        protected override void Apply(TEntity root)
         {
             _storage.Remove(root);
         }

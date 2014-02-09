@@ -40,20 +40,57 @@
     <Reference Include="Microsoft.Practices.Unity.Configuration">
       <HintPath>..\packages\Unity.3.0.1304.1\lib\Net45\Microsoft.Practices.Unity.Configuration.dll</HintPath>
     </Reference>
+    <Reference Include="protobuf-net">
+      <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\Entities\Clocks\ClockCreatedData.cs" />
+    <Compile Include="Data\Entities\Clocks\TimeChangedData.cs" />
+    <Compile Include="Data\Entities\Creatures\CreatureCreatedData.cs" />
+    <Compile Include="Data\Entities\Creatures\CreatureDestroyedData.cs" />
+    <Compile Include="Data\Entities\Creatures\CreatureProperties.cs" />
+    <Compile Include="Data\Entities\Creatures\FiredData.cs" />
+    <Compile Include="Data\Entities\Creatures\MovementChangedData.cs" />
+    <Compile Include="Data\Entities\Heroes\HeroCreatedData.cs" />
+    <Compile Include="Data\Entities\Heroes\HeroDestroyedData.cs" />
+    <Compile Include="Data\Entities\Heroes\HeroStateData.cs" />
+    <Compile Include="Data\Entities\Heroes\StateChangedData.cs" />
+    <Compile Include="Data\Entities\Projectiles\ProjectileCreatedData.cs" />
+    <Compile Include="Data\Entities\Projectiles\ProjectileDestroyedData.cs" />
+    <Compile Include="Data\Entities\RigidBodies\AcceleratedAndMovedData.cs" />
+    <Compile Include="Data\Entities\RigidBodies\AcceleratedData.cs" />
+    <Compile Include="Data\Entities\RigidBodies\ExternalForceChangedData.cs" />
+    <Compile Include="Data\Entities\RigidBodies\MovedData.cs" />
+    <Compile Include="Data\Entities\RigidBodies\RigidBodyCreatedData.cs" />
+    <Compile Include="Data\Entities\RigidBodies\RigidBodyDestroyedData.cs" />
+    <Compile Include="Data\Entities\RigidBodies\RigidBodyInitialProperties.cs" />
+    <Compile Include="Data\Entities\RigidBodies\RigidBodyProperties.cs" />
+    <Compile Include="Data\Entities\Terrains\TerrainCreatedData.cs" />
+    <Compile Include="Data\Entities\Worlds\HeroSpawnActivationTimeChangedData.cs" />
+    <Compile Include="Data\Entities\Worlds\PlayerAvatarSpawnedData.cs" />
+    <Compile Include="Data\Entities\Worlds\SpawnHeroesChangedData.cs" />
+    <Compile Include="Data\Entities\Worlds\WorldCreatedData.cs" />
+    <Compile Include="Data\Entities\Worlds\WorldProperties.cs" />
+    <Compile Include="GameFactory.cs" />
+    <Compile Include="Data\Infrastructure\EventDataBase.cs" />
+    <Compile Include="Data\Infrastructure\IEventDataReciever.cs" />
+    <Compile Include="Data\Other\Direction.cs" />
+    <Compile Include="Data\Other\DirectionExtensions.cs" />
+    <Compile Include="Data\Other\Movement.cs" />
+    <Compile Include="Data\Other\MovementExtensions.cs" />
+    <Compile Include="Data\Other\Tile.cs" />
     <Compile Include="Entities\Heroes\Events\HeroDestroyed.cs" />
     <Compile Include="Entities\RigidBodies\RigidBody.cs" />
     <Compile Include="Interfaces\IWorld.cs" />
     <Compile Include="Interfaces\IPlayer.cs" />
     <Compile Include="Interfaces\IGame.cs" />
-    <Compile Include="Infrastructure\Destroyed.cs" />
-    <Compile Include="Infrastructure\DomainEvent.cs" />
     <Compile Include="Entities\Clocks\Events\ClockCreated.cs" />
-    <Compile Include="Entities\Clocks\ClockFactory.cs" />
+    <Compile Include="Factories\ClockFactory.cs" />
     <Compile Include="Entities\Creatures\Events\CreatureDestroyed.cs" />
     <Compile Include="Adapters\GameAdapter.cs" />
     <Compile Include="Entities\Clocks\Clock.cs" />
@@ -62,7 +99,7 @@
     <Compile Include="Entities\Heroes\Events\HeroCreated.cs" />
     <Compile Include="Entities\Heroes\States\Deciding.cs" />
     <Compile Include="Entities\Heroes\Hero.cs" />
-    <Compile Include="Entities\Heroes\HeroFactory.cs" />
+    <Compile Include="Factories\HeroFactory.cs" />
     <Compile Include="Entities\Heroes\Events\StateChanged.cs" />
     <Compile Include="Entities\Heroes\States\Falling.cs" />
     <Compile Include="Entities\Heroes\States\HeroStateFactory.cs" />
@@ -76,33 +113,33 @@
     <Compile Include="Entities\RigidBodies\Events\RigidBodyDestroyed.cs" />
     <Compile Include="Entities\Other\Cooldown.cs" />
     <Compile Include="Entities\Creatures\Events\Fired.cs" />
-    <Compile Include="Entities\Creatures\CreatureFactory.cs" />
+    <Compile Include="Factories\CreatureFactory.cs" />
     <Compile Include="Entities\Creatures\Events\MovementChanged.cs" />
     <Compile Include="Entities\Creatures\Creature.cs" />
-    <Compile Include="Entities\Projectiles\ProjectileFactory.cs" />
+    <Compile Include="Factories\ProjectileFactory.cs" />
     <Compile Include="Entities\Projectiles\Projectile.cs" />
     <Compile Include="Entities\Worlds\Events\PlayerAvatarSpawned.cs" />
     <Compile Include="Adapters\PlayerAdapter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Entities\RigidBodies\RigidBodyFactory.cs" />
+    <Compile Include="Factories\RigidBodyFactory.cs" />
     <Compile Include="Entities\RigidBodies\Events\Accelerated.cs" />
     <Compile Include="Entities\RigidBodies\Events\Moved.cs" />
     <Compile Include="Entities\RigidBodies\Events\ExternalForceChanged.cs" />
     <Compile Include="Entities\Terrains\Terrain.cs" />
     <Compile Include="Entities\Terrains\Events\TerrainCreated.cs" />
-    <Compile Include="Entities\Terrains\TerrainFactory.cs" />
+    <Compile Include="Factories\TerrainFactory.cs" />
     <Compile Include="Entities\Worlds\Events\HeroSpawnActivationTimeChanged.cs" />
     <Compile Include="Entities\Worlds\Events\SpawnHeroesChanged.cs" />
     <Compile Include="Entities\Clocks\Events\TimeChanged.cs" />
     <Compile Include="Entities\Worlds\World.cs" />
     <Compile Include="Entities\Worlds\Events\WorldCreated.cs" />
-    <Compile Include="Entities\Worlds\WorldFactory.cs" />
+    <Compile Include="Factories\WorldFactory.cs" />
     <Compile Include="Adapters\WorldAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DarkDefenders.Dtos\DarkDefenders.Dtos.csproj">
-      <Project>{26A20BD4-CC76-4E2E-BA4C-89E919E308B5}</Project>
-      <Name>DarkDefenders.Dtos</Name>
+    <ProjectReference Include="..\Infrastructure.Data\Infrastructure.Data.csproj">
+      <Project>{96099472-811A-440D-85D2-5F0F44E09EE8}</Project>
+      <Name>Infrastructure.Data</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.DDDES.Implementations\Infrastructure.DDDES.Implementations.csproj">
       <Project>{5E4CA423-37F5-4B6A-B00C-0ADC06EC0378}</Project>
@@ -119,6 +156,10 @@
     <ProjectReference Include="..\Infrastructure.Physics\Infrastructure.Physics.csproj">
       <Project>{305E7C2A-4803-47CD-84B8-5C9DF6134395}</Project>
       <Name>Infrastructure.Physics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Runtime\Infrastructure.Runtime.csproj">
+      <Project>{46C6CCD9-0683-4A63-82B8-D9C48D5A20C9}</Project>
+      <Name>Infrastructure.Runtime</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Unity\Infrastructure.Unity.csproj">
       <Project>{3CE8AEC8-8016-4431-ACCD-564E0DF56FE6}</Project>

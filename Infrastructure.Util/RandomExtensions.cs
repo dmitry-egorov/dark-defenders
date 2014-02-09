@@ -5,7 +5,7 @@ namespace Infrastructure.Util
 {
     public static class RandomExtensions
     {
-        public static T From<T>(this Random random, IReadOnlyList<T> list)
+        public static T ElementFrom<T>(this Random random, IReadOnlyList<T> list)
         {
             var count = list.Count;
             if (count == 0)

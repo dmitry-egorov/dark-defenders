@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using DarkDefenders.Domain.Data.Entities.Creatures;
+using DarkDefenders.Domain.Data.Entities.Worlds;
 using DarkDefenders.Domain.Entities.Clocks;
 using DarkDefenders.Domain.Entities.Creatures;
 using DarkDefenders.Domain.Entities.Heroes;
 using DarkDefenders.Domain.Entities.Other;
 using DarkDefenders.Domain.Entities.Worlds.Events;
-using DarkDefenders.Domain.Interfaces;
-using DarkDefenders.Dtos.Entities.Creatures;
-using DarkDefenders.Dtos.Entities.Worlds;
+using DarkDefenders.Domain.Factories;
+using Infrastructure.Data;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
@@ -16,12 +17,12 @@ using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.Entities.Worlds
 {
-    internal class World : Entity<WorldId>
+    public class World : Entity<World>
     {
         private readonly CreatureFactory _creatureFactory;
         private readonly HeroFactory _heroFactory;
 
-        private readonly IContainer<Clock> _clockContainer;
+        private readonly Clock _clock;
         private readonly Random _random;
 
         private readonly ReadOnlyCollection<Vector> _playersSpawnPositions;
@@ -32,26 +33,26 @@ namespace DarkDefenders.Domain.Entities.Worlds
 
         private bool _spawnHeroes = true;
 
-        public World
+        internal World
         (
             HeroFactory heroFactory, 
             CreatureFactory creatureFactory, 
-            IContainer<Clock> clockContainer, 
+            Clock clock, 
             Random random, 
             WorldProperties properties
         )
         {
             _creatureFactory = creatureFactory;
-            _heroesSpawnPositions = properties.HeroesSpawnPositions;
+            _heroesSpawnPositions = properties.HeroesSpawnPositions.ToVectors().AsReadOnly();
             _heroesCreatureProperties = properties.HeroesCreatureProperties;
             _heroFactory = heroFactory;
             _random = random;
             _playersAvatarProperties = properties.PlayersAvatarProperties;
 
-            _playersSpawnPositions = properties.PlayersSpawnPositions;
+            _playersSpawnPositions = properties.PlayersSpawnPositions.ToVectors().AsReadOnly();
 
-            _clockContainer = clockContainer;
-            _heroSpawnCooldown = new Cooldown(clockContainer, properties.HeroesSpawnCooldown);
+            _clock = clock;
+            _heroSpawnCooldown = new Cooldown(clock, properties.HeroesSpawnCooldown);
         }
 
         public IEnumerable<IEvent> SpawnHeroes()
@@ -71,28 +72,24 @@ namespace DarkDefenders.Domain.Entities.Worlds
             yield return new SpawnHeroesChanged(this, enabled);
         }
 
-        public IEnumerable<IEvent> SpawnPlayerAvatar(IStorage<Creature> storage)
+        public ICreation<Creature> SpawnPlayerAvatar()
         {
-            var position = _random.From(_playersSpawnPositions);
+            var position = _random.ElementFrom(_playersSpawnPositions);
 
-            var container = new Container<Creature>();
-            
-            var events = _creatureFactory.Create(storage.ComposeWith(container), position, _playersAvatarProperties);
+            var creation = _creatureFactory.Create(position, _playersAvatarProperties);
 
-            foreach (var e in events) { yield return e;}
-
-            yield return new PlayerAvatarSpawned(this, container);
+            return creation.ConcatEvent(new PlayerAvatarSpawned(this, creation));
         }
 
-        public IEnumerable<IEvent> SpawnHero()
+        public ICreation<Hero> SpawnHero()
         {
-            var position = _random.From(_heroesSpawnPositions);
+            var position = _random.ElementFrom(_heroesSpawnPositions);
 
             var events = _heroFactory.Create(position, _heroesCreatureProperties);
 
-            var clock = _clockContainer.Item;
+            var currentTime = _clock.GetCurrentTime();
 
-            return events.ConcatItem(new HeroSpawnActivationTimeChanged(this, clock.GetCurrentTime()));
+            return events.ConcatEvent(new HeroSpawnActivationTimeChanged(this, currentTime));
         }
 
         internal void SetSpawnHeroes(bool enabled)

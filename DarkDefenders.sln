@@ -17,8 +17,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.DDDES", "Inf
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.DDDES.Implementations", "Infrastructure.DDDES.Implementations\Infrastructure.DDDES.Implementations.csproj", "{5E4CA423-37F5-4B6A-B00C-0ADC06EC0378}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DarkDefenders.Console", "DarkDefenders.Console\DarkDefenders.Console.csproj", "{D29A2BF6-40D4-4405-9E40-C1EC8BC91705}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DarkDefenders.Domain.Files", "DarkDefenders.Domain.Files\DarkDefenders.Domain.Files.csproj", "{9660C753-8246-4AE8-84B2-6DA809FF9ACB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Math.Tests", "Infrastructure.Math.Tests\Infrastructure.Math.Tests.csproj", "{CDD0E2E5-BCEE-4603-92C3-29858B205B20}"
@@ -27,7 +25,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Physics", "I
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Unity", "Infrastructure.Unity\Infrastructure.Unity.csproj", "{3CE8AEC8-8016-4431-ACCD-564E0DF56FE6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DarkDefenders.Dtos", "DarkDefenders.Dtos\DarkDefenders.Dtos.csproj", "{26A20BD4-CC76-4E2E-BA4C-89E919E308B5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Runtime", "Infrastructure.Runtime\Infrastructure.Runtime.csproj", "{46C6CCD9-0683-4A63-82B8-D9C48D5A20C9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DarkDefenders.ConsoleServer", "DarkDefenders.ConsoleServer\DarkDefenders.ConsoleServer.csproj", "{C631954C-19D6-42BA-A52C-B8978D8C7E64}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Data", "Infrastructure.Data\Infrastructure.Data.csproj", "{96099472-811A-440D-85D2-5F0F44E09EE8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DarkDefenders.ConsoleClient", "DarkDefenders.ConsoleClient\DarkDefenders.ConsoleClient.csproj", "{0D7EFF7B-4069-4E36-BC5E-D0CF128DAC9F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Serialization", "Infrastructure.Serialization\Infrastructure.Serialization.csproj", "{75E3B4B6-49F0-4064-967F-3C125C7CE19D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,10 +65,6 @@ Global
 		{5E4CA423-37F5-4B6A-B00C-0ADC06EC0378}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E4CA423-37F5-4B6A-B00C-0ADC06EC0378}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E4CA423-37F5-4B6A-B00C-0ADC06EC0378}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D29A2BF6-40D4-4405-9E40-C1EC8BC91705}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D29A2BF6-40D4-4405-9E40-C1EC8BC91705}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D29A2BF6-40D4-4405-9E40-C1EC8BC91705}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D29A2BF6-40D4-4405-9E40-C1EC8BC91705}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9660C753-8246-4AE8-84B2-6DA809FF9ACB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9660C753-8246-4AE8-84B2-6DA809FF9ACB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9660C753-8246-4AE8-84B2-6DA809FF9ACB}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -79,10 +81,26 @@ Global
 		{3CE8AEC8-8016-4431-ACCD-564E0DF56FE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3CE8AEC8-8016-4431-ACCD-564E0DF56FE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3CE8AEC8-8016-4431-ACCD-564E0DF56FE6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{26A20BD4-CC76-4E2E-BA4C-89E919E308B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{26A20BD4-CC76-4E2E-BA4C-89E919E308B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{26A20BD4-CC76-4E2E-BA4C-89E919E308B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{26A20BD4-CC76-4E2E-BA4C-89E919E308B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46C6CCD9-0683-4A63-82B8-D9C48D5A20C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46C6CCD9-0683-4A63-82B8-D9C48D5A20C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46C6CCD9-0683-4A63-82B8-D9C48D5A20C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46C6CCD9-0683-4A63-82B8-D9C48D5A20C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C631954C-19D6-42BA-A52C-B8978D8C7E64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C631954C-19D6-42BA-A52C-B8978D8C7E64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C631954C-19D6-42BA-A52C-B8978D8C7E64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C631954C-19D6-42BA-A52C-B8978D8C7E64}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96099472-811A-440D-85D2-5F0F44E09EE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96099472-811A-440D-85D2-5F0F44E09EE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96099472-811A-440D-85D2-5F0F44E09EE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96099472-811A-440D-85D2-5F0F44E09EE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D7EFF7B-4069-4E36-BC5E-D0CF128DAC9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D7EFF7B-4069-4E36-BC5E-D0CF128DAC9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D7EFF7B-4069-4E36-BC5E-D0CF128DAC9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D7EFF7B-4069-4E36-BC5E-D0CF128DAC9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75E3B4B6-49F0-4064-967F-3C125C7CE19D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75E3B4B6-49F0-4064-967F-3C125C7CE19D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75E3B4B6-49F0-4064-967F-3C125C7CE19D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75E3B4B6-49F0-4064-967F-3C125C7CE19D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -95,5 +113,8 @@ Global
 		{CDD0E2E5-BCEE-4603-92C3-29858B205B20} = {BC354A87-095F-4CB1-AACF-2611A8A79612}
 		{305E7C2A-4803-47CD-84B8-5C9DF6134395} = {BC354A87-095F-4CB1-AACF-2611A8A79612}
 		{3CE8AEC8-8016-4431-ACCD-564E0DF56FE6} = {BC354A87-095F-4CB1-AACF-2611A8A79612}
+		{46C6CCD9-0683-4A63-82B8-D9C48D5A20C9} = {BC354A87-095F-4CB1-AACF-2611A8A79612}
+		{96099472-811A-440D-85D2-5F0F44E09EE8} = {BC354A87-095F-4CB1-AACF-2611A8A79612}
+		{75E3B4B6-49F0-4064-967F-3C125C7CE19D} = {BC354A87-095F-4CB1-AACF-2611A8A79612}
 	EndGlobalSection
 EndGlobal

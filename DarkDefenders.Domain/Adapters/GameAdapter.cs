@@ -1,56 +1,60 @@
 ﻿using System;
+using DarkDefenders.Domain.Data.Entities.Worlds;
+using DarkDefenders.Domain.Data.Other;
 using DarkDefenders.Domain.Entities.Clocks;
 using DarkDefenders.Domain.Entities.Heroes;
 using DarkDefenders.Domain.Entities.Projectiles;
 using DarkDefenders.Domain.Entities.RigidBodies;
 using DarkDefenders.Domain.Entities.Terrains;
 using DarkDefenders.Domain.Entities.Worlds;
+using DarkDefenders.Domain.Factories;
 using DarkDefenders.Domain.Interfaces;
-using DarkDefenders.Dtos.Entities.Worlds;
-using DarkDefenders.Dtos.Other;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
+using Infrastructure.Util;
+using JetBrains.Annotations;
 
 namespace DarkDefenders.Domain.Adapters
 {
+    [UsedImplicitly]
     internal class GameAdapter : IGame
     {
         private readonly IEventsProcessor _processor;
 
-        private readonly FactoryAdapter<ClockFactory> _clockFactory;
-        private readonly FactoryAdapter<TerrainFactory> _terrainFactory;
-        private readonly FactoryAdapter<WorldFactory> _worldFactory;
+        private readonly FactoryAdapter<Clock, ClockFactory> _clockFactory;
+        private readonly FactoryAdapter<Terrain, TerrainFactory> _terrainFactory;
+        private readonly FactoryAdapter<World, WorldFactory> _worldFactory;
 
-        private readonly RootAdapter<World> _world;
-        private readonly RootAdapter<Clock> _clock;
-        private readonly RootsAdapter<RigidBody> _rigidBodies;
-        private readonly RootsAdapter<Projectile> _projectiles;
-        private readonly RootsAdapter<Hero> _heroes;
+        private readonly EntitiesAdapter<RigidBody> _rigidBodies;
+        private readonly EntitiesAdapter<Projectile> _projectiles;
+        private readonly EntitiesAdapter<Hero> _heroes;
+
+        private EntityAdapter<World> _world;
+        private EntityAdapter<Clock> _clock;
+
 
         public GameAdapter(IEventsProcessor processor, ClockFactory clockFactory, TerrainFactory terrainFactory, WorldFactory worldFactory, IContainer<World> worldContainer, IRepository<Hero> heroRepository, IRepository<RigidBody> rigidBodyRepository, IRepository<Projectile> projectileRepository, IContainer<Clock> clockContainer)
         {
             _processor = processor;
-            _clockFactory = new FactoryAdapter<ClockFactory>(clockFactory, _processor);
-            _terrainFactory = new FactoryAdapter<TerrainFactory>(terrainFactory, _processor);
-            _worldFactory = new FactoryAdapter<WorldFactory>(worldFactory, _processor);
+            _clockFactory = new FactoryAdapter<Clock, ClockFactory>(clockFactory, _processor);
+            _terrainFactory = new FactoryAdapter<Terrain, TerrainFactory>(terrainFactory, _processor);
+            _worldFactory = new FactoryAdapter<World, WorldFactory>(worldFactory, _processor);
 
-            _world = new RootAdapter<World>(worldContainer, _processor);
-            _clock = new RootAdapter<Clock>(clockContainer, _processor);
-            _rigidBodies = new RootsAdapter<RigidBody>(rigidBodyRepository, _processor);
-            _projectiles = new RootsAdapter<Projectile>(projectileRepository, _processor);
-            _heroes = new RootsAdapter<Hero>(heroRepository, _processor);
+            _rigidBodies = new EntitiesAdapter<RigidBody>(rigidBodyRepository, _processor);
+            _projectiles = new EntitiesAdapter<Projectile>(projectileRepository, _processor);
+            _heroes = new EntitiesAdapter<Hero>(heroRepository, _processor);
         }
 
-        public IWorld Initialize(Map<Tile> map, WorldProperties worldProperties)
+
+        public IWorld Initialize(string mapId, Map<Tile> map, WorldProperties worldProperties)
         {
-            _clockFactory.Commit(x => x.Create());
-            _terrainFactory.Commit(x => x.Create(map));
-            _worldFactory.Commit(x => x.Create(worldProperties));
+            _clock = _clockFactory.Commit(x => x.Create());
+            _terrainFactory.Commit(x => x.Create(map, mapId));
+            _world = _worldFactory.Commit(x => x.Create(worldProperties));
 
             return new WorldAdapter(_processor, _world);
         }
-
         public void Update(TimeSpan elapsed)
         {
             _clock.Commit(x => x.UpdateTime(elapsed));

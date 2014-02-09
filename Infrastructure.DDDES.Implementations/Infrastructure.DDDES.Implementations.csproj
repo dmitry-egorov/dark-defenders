@@ -36,23 +36,30 @@
   <ItemGroup>
     <Compile Include="Domain\CompositeStorage.cs" />
     <Compile Include="Domain\Container.cs" />
-    <Compile Include="Domain\DestroyedDto.cs" />
+    <Compile Include="Domain\Creation.cs" />
+    <Compile Include="Domain\CreationExtensions.cs" />
+    <Compile Include="Domain\DestroyedData.cs" />
     <Compile Include="Domain\Entity.cs" />
+    <Compile Include="Domain\Factory.cs" />
     <Compile Include="Domain\FactoryAdapter.cs" />
-    <Compile Include="Domain\RootAdapter.cs" />
-    <Compile Include="Domain\RootsAdapter.cs" />
+    <Compile Include="Domain\EntityAdapter.cs" />
+    <Compile Include="Domain\EntitiesAdapter.cs" />
     <Compile Include="Domain\StorageExtensions.cs" />
     <Compile Include="EventsExtensions.cs" />
     <Compile Include="EventsProcessor.cs" />
     <Compile Include="CompositeEventsListener.cs" />
     <Compile Include="Domain\Created.cs" />
     <Compile Include="Domain\Destroyed.cs" />
-    <Compile Include="Domain\DomainEvent.cs" />
+    <Compile Include="Domain\Event.cs" />
     <Compile Include="Domain\Repository.cs" />
     <Compile Include="CountingEventsListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Infrastructure.Data\Infrastructure.Data.csproj">
+      <Project>{96099472-811A-440D-85D2-5F0F44E09EE8}</Project>
+      <Name>Infrastructure.Data</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Infrastructure.DDDES\Infrastructure.DDDES.csproj">
       <Project>{457CCF4D-7E52-4A7F-867C-13BAC32E13F0}</Project>
       <Name>Infrastructure.DDDES</Name>

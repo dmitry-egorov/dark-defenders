@@ -1,18 +1,19 @@
-﻿namespace Infrastructure.DDDES.Implementations.Domain
+﻿using Infrastructure.Data;
+
+namespace Infrastructure.DDDES.Implementations.Domain
 {
-    public abstract class Entity<TId> : IEntity<TId> 
-        where TId : new()
+    public abstract class Entity<TEntity> : IEntity<TEntity>
     {
-        private readonly TId _globalId;
+        private readonly IdentityOf<TEntity> _id;
 
         protected Entity()
         {
-            _globalId = new TId();
+            _id = new IdentityOf<TEntity>();
         }
 
-        public TId GetGlobalId()
+        public IdentityOf<TEntity> Id
         {
-            return _globalId;
+            get { return _id; }
         }
     }
 }

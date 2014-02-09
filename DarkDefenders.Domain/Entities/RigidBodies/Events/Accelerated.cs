@@ -1,11 +1,12 @@
-using DarkDefenders.Domain.Infrastructure;
-using DarkDefenders.Dtos.Entities.RigidBodies;
-using DarkDefenders.Dtos.Infrastructure;
+using DarkDefenders.Domain.Data.Entities.RigidBodies;
+using Infrastructure.Data;
+using Infrastructure.DDDES;
+using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Physics;
 
 namespace DarkDefenders.Domain.Entities.RigidBodies.Events
 {
-    internal class Accelerated : DomainEvent<RigidBody, RigidBodyId>
+    internal class Accelerated : Event<RigidBody>
     {
         private readonly Momentum _newMomentum;
 
@@ -19,9 +20,9 @@ namespace DarkDefenders.Domain.Entities.RigidBodies.Events
             rigidBody.SetNewMomentum(_newMomentum);
         }
 
-        protected override IEventDto CreateDto(RigidBodyId id)
+        protected override object CreateData(IdentityOf<RigidBody> id)
         {
-            return new AcceleratedDto(id, _newMomentum);
+            return new AcceleratedData(id, _newMomentum.ToData());
         }
     }
 }

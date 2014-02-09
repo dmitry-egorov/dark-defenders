@@ -15,6 +15,11 @@ namespace Infrastructure.Math
             get { return _dimensions; }
         }
 
+        public T DefaultItem
+        {
+            get { return _defaultItem; }
+        }
+
         public Map(Dimensions dimensions, T defaultItem)
         {
             _dimensions = dimensions;
@@ -40,7 +45,7 @@ namespace Infrastructure.Math
             {
                 if (IsNotWithinDimensions(x, y))
                 {
-                    return _defaultItem;
+                    return DefaultItem;
                 }
 
                 return _data[y*_dimensions.Width + x];
@@ -64,12 +69,12 @@ namespace Infrastructure.Math
 
             if (other < 0 || other >= otherDimension)
             {
-                return _defaultItem.Equals(value);
+                return DefaultItem.Equals(value);
             }
 
             if (mainStart < 0)
             {
-                if (_defaultItem.Equals(value))
+                if (DefaultItem.Equals(value))
                 {
                     return true;
                 }
@@ -79,7 +84,7 @@ namespace Infrastructure.Math
 
             if (mainEnd >= mainDimension)
             {
-                if (_defaultItem.Equals(value))
+                if (DefaultItem.Equals(value))
                 {
                     return true;
                 }

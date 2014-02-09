@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using DarkDefenders.Domain.Data.Entities.RigidBodies;
+using DarkDefenders.Domain.Data.Other;
 using DarkDefenders.Domain.Entities.Clocks;
 using DarkDefenders.Domain.Entities.RigidBodies.Events;
 using DarkDefenders.Domain.Entities.Terrains;
-using DarkDefenders.Dtos.Entities.RigidBodies;
-using DarkDefenders.Dtos.Other;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
@@ -14,10 +14,10 @@ using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.Entities.RigidBodies
 {
-    internal class RigidBody : Entity<RigidBodyId>
+    public class RigidBody : Entity<RigidBody>
     {
-        private const double GravityAcceleration = 200;
-        private const double FrictionCoefficient = 400;
+        private const double GravityAcceleration = 200.0;
+        private const double FrictionCoefficient = 400.0;
 
         private readonly IStorage<RigidBody> _storage;
         private readonly IContainer<Clock> _clockContainer;
@@ -40,7 +40,7 @@ namespace DarkDefenders.Domain.Entities.RigidBodies
 
         public Vector Position { get { return _boundingBox.Center; } }
 
-        public RigidBody
+        internal RigidBody
         (
             IStorage<RigidBody> storage, 
             IContainer<Clock> clockContainer, 
@@ -52,9 +52,9 @@ namespace DarkDefenders.Domain.Entities.RigidBodies
 
             var radius = properties.Properties.BoundingBoxRadius;
 
-            _momentum = properties.InitialMomentum;
+            _momentum = properties.InitialMomentum.ToMomentum();
             _topHorizontalMomentum = properties.Properties.TopHorizontalMomentum;
-            _boundingBox = new Box(properties.Position, radius, radius);
+            _boundingBox = new Box(properties.Position.ToVector(), radius, radius);
             _storage = storage;
             _clockContainer = clockContainer;
             _externalForce = Force.Zero;

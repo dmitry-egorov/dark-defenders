@@ -3,17 +3,16 @@ using System.Collections.Generic;
 using DarkDefenders.Domain.Entities.Creatures;
 using DarkDefenders.Domain.Entities.Heroes.Events;
 using DarkDefenders.Domain.Entities.Heroes.States;
-using DarkDefenders.Dtos.Entities.Heroes;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Entities.Heroes
 {
-    internal class Hero : Entity<HeroId>
+    public class Hero : Entity<Hero>
     {
         private readonly Creature _creature;
 
-        public Hero(IStorage<Hero> storage, Creature creature, Random random)
+        internal Hero(IStorage<Hero> storage, Creature creature, Random random)
         {
             _storage = storage;
             _creature = creature;

@@ -11,7 +11,7 @@ namespace Infrastructure.Math
         public static readonly Vector Left  = new Vector(-1, 0);
         public static readonly Vector Right = new Vector(1, 0);
         public static readonly Vector Down  = new Vector(0, -1);
-        
+
         private readonly double _x;
         private readonly double _y;
 

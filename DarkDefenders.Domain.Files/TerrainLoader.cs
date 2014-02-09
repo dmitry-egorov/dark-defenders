@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using DarkDefenders.Dtos.Other;
+using DarkDefenders.Domain.Data.Other;
+using Infrastructure.Data;
 using Infrastructure.Math;
 using Infrastructure.Util;
 
@@ -10,8 +11,11 @@ namespace DarkDefenders.Domain.Files
 {
     public static class TerrainLoader
     {
-        public static TerrainData LoadFromFile(string path)
+        public static TerrainData LoadFromFile(string mapId)
         {
+            var pathToFiles = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "WorldsData");
+            var path = Path.Combine(pathToFiles, mapId);
+
             var extension = Path.GetExtension(path);
 
             if (extension == ".txt")
@@ -76,7 +80,7 @@ namespace DarkDefenders.Domain.Files
                 y++;
             }
 
-            return new TerrainData(map, playerSpawns, heroSpawns);
+            return new TerrainData(map.ToData(), playerSpawns.ToData(), heroSpawns.ToData());
         }
 
         public static TerrainData LoadFromMonochromeBmp(string path)
@@ -121,7 +125,7 @@ namespace DarkDefenders.Domain.Files
                     }
                 }
 
-                return new TerrainData(map, playerSpawns, heroSpawns);
+                return new TerrainData(map.ToData(), playerSpawns.ToData(), heroSpawns.ToData());
             }
         }
 

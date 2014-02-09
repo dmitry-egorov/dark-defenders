@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using DarkDefenders.Domain.Data.Entities.Creatures;
+using DarkDefenders.Domain.Data.Other;
 using DarkDefenders.Domain.Entities.Clocks;
 using DarkDefenders.Domain.Entities.Creatures.Events;
 using DarkDefenders.Domain.Entities.Other;
 using DarkDefenders.Domain.Entities.Projectiles;
 using DarkDefenders.Domain.Entities.RigidBodies;
 using DarkDefenders.Domain.Entities.Terrains;
-using DarkDefenders.Dtos.Entities.Creatures;
-using DarkDefenders.Dtos.Other;
+using DarkDefenders.Domain.Factories;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
@@ -16,7 +17,7 @@ using Infrastructure.Physics;
 
 namespace DarkDefenders.Domain.Entities.Creatures
 {
-    internal class Creature: Entity<CreatureId>
+    public class Creature: Entity<Creature>
     {
         private static readonly TimeSpan _fireDelay = TimeSpan.FromSeconds(0.25);
         private const double ProjectileMomentum = 150.0 * Projectile.Mass;
@@ -31,8 +32,8 @@ namespace DarkDefenders.Domain.Entities.Creatures
 
         private readonly IStorage<Creature> _storage;
         private readonly ProjectileFactory _projectileFactory;
-        private readonly IContainer<Clock> _clockContainer;
-        private readonly IContainer<Terrain> _terrainContainer;
+        private readonly Clock _clock;
+        private readonly Terrain _terrain;
         private readonly RigidBody _rigidBody;
         private readonly Cooldown _fireCooldown;
 
@@ -40,20 +41,20 @@ namespace DarkDefenders.Domain.Entities.Creatures
         private Direction _direction;
         private Momentum _projectileMomentum;
 
-        public Creature(IStorage<Creature> storage, ProjectileFactory projectileFactory, IContainer<Clock> clockContainer, IContainer<Terrain> terrainContainer, RigidBody rigidBody, CreatureProperties properties) 
+        internal Creature(IStorage<Creature> storage, ProjectileFactory projectileFactory, Clock clock, Terrain terrain, RigidBody rigidBody, CreatureProperties properties) 
         {
             
-            _terrainContainer = terrainContainer;
+            _terrain = terrain;
             _rigidBody = rigidBody;
             _storage = storage;
-            _clockContainer = clockContainer;
+            _clock = clock;
             _projectileFactory = projectileFactory;
 
             _movement = Movement.Stop;
             _direction = InitialDirection;
             _projectileMomentum = GetProjectileMomentum();
 
-            _fireCooldown = new Cooldown(clockContainer, _fireDelay);
+            _fireCooldown = new Cooldown(clock, _fireDelay);
 
             _rightMovementForce = Force.Right * properties.MovementForce;
             _leftMovementForce = Force.Left * properties.MovementForce;
@@ -99,8 +100,7 @@ namespace DarkDefenders.Domain.Entities.Creatures
 
             foreach (var e in events) { yield return e; }
 
-            var clock = _clockContainer.Item;
-            var currentTime = clock.GetCurrentTime();
+            var currentTime = _clock.GetCurrentTime();
 
             yield return new Fired(this, currentTime);
         }
@@ -171,7 +171,7 @@ namespace DarkDefenders.Domain.Entities.Creatures
             var xEnd = fallenFrom.X;
             var sign = direction.GetXIncrement();
 
-            var terrain = _terrainContainer.Item;
+            var terrain = _terrain;
             for (var x = xStart; (xEnd - x) * sign >= 0; x += sign)
             {
                 if(!terrain.AnyOpenWallsAt(Axis.Vertical, yStart, yEnd, x))

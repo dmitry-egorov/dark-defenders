@@ -1,10 +1,11 @@
-﻿using DarkDefenders.Domain.Infrastructure;
-using DarkDefenders.Dtos.Entities.Worlds;
-using DarkDefenders.Dtos.Infrastructure;
+﻿using DarkDefenders.Domain.Data.Entities.Worlds;
+using Infrastructure.Data;
+using Infrastructure.DDDES;
+using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Entities.Worlds.Events
 {
-    internal class SpawnHeroesChanged : DomainEvent<World, WorldId>
+    internal class SpawnHeroesChanged : Event<World>
     {
         private readonly bool _enabled;
 
@@ -18,9 +19,9 @@ namespace DarkDefenders.Domain.Entities.Worlds.Events
             world.SetSpawnHeroes(_enabled);
         }
 
-        protected override IEventDto CreateDto(WorldId id)
+        protected override object CreateData(IdentityOf<World> id)
         {
-            return new SpawnHeroesChangedDto(id, _enabled);
+            return new SpawnHeroesChangedData(id, _enabled);
         }
     }
 }

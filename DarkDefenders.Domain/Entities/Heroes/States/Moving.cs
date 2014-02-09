@@ -1,6 +1,6 @@
 using System.Collections.Generic;
+using DarkDefenders.Domain.Data.Entities.Heroes;
 using DarkDefenders.Domain.Entities.Creatures;
-using DarkDefenders.Dtos;
 using Infrastructure.DDDES;
 
 namespace DarkDefenders.Domain.Entities.Heroes.States
@@ -48,9 +48,9 @@ namespace DarkDefenders.Domain.Entities.Heroes.States
             }
         }
 
-        public HeroStateDto GetDto()
+        public HeroStateData GetData()
         {
-            return HeroStateDto.Moving;
+            return HeroStateData.Moving;
         }
     }
 }

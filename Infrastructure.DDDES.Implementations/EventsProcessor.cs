@@ -1,25 +1,22 @@
 ﻿using System.Collections.Generic;
-using Infrastructure.Util;
 
 namespace Infrastructure.DDDES.Implementations
 {
-    public class EventsProcessor<TEventDto> : IEventsProcessor
+    public class EventsProcessor<TEventData> : IEventsProcessor
     {
-        private readonly IEventsListener<TEventDto> _listener;
+        private readonly IEventsListener<TEventData> _listener;
 
-        public EventsProcessor(IEventsListener<TEventDto> listener)
+        public EventsProcessor(IEventsListener<TEventData> listener)
         {
             _listener = listener;
         }
 
         public void Process(IEnumerable<IEvent> events)
         {
-            var readOnly = events.AsReadOnly();
-
-            readOnly.ApplyAll();
-            foreach (var e in readOnly)
+            foreach (var e in events)
             {
-                _listener.Recieve((TEventDto) e.ToDto());
+                e.Apply();
+                _listener.Recieve((TEventData) e.GetData());
             }
         }
     }

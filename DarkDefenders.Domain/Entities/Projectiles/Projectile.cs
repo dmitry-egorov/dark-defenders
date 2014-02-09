@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using DarkDefenders.Domain.Entities.Projectiles.Events;
 using DarkDefenders.Domain.Entities.RigidBodies;
-using DarkDefenders.Dtos.Entities.Projectiles;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Entities.Projectiles
 {
-    internal class Projectile : Entity<ProjectileId>
+    public class Projectile : Entity<Projectile>
     {
         public const double Mass = 0.001;
         public const double BoundingBoxRadius = 0.1;
@@ -15,7 +14,7 @@ namespace DarkDefenders.Domain.Entities.Projectiles
         private readonly RigidBody _rigidBody;
         private readonly IStorage<Projectile> _storage;
 
-        public Projectile(IStorage<Projectile> storage, RigidBody rigidBody)
+        internal Projectile(IStorage<Projectile> storage, RigidBody rigidBody)
         {
             _storage = storage;
             _rigidBody = rigidBody;

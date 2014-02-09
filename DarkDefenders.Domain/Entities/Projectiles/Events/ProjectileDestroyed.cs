@@ -1,20 +1,20 @@
-﻿using DarkDefenders.Domain.Infrastructure;
-using DarkDefenders.Dtos.Entities.Projectiles;
-using DarkDefenders.Dtos.Infrastructure;
+﻿using DarkDefenders.Domain.Data.Entities.Projectiles;
+using Infrastructure.Data;
 using Infrastructure.DDDES;
+using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Entities.Projectiles.Events
 {
-    internal class ProjectileDestroyed : Destroyed<Projectile, ProjectileId>
+    internal class ProjectileDestroyed : Destroyed<Projectile>
     {
         public ProjectileDestroyed(Projectile root, IStorage<Projectile> storage) 
             : base(root, storage)
         {
         }
 
-        protected override IEventDto CreateDto(ProjectileId id)
+        protected override object CreateData(IdentityOf<Projectile> id)
         {
-            return new ProjectileDestroyedDto(id);
+            return new ProjectileDestroyedData(id);
         }
     }
 }

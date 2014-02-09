@@ -1,11 +1,12 @@
-using DarkDefenders.Domain.Infrastructure;
-using DarkDefenders.Dtos.Entities.Creatures;
-using DarkDefenders.Dtos.Infrastructure;
-using DarkDefenders.Dtos.Other;
+using DarkDefenders.Domain.Data.Entities.Creatures;
+using DarkDefenders.Domain.Data.Other;
+using Infrastructure.Data;
+using Infrastructure.DDDES;
+using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Entities.Creatures.Events
 {
-    internal class MovementChanged : DomainEvent<Creature, CreatureId>
+    internal class MovementChanged : Event<Creature>
     {
         private readonly Movement _movement;
 
@@ -19,9 +20,9 @@ namespace DarkDefenders.Domain.Entities.Creatures.Events
             creature.SetMovement(_movement);
         }
 
-        protected override IEventDto CreateDto(CreatureId id)
+        protected override object CreateData(IdentityOf<Creature> id)
         {
-            return new MovementChangedDto(id, _movement);
+            return new MovementChangedData(id, _movement);
         }
     }
 }

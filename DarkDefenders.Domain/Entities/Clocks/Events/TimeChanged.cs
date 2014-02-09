@@ -1,11 +1,12 @@
 ﻿using System;
-using DarkDefenders.Domain.Infrastructure;
-using DarkDefenders.Dtos.Entities.Clocks;
-using DarkDefenders.Dtos.Infrastructure;
+using DarkDefenders.Domain.Data.Entities.Clocks;
+using Infrastructure.Data;
+using Infrastructure.DDDES;
+using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Entities.Clocks.Events
 {
-    internal class TimeChanged : DomainEvent<Clock, ClockId>
+    internal class TimeChanged : Event<Clock>
     {
         private readonly TimeSpan _newTime;
 
@@ -20,9 +21,9 @@ namespace DarkDefenders.Domain.Entities.Clocks.Events
             clock.SetNewTime(_newTime);
         }
 
-        protected override IEventDto CreateDto(ClockId id)
+        protected override object CreateData(IdentityOf<Clock> id)
         {
-            return new TimeChangedDto(id, _newTime);
+            return new TimeChangedData(id, _newTime);
         }
     }
 }

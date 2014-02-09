@@ -1,19 +1,19 @@
-﻿using DarkDefenders.Domain.Infrastructure;
-using DarkDefenders.Dtos.Entities.Heroes;
-using DarkDefenders.Dtos.Infrastructure;
+﻿using DarkDefenders.Domain.Data.Entities.Heroes;
+using Infrastructure.Data;
 using Infrastructure.DDDES;
+using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Entities.Heroes.Events
 {
-    internal class HeroDestroyed : Destroyed<Hero, HeroId>
+    internal class HeroDestroyed : Destroyed<Hero>
     {
         public HeroDestroyed(Hero root, IStorage<Hero> storage) : base(root, storage)
         {
         }
 
-        protected override IEventDto CreateDto(HeroId id)
+        protected override object CreateData(IdentityOf<Hero> id)
         {
-            return new HeroDestroyedDto(id);
+            return new HeroDestroyedData(id);
         }
     }
 }

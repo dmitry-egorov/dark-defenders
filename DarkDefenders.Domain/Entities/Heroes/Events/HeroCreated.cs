@@ -1,37 +1,33 @@
 ﻿using System;
+using DarkDefenders.Domain.Data.Entities.Heroes;
 using DarkDefenders.Domain.Entities.Creatures;
-using DarkDefenders.Dtos.Entities.Heroes;
+using Infrastructure.Data;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Entities.Heroes.Events
 {
-    internal class HeroCreated: Created<Hero, HeroId>
+    internal class HeroCreated: Created<Hero>
     {
         private readonly IStorage<Hero> _storage;
         private readonly Random _random;
-        private readonly IContainer<Creature> _creatureContainer;
+        private readonly IContainer<Creature> _creature;
 
-        public HeroCreated(IStorage<Hero> storage, IContainer<Creature> creatureContainer, Random random) : base(storage)
+        public HeroCreated(IStorage<Hero> storage, IContainer<Creature> creature, Random random) : base(storage)
         {
             _storage = storage;
             _random = random;
-            _creatureContainer = creatureContainer;
+            _creature = creature;
         }
 
-
-        protected override object CreateDto(HeroId heroId)
+        protected override object CreateData(IdentityOf<Hero> heroId)
         {
-            var creatureId = _creatureContainer.Item.GetGlobalId();
-
-            return new HeroCreatedDto(heroId, creatureId);
+            return new HeroCreatedData(heroId, _creature.Item.Id);
         }
 
         protected override Hero Create()
         {
-            var creature = _creatureContainer.Item;
-
-            return new Hero(_storage, creature, _random);
+            return new Hero(_storage, _creature.Item, _random);
         }
     }
 }

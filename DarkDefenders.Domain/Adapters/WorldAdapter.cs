@@ -9,9 +9,9 @@ namespace DarkDefenders.Domain.Adapters
     internal class WorldAdapter : IWorld
     {
         private readonly IEventsProcessor _processor;
-        private readonly RootAdapter<World> _world;
+        private readonly EntityAdapter<World> _world;
 
-        public WorldAdapter(IEventsProcessor processor, RootAdapter<World> worldAdapter)
+        public WorldAdapter(IEventsProcessor processor, EntityAdapter<World> worldAdapter)
         {
             _processor = processor;
             _world = worldAdapter;
@@ -19,10 +19,7 @@ namespace DarkDefenders.Domain.Adapters
 
         public IPlayer AddPlayer()
         {
-            var storage = new Container<Creature>();
-            _world.Commit(x => x.SpawnPlayerAvatar(storage));
-
-            var creatureAdapter = new RootAdapter<Creature>(storage, _processor);
+            var creatureAdapter = _world.Commit(x => x.SpawnPlayerAvatar());
 
             return new PlayerAdapter(creatureAdapter);
         }

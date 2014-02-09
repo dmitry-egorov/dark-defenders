@@ -1,11 +1,12 @@
 ﻿using System;
-using DarkDefenders.Domain.Infrastructure;
-using DarkDefenders.Dtos.Entities.Worlds;
-using DarkDefenders.Dtos.Infrastructure;
+using DarkDefenders.Domain.Data.Entities.Worlds;
+using Infrastructure.Data;
+using Infrastructure.DDDES;
+using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Entities.Worlds.Events
 {
-    internal class HeroSpawnActivationTimeChanged : DomainEvent<World, WorldId>
+    internal class HeroSpawnActivationTimeChanged : Event<World>
     {
         private readonly TimeSpan _time;
 
@@ -19,9 +20,9 @@ namespace DarkDefenders.Domain.Entities.Worlds.Events
             world.SetHeroSpawnActivationTime(_time);
         }
 
-        protected override IEventDto CreateDto(WorldId id)
+        protected override object CreateData(IdentityOf<World> id)
         {
-            return new HeroSpawnActivationTimeChangedDto(id, _time);
+            return new HeroSpawnActivationTimeChangedData(id, _time);
         }
     }
 }

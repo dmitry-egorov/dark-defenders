@@ -34,46 +34,6 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Entities\Clocks\ClockId.cs" />
-    <Compile Include="Entities\Creatures\CreatureId.cs" />
-    <Compile Include="Entities\Heroes\HeroId.cs" />
-    <Compile Include="Entities\Projectiles\ProjectileId.cs" />
-    <Compile Include="Entities\RigidBodies\AcceleratedAndMovedDto.cs" />
-    <Compile Include="Entities\RigidBodies\AcceleratedDto.cs" />
-    <Compile Include="Entities\Clocks\ClockCreatedDto.cs" />
-    <Compile Include="Entities\Creatures\CreatureCreatedDto.cs" />
-    <Compile Include="Entities\Creatures\CreatureDestroyedDto.cs" />
-    <Compile Include="Entities\RigidBodies\ExternalForceChangedDto.cs" />
-    <Compile Include="Entities\Creatures\FiredDto.cs" />
-    <Compile Include="Entities\Heroes\HeroCreatedDto.cs" />
-    <Compile Include="Entities\Heroes\HeroDestroyedDto.cs" />
-    <Compile Include="Entities\RigidBodies\RigidBodyId.cs" />
-    <Compile Include="Entities\RigidBodies\RigidBodyInitialProperties.cs" />
-    <Compile Include="Entities\Terrains\TerrainId.cs" />
-    <Compile Include="Entities\Worlds\HeroSpawnActivationTimeChangedDto.cs" />
-    <Compile Include="Entities\RigidBodies\MovedDto.cs" />
-    <Compile Include="Entities\Creatures\MovementChangedDto.cs" />
-    <Compile Include="Entities\Worlds\PlayerAvatarSpawnedDto.cs" />
-    <Compile Include="Entities\Projectiles\ProjectileCreatedDto.cs" />
-    <Compile Include="Entities\Projectiles\ProjectileDestroyedDto.cs" />
-    <Compile Include="Entities\RigidBodies\RigidBodyCreatedDto.cs" />
-    <Compile Include="Entities\RigidBodies\RigidBodyDestroyedDto.cs" />
-    <Compile Include="Entities\Worlds\SpawnHeroesChangedDto.cs" />
-    <Compile Include="Entities\Heroes\StateChangedDto.cs" />
-    <Compile Include="Entities\Terrains\TerrainCreatedDto.cs" />
-    <Compile Include="Entities\Clocks\TimeChangedDto.cs" />
-    <Compile Include="Entities\Worlds\WorldCreatedDto.cs" />
-    <Compile Include="Entities\Worlds\WorldId.cs" />
-    <Compile Include="Entities\Worlds\WorldProperties.cs" />
-    <Compile Include="HeroStateDto.cs" />
-    <Compile Include="Infrastructure\EventDto.cs" />
-    <Compile Include="Infrastructure\IEventDto.cs" />
-    <Compile Include="Infrastructure\IEventDtoReciever.cs" />
-    <Compile Include="Entities\Creatures\CreatureProperties.cs" />
-    <Compile Include="Other\Direction.cs" />
-    <Compile Include="Other\Movement.cs" />
-    <Compile Include="Entities\RigidBodies\RigidBodyProperties.cs" />
-    <Compile Include="Other\Tile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

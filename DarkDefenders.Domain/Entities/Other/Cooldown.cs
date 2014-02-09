@@ -1,19 +1,18 @@
 ﻿using System;
 using DarkDefenders.Domain.Entities.Clocks;
-using Infrastructure.DDDES;
 
 namespace DarkDefenders.Domain.Entities.Other
 {
     internal class Cooldown
     {
-        private readonly IContainer<Clock> _clockContainer;
+        private readonly Clock _clock;
         private readonly TimeSpan _cooldownDelay;
 
         private TimeSpan _activationTime = TimeSpan.Zero;
 
-        public Cooldown(IContainer<Clock> clockContainer, TimeSpan cooldownDelay)
+        public Cooldown(Clock clock, TimeSpan cooldownDelay)
         {
-            _clockContainer = clockContainer;
+            _clock = clock;
             _cooldownDelay = cooldownDelay;
         }
 
@@ -24,8 +23,9 @@ namespace DarkDefenders.Domain.Entities.Other
 
         public bool IsInEffect()
         {
-            var clock = _clockContainer.Item;
-            return clock.GetCurrentTime() - _activationTime < _cooldownDelay;
+            var currentTime = _clock.GetCurrentTime();
+
+            return currentTime - _activationTime < _cooldownDelay;
         }
     }
 }

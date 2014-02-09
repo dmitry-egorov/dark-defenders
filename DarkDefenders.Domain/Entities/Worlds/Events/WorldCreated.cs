@@ -1,21 +1,16 @@
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using DarkDefenders.Domain.Data.Entities.Worlds;
 using DarkDefenders.Domain.Entities.Clocks;
 using DarkDefenders.Domain.Entities.Creatures;
 using DarkDefenders.Domain.Entities.Heroes;
-using DarkDefenders.Domain.Interfaces;
-using DarkDefenders.Dtos.Entities.Creatures;
-using DarkDefenders.Dtos.Entities.Worlds;
-using DarkDefenders.Dtos.Other;
+using DarkDefenders.Domain.Factories;
+using Infrastructure.Data;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
-using Infrastructure.Math;
-using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.Entities.Worlds.Events
 {
-    internal class WorldCreated : Created<World, WorldId>
+    internal class WorldCreated : Created<World>
     {
         private readonly CreatureFactory _creatureFactory;
         private readonly HeroFactory _heroFactory;
@@ -43,14 +38,14 @@ namespace DarkDefenders.Domain.Entities.Worlds.Events
             _worldProperties = worldProperties;
         }
 
-        protected override object CreateDto(WorldId rootId)
+        protected override object CreateData(IdentityOf<World> id)
         {
-            return new WorldCreatedDto(rootId, _worldProperties);
+            return new WorldCreatedData(id, _worldProperties);
         }
 
         protected override World Create()
         {
-            return new World(_heroFactory, _creatureFactory, _clockContainer, _random, _worldProperties);
+            return new World(_heroFactory, _creatureFactory, _clockContainer.Item, _random, _worldProperties);
         }
     }
 }

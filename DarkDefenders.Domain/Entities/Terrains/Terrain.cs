@@ -1,16 +1,15 @@
 ﻿using System.Runtime.CompilerServices;
-using DarkDefenders.Dtos.Entities.Terrains;
-using DarkDefenders.Dtos.Other;
+using DarkDefenders.Domain.Data.Other;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
 
 namespace DarkDefenders.Domain.Entities.Terrains
 {
-    internal class Terrain : Entity<TerrainId>
+    public class Terrain : Entity<Terrain>
     {
         private readonly Map<Tile> _map;
 
-        public Terrain(Map<Tile> map)
+        internal Terrain(Map<Tile> map)
         {
             _map = map;
         }

@@ -3,6 +3,6 @@
     public interface IEvent
     {
         void Apply();
-        object ToDto();
+        object GetData();
     }
 }

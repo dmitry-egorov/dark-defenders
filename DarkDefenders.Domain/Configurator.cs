@@ -1,5 +1,6 @@
 ﻿using System;
 using DarkDefenders.Domain.Adapters;
+using DarkDefenders.Domain.Data.Infrastructure;
 using DarkDefenders.Domain.Entities.Clocks;
 using DarkDefenders.Domain.Entities.Creatures;
 using DarkDefenders.Domain.Entities.Heroes;
@@ -7,8 +8,8 @@ using DarkDefenders.Domain.Entities.Projectiles;
 using DarkDefenders.Domain.Entities.RigidBodies;
 using DarkDefenders.Domain.Entities.Terrains;
 using DarkDefenders.Domain.Entities.Worlds;
+using DarkDefenders.Domain.Factories;
 using DarkDefenders.Domain.Interfaces;
-using DarkDefenders.Dtos.Infrastructure;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations;
 using Infrastructure.DDDES.Implementations.Domain;
@@ -48,7 +49,7 @@ namespace DarkDefenders.Domain
 
         private static IUnityContainer RegisterProcessor(this IUnityContainer container)
         {
-            return container.RegisterSingleton<EventsProcessor<IEventDto>, IEventsProcessor>();
+            return container.RegisterSingleton<EventsProcessor<EventDataBase>, IEventsProcessor>();
         }
 
         private static IUnityContainer RegisterContainerFor<T>(this IUnityContainer container) 

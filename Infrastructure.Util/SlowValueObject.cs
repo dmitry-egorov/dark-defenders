@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace Infrastructure.Util
 {
-    public abstract class SlowValueObject<T> : ValueObject<T>
+    public abstract class SlowValueObject : ValueObject<SlowValueObject>
     {
         protected override string ToStringInternal()
         {
@@ -43,7 +43,7 @@ namespace Infrastructure.Util
             return values.Aggregate(0, (hash, item) => (hash * 397) ^ GetHashCodeOf(item));
         }
 
-        protected override bool EqualsInternal(T other)
+        protected override bool EqualsInternal(SlowValueObject other)
         {
             var fields = GetFields().AsReadOnly();
 

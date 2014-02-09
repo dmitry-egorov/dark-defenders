@@ -40,13 +40,21 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DarkDefenders.Dtos\DarkDefenders.Dtos.csproj">
-      <Project>{26A20BD4-CC76-4E2E-BA4C-89E919E308B5}</Project>
-      <Name>DarkDefenders.Dtos</Name>
+    <ProjectReference Include="..\DarkDefenders.Domain\DarkDefenders.Domain.csproj">
+      <Project>{27F91716-3957-49C9-94BB-8AA160BF96AA}</Project>
+      <Name>DarkDefenders.Domain</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Data\Infrastructure.Data.csproj">
+      <Project>{96099472-811A-440D-85D2-5F0F44E09EE8}</Project>
+      <Name>Infrastructure.Data</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Math\Infrastructure.Math.csproj">
       <Project>{9DA761FD-492C-4BF7-A50D-10930664021D}</Project>
       <Name>Infrastructure.Math</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Physics\Infrastructure.Physics.csproj">
+      <Project>{305e7c2a-4803-47cd-84b8-5c9df6134395}</Project>
+      <Name>Infrastructure.Physics</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Util\Infrastructure.Util.csproj">
       <Project>{0B407BC3-7B5B-431A-96E7-A41F25AB27BE}</Project>

@@ -7,6 +7,11 @@ namespace Infrastructure.Util
 {
     public static class ObjectExtensions
     {
+        public static bool IsIn<T>(this T obj, params T[] objects) 
+        {
+            return objects.Any(o => obj.Equals(o));
+        }
+
         public static bool IsNot<T>(this object obj)
         {
             return !(obj is T);

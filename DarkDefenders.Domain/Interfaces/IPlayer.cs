@@ -1,4 +1,4 @@
-using DarkDefenders.Dtos.Other;
+using DarkDefenders.Domain.Data.Other;
 
 namespace DarkDefenders.Domain.Interfaces
 {

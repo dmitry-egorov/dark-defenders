@@ -1,15 +1,15 @@
-﻿using DarkDefenders.Domain.Entities.Creatures;
+﻿using DarkDefenders.Domain.Data.Other;
+using DarkDefenders.Domain.Entities.Creatures;
 using DarkDefenders.Domain.Interfaces;
-using DarkDefenders.Dtos.Other;
 using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Adapters
 {
     internal class PlayerAdapter : IPlayer
     {
-        private readonly RootAdapter<Creature> _creature;
+        private readonly EntityAdapter<Creature> _creature;
 
-        public PlayerAdapter(RootAdapter<Creature> creatureAdapter)
+        public PlayerAdapter(EntityAdapter<Creature> creatureAdapter)
         {
             _creature = creatureAdapter;
         }
