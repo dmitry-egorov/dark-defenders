@@ -80,7 +80,7 @@ namespace DarkDefenders.Domain.Files
                 y++;
             }
 
-            return new TerrainData(map.ToData(), playerSpawns.ToData(), heroSpawns.ToData());
+            return new TerrainData(map, playerSpawns.ToData(), heroSpawns.ToData());
         }
 
         public static TerrainData LoadFromMonochromeBmp(string path)
@@ -125,7 +125,7 @@ namespace DarkDefenders.Domain.Files
                     }
                 }
 
-                return new TerrainData(map.ToData(), playerSpawns.ToData(), heroSpawns.ToData());
+                return new TerrainData(map, playerSpawns.ToData(), heroSpawns.ToData());
             }
         }
 

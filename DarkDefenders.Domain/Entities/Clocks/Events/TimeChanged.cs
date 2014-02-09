@@ -1,7 +1,6 @@
 ﻿using System;
 using DarkDefenders.Domain.Data.Entities.Clocks;
 using Infrastructure.Data;
-using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Entities.Clocks.Events

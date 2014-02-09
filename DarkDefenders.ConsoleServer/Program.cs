@@ -111,7 +111,7 @@ namespace DarkDefenders.ConsoleServer
 
             var worldProperties = new WorldProperties(terrainData.PlayerSpawns, _playersAvatarProperties, terrainData.HeroSpawns, _heroesSpawnCooldown, _heroesCreatureProperties);
 
-            return game.Initialize(WorldFileName, terrainData.Map.ToMap(), worldProperties);
+            return game.Initialize(WorldFileName, terrainData.Map, worldProperties);
         }
 
         private static TerrainData LoadTerrain()

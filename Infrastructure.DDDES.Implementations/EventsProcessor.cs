@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace Infrastructure.DDDES.Implementations
 {
+    [UsedImplicitly]
     public class EventsProcessor<TEventData> : IEventsProcessor
     {
         private readonly IEventsListener<TEventData> _listener;

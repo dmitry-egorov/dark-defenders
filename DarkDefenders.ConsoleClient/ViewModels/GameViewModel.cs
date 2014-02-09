@@ -57,7 +57,8 @@ namespace DarkDefenders.ConsoleClient.ViewModels
         public void Recieve(TerrainCreatedData terrainCreated)
         {
             var data = TerrainLoader.LoadFromFile(terrainCreated.MapId);
-            _map = data.Map.ToMap();
+
+            _map = data.Map;
 
             SetViewPort();
             RenderWorld();
