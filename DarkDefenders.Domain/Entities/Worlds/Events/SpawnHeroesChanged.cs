@@ -1,5 +1,5 @@
-﻿using DarkDefenders.Domain.Infrastructure;
-
+﻿using DarkDefenders.Domain.Events;
+using DarkDefenders.Domain.Interfaces;
 using Infrastructure.DDDES;
 
 namespace DarkDefenders.Domain.Entities.Worlds.Events
@@ -19,7 +19,7 @@ namespace DarkDefenders.Domain.Entities.Worlds.Events
 
         protected override void Apply(World world)
         {
-            world.SetSpawnHeroes(_enabled);
+            world.SpawnHeroesChanged(_enabled);
         }
     }
 }

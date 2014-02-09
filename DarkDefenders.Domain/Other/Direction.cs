@@ -1,4 +1,4 @@
-﻿namespace DarkDefenders.Domain.Data.Other
+﻿namespace DarkDefenders.Domain.Other
 {
     public enum Direction: byte
     {

@@ -52,8 +52,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CompositeEventsListener.cs" />
-    <Compile Include="CountingEventsListener.cs" />
     <Compile Include="Renderer\ConsoleRenderer.cs" />
     <Compile Include="EventDataListener.cs" />
     <Compile Include="KeyboardState.cs" />
@@ -61,8 +59,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Renderer\IConsoleRenderer.cs" />
-    <Compile Include="ViewModels\GameViewModel.cs" />
-    <Compile Include="ViewModels\RigidBodyViewModel.cs" />
+    <Compile Include="Presenters\GamePresenter.cs" />
+    <Compile Include="Presenters\RigidBodyPresenter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

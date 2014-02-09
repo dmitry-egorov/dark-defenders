@@ -1,6 +1,6 @@
 using System;
-using DarkDefenders.Domain.Data.Other;
 using DarkDefenders.Domain.Entities.Worlds;
+using DarkDefenders.Domain.Other;
 using Infrastructure.Math;
 
 namespace DarkDefenders.Domain.Interfaces

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DarkDefenders.Domain.Data.Other
+namespace DarkDefenders.Domain.Other
 {
     public static class MovementExtensions
     {

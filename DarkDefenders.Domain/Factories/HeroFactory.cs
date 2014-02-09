@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using DarkDefenders.Domain.Data.Entities.Creatures;
+using DarkDefenders.Domain.Entities.Creatures;
 using DarkDefenders.Domain.Entities.Heroes;
 using DarkDefenders.Domain.Entities.Heroes.Events;
 using Infrastructure.DDDES;

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using DarkDefenders.Domain.Data.Other;
+using DarkDefenders.Domain.Other;
 using Infrastructure.Math;
 using Infrastructure.Util;
 

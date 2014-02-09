@@ -1,6 +1,7 @@
 ﻿using System;
 using DarkDefenders.Domain.Entities.Creatures;
-using DarkDefenders.Domain.Infrastructure;
+using DarkDefenders.Domain.Events;
+using DarkDefenders.Domain.Interfaces;
 using Infrastructure.DDDES;
 
 namespace DarkDefenders.Domain.Entities.Heroes.Events
@@ -9,23 +10,23 @@ namespace DarkDefenders.Domain.Entities.Heroes.Events
     {
         private readonly IStorage<Hero> _storage;
         private readonly Random _random;
-        private readonly IContainer<Creature> _creature;
+        private readonly IContainer<Creature> _creatureContainer;
 
-        public HeroCreated(IStorage<Hero> storage, IContainer<Creature> creature, Random random) : base(storage)
+        public HeroCreated(IStorage<Hero> storage, IContainer<Creature> creatureContainer, Random random) : base(storage)
         {
             _storage = storage;
             _random = random;
-            _creature = creature;
+            _creatureContainer = creatureContainer;
         }
 
         protected override Hero Create()
         {
-            return new Hero(_storage, _creature.Item, _random);
+            return new Hero(_storage, _creatureContainer.Item, _random);
         }
 
         protected override void Accept(IEventsReciever reciever, IdentityOf<Hero> id)
         {
-            reciever.HeroCreated(_creature.Item.Id);
+            reciever.HeroCreated(_creatureContainer.Item.Id);
         }
     }
 }

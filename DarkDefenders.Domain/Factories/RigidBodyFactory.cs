@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using DarkDefenders.Domain.Data.Entities.RigidBodies;
 using DarkDefenders.Domain.Entities.Clocks;
 using DarkDefenders.Domain.Entities.RigidBodies;
 using DarkDefenders.Domain.Entities.RigidBodies.Events;

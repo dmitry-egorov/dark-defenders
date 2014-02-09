@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DarkDefenders.Domain.Data.Entities.Creatures;
+using DarkDefenders.Domain.Entities.Creatures;
 using Infrastructure.Math;
 using Infrastructure.Util;
 

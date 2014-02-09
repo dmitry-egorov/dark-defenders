@@ -1,4 +1,5 @@
-using DarkDefenders.Domain.Infrastructure;
+using DarkDefenders.Domain.Events;
+using DarkDefenders.Domain.Interfaces;
 using Infrastructure.DDDES;
 using Infrastructure.Physics;
 

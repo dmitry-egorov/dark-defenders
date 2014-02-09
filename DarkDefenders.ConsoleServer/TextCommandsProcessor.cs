@@ -37,7 +37,7 @@ namespace DarkDefenders.ConsoleServer
 
             var commandTextParts = commandText.Split(' ');
 
-            if (commandTextParts[0] == "spawn")
+            if (commandTextParts.Length == 2 && commandTextParts[0] == "spawn")
             {
                 var enable = commandTextParts[1] == "enable";
                 action = () => _world.ChangeSpawnHeroes(enable);

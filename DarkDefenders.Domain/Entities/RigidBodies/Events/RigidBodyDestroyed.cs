@@ -1,13 +1,13 @@
-using DarkDefenders.Domain.Infrastructure;
-
+using DarkDefenders.Domain.Events;
+using DarkDefenders.Domain.Interfaces;
 using Infrastructure.DDDES;
-using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Entities.RigidBodies.Events
 {
     internal class RigidBodyDestroyed : Destroyed<RigidBody>
     {
-        public RigidBodyDestroyed(RigidBody root, IStorage<RigidBody> storage) : base(root, storage)
+        public RigidBodyDestroyed(RigidBody root, IStorage<RigidBody> storage) 
+            : base(root, storage)
         {
         }
 

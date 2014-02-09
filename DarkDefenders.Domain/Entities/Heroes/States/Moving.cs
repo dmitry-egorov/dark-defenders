@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using DarkDefenders.Domain.Data.Entities.Heroes;
 using DarkDefenders.Domain.Entities.Creatures;
 using Infrastructure.DDDES;
 
@@ -46,11 +45,6 @@ namespace DarkDefenders.Domain.Entities.Heroes.States
 
                 foreach (var e in stop) yield return e;
             }
-        }
-
-        public HeroState GetData()
-        {
-            return HeroState.Moving;
         }
     }
 }

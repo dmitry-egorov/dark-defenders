@@ -1,4 +1,5 @@
-using DarkDefenders.Domain.Infrastructure;
+using DarkDefenders.Domain.Events;
+using DarkDefenders.Domain.Interfaces;
 using Infrastructure.DDDES;
 using Infrastructure.Math;
 using Infrastructure.Physics;
@@ -25,7 +26,7 @@ namespace DarkDefenders.Domain.Entities.RigidBodies.Events
         protected override void Apply(RigidBody rigidBody)
         {
             rigidBody.Accelerated(_newMomentum);
-            rigidBody.SetNewPosition(_newPosition);
+            rigidBody.Moved(_newPosition);
         }
     }
 }

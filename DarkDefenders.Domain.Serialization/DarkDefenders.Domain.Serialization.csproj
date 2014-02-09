@@ -66,6 +66,10 @@
       <Project>{75E3B4B6-49F0-4064-967F-3C125C7CE19D}</Project>
       <Name>Infrastructure.Serialization</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Util\Infrastructure.Util.csproj">
+      <Project>{0B407BC3-7B5B-431A-96E7-A41F25AB27BE}</Project>
+      <Name>Infrastructure.Util</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

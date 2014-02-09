@@ -1,6 +1,6 @@
 namespace Infrastructure.DDDES.Implementations.Domain
 {
-    public abstract class EventOf<TEntity, TReciever> : IEvent, IAcceptorOf<TReciever> 
+    public abstract class EventOf<TEntity, TReciever> : IEvent, IAcceptorOf<TReciever>
         where TEntity: IEntity<TEntity>
     {
         private readonly TEntity _root;

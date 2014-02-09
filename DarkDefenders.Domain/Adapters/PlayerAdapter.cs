@@ -1,6 +1,6 @@
-﻿using DarkDefenders.Domain.Data.Other;
-using DarkDefenders.Domain.Entities.Creatures;
+﻿using DarkDefenders.Domain.Entities.Creatures;
 using DarkDefenders.Domain.Interfaces;
+using DarkDefenders.Domain.Other;
 using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Adapters

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using DarkDefenders.Domain.Data.Entities.RigidBodies;
 using DarkDefenders.Domain.Entities.Projectiles;
 using DarkDefenders.Domain.Entities.Projectiles.Events;
 using DarkDefenders.Domain.Entities.RigidBodies;

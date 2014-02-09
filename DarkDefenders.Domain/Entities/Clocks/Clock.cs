@@ -36,7 +36,7 @@ namespace DarkDefenders.Domain.Entities.Clocks
             yield return new TimeChanged(this, newTime);
         }
 
-        internal void SetNewTime(TimeSpan newTime)
+        internal void TimeChanged(TimeSpan newTime)
         {
             _elapsedSeconds = (newTime - _currentTime).ToSeconds();
             _currentTime = newTime;

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using DarkDefenders.Domain.Data.Entities.Creatures;
-using DarkDefenders.Domain.Data.Other;
 using DarkDefenders.Domain.Entities.Clocks;
 using DarkDefenders.Domain.Entities.Creatures.Events;
 using DarkDefenders.Domain.Entities.Other;
@@ -10,6 +8,7 @@ using DarkDefenders.Domain.Entities.Projectiles;
 using DarkDefenders.Domain.Entities.RigidBodies;
 using DarkDefenders.Domain.Entities.Terrains;
 using DarkDefenders.Domain.Factories;
+using DarkDefenders.Domain.Other;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
@@ -43,7 +42,6 @@ namespace DarkDefenders.Domain.Entities.Creatures
 
         internal Creature(IStorage<Creature> storage, ProjectileFactory projectileFactory, Clock clock, Terrain terrain, RigidBody rigidBody, CreatureProperties properties) 
         {
-            
             _terrain = terrain;
             _rigidBody = rigidBody;
             _storage = storage;
@@ -70,7 +68,7 @@ namespace DarkDefenders.Domain.Entities.Creatures
 
             yield return new MovementChanged(this, movement);
 
-            var movementForce = GetMovementForce(movement);
+            var movementForce = GetMovementForceFor(movement);
 
             var events = _rigidBody.ChangeExternalForce(movementForce);
 
@@ -183,14 +181,14 @@ namespace DarkDefenders.Domain.Entities.Creatures
             return true;
         }
 
-        internal void SetMovement(Movement movement)
+        internal void MovementChanged(Movement movement)
         {
             _movement = movement;
             _direction = GetDirection();
             _projectileMomentum = GetProjectileMomentum();
         }
 
-        internal void SetFireActivationTime(TimeSpan activationTime)
+        internal void Fired(TimeSpan activationTime)
         {
             _fireCooldown.SetLastActivationTime(activationTime);
         }
@@ -218,7 +216,7 @@ namespace DarkDefenders.Domain.Entities.Creatures
             }
         }
 
-        private Force GetMovementForce(Movement desiredMovement)
+        private Force GetMovementForceFor(Movement desiredMovement)
         {
             var force = GetMovementForceDirection(desiredMovement);
 

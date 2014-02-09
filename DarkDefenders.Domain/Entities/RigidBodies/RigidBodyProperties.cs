@@ -1,7 +1,7 @@
 ﻿using Infrastructure.Util;
 using ProtoBuf;
 
-namespace DarkDefenders.Domain.Data.Entities.RigidBodies
+namespace DarkDefenders.Domain.Entities.RigidBodies
 {
     [ProtoContract]
     public class RigidBodyProperties : SlowValueObject

@@ -1,9 +1,9 @@
-﻿using DarkDefenders.Domain.Data.Entities.Creatures;
-using DarkDefenders.Domain.Entities.Clocks;
+﻿using DarkDefenders.Domain.Entities.Clocks;
 using DarkDefenders.Domain.Entities.RigidBodies;
 using DarkDefenders.Domain.Entities.Terrains;
+using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.Factories;
-using DarkDefenders.Domain.Infrastructure;
+using DarkDefenders.Domain.Interfaces;
 using Infrastructure.DDDES;
 
 namespace DarkDefenders.Domain.Entities.Creatures.Events

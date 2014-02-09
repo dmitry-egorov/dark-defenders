@@ -38,10 +38,14 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Domain\ActionAcceptorOf.cs" />
+    <Compile Include="Domain\CompositeEventsListener.cs" />
     <Compile Include="Domain\CompositeStorage.cs" />
     <Compile Include="Domain\Container.cs" />
+    <Compile Include="Domain\CountingEventsListener.cs" />
     <Compile Include="Domain\Creation.cs" />
     <Compile Include="Domain\CreationExtensions.cs" />
+    <Compile Include="Domain\DelegatingEventsListener.cs" />
     <Compile Include="Domain\DestroyedData.cs" />
     <Compile Include="Domain\Entity.cs" />
     <Compile Include="Domain\Factory.cs" />

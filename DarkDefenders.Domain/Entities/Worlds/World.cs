@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using DarkDefenders.Domain.Data.Entities.Creatures;
 using DarkDefenders.Domain.Entities.Clocks;
 using DarkDefenders.Domain.Entities.Creatures;
 using DarkDefenders.Domain.Entities.Heroes;
@@ -91,12 +90,12 @@ namespace DarkDefenders.Domain.Entities.Worlds
             return events.ConcatEvent(new HeroSpawnActivationTimeChanged(this, currentTime));
         }
 
-        internal void SetSpawnHeroes(bool enabled)
+        internal void SpawnHeroesChanged(bool enabled)
         {
             _spawnHeroes = enabled;
         }
 
-        internal void SetHeroSpawnActivationTime(TimeSpan activationTime)
+        internal void HeroSpawnActivationTimeChanged(TimeSpan activationTime)
         {
             _heroSpawnCooldown.SetLastActivationTime(activationTime);
         }

@@ -1,7 +1,7 @@
 using System.IO;
 using DarkDefenders.Domain.Entities.Creatures;
 using DarkDefenders.Domain.Entities.RigidBodies;
-using DarkDefenders.Domain.Infrastructure;
+using DarkDefenders.Domain.Interfaces;
 using Infrastructure.DDDES;
 using Infrastructure.Math;
 using Infrastructure.Serialization;

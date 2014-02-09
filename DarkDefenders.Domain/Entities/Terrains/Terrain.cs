@@ -1,5 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
-using DarkDefenders.Domain.Data.Other;
+using DarkDefenders.Domain.Other;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
 

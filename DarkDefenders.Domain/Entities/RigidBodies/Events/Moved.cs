@@ -1,5 +1,5 @@
-using DarkDefenders.Domain.Infrastructure;
-
+using DarkDefenders.Domain.Events;
+using DarkDefenders.Domain.Interfaces;
 using Infrastructure.DDDES;
 using Infrastructure.Math;
 
@@ -21,7 +21,7 @@ namespace DarkDefenders.Domain.Entities.RigidBodies.Events
 
         protected override void Apply(RigidBody rigidBody)
         {
-            rigidBody.SetNewPosition(_newPosition);
+            rigidBody.Moved(_newPosition);
         }
     }
 }

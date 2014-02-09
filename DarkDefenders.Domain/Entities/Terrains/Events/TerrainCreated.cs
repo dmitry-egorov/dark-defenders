@@ -1,6 +1,6 @@
-﻿using DarkDefenders.Domain.Data.Other;
-using DarkDefenders.Domain.Infrastructure;
-
+﻿using DarkDefenders.Domain.Events;
+using DarkDefenders.Domain.Interfaces;
+using DarkDefenders.Domain.Other;
 using Infrastructure.DDDES;
 using Infrastructure.Math;
 

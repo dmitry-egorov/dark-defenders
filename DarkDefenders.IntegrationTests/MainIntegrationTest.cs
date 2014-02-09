@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using DarkDefenders.Domain;
-using DarkDefenders.Domain.Data.Entities.Creatures;
-using DarkDefenders.Domain.Data.Entities.RigidBodies;
-using DarkDefenders.Domain.Data.Other;
 using DarkDefenders.Domain.Entities.Creatures;
 using DarkDefenders.Domain.Entities.RigidBodies;
 using DarkDefenders.Domain.Entities.Worlds;
-using DarkDefenders.Domain.Infrastructure;
+using DarkDefenders.Domain.Events;
+using DarkDefenders.Domain.Interfaces;
+using DarkDefenders.Domain.Other;
 using Infrastructure.DDDES;
+using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
 using Infrastructure.Util;
 using Moq;
@@ -62,7 +62,7 @@ namespace DarkDefenders.IntegrationTests
             reciever.Setup(x => x.PlayerAvatarSpawned(expectedCreatureId));
             reciever.Setup(x => x.Moved(expectedRigidBodyId, newPosition));
 
-            var eventsProcessor = new FakeEventsProcessor(reciever.Object);
+            var eventsProcessor = DelegatingEventsListener.Create(reciever.Object);
             var game = GameFactory.Create(eventsProcessor);
 
             var world = game.Initialize(mapId, map, _worldProperties);
@@ -73,24 +73,6 @@ namespace DarkDefenders.IntegrationTests
             game.Update(elapsed);
 
             reciever.VerifyAll();
-        }
-
-        private class FakeEventsProcessor : IEventsListener<IEventsReciever>
-        {
-            private readonly IEventsReciever _reciever;
-
-            public FakeEventsProcessor(IEventsReciever reciever)
-            {
-                _reciever = reciever;
-            }
-
-            public void Recieve(IEnumerable<IAcceptorOf<IEventsReciever>> events)
-            {
-                foreach (var e in events)
-                {
-                    e.Accept(_reciever);
-                }
-            }
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using DarkDefenders.Domain.Data.Entities.RigidBodies;
-using Infrastructure.Math;
+﻿using Infrastructure.Math;
 using Infrastructure.Physics;
 using Infrastructure.Util;
 

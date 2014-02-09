@@ -7,12 +7,12 @@ namespace Infrastructure.Serialization
 {
     public static class SerializationExtensions
     {
-        public static void UsingBinaryReader(this byte[] buffer, Action<BinaryReader> action)
+        public static T UsingBinaryReader<T>(this byte[] buffer, Func<BinaryReader, T> action)
         {
             using (var stream = new MemoryStream(buffer))
             using (var reader = new BinaryReader(stream))
             {
-                action(reader);
+                return action(reader);
             }
         }
 

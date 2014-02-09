@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using System.Globalization;
 using DarkDefenders.ConsoleClient.Renderer;
-using DarkDefenders.Domain.Data.Other;
 using DarkDefenders.Domain.Entities.Creatures;
 using DarkDefenders.Domain.Entities.RigidBodies;
 using DarkDefenders.Domain.Files;
-using DarkDefenders.Domain.Infrastructure;
+using DarkDefenders.Domain.Interfaces;
+using DarkDefenders.Domain.Other;
 using Infrastructure.DDDES;
 using Infrastructure.Math;
 
-namespace DarkDefenders.ConsoleClient.ViewModels
+namespace DarkDefenders.ConsoleClient.Presenters
 {
-    internal class GameViewModel : IEventsReciever
+    internal class GamePresenter : IEventsReciever
     {
         private IConsoleRenderer _consoleRenderer;
-        private readonly Dictionary<IdentityOf<RigidBody>, RigidBodyViewModel> _viewModelsMap = new Dictionary<IdentityOf<RigidBody>, RigidBodyViewModel>();
+        private readonly Dictionary<IdentityOf<RigidBody>, RigidBodyPresenter> _viewModelsMap = new Dictionary<IdentityOf<RigidBody>, RigidBodyPresenter>();
         private readonly Dictionary<IdentityOf<Creature>, IdentityOf<RigidBody>> _rigidBodyIdsMap = new Dictionary<IdentityOf<Creature>, IdentityOf<RigidBody>>();
 
         private Vector _lastCreaturePosition = Vector.Zero;
@@ -24,7 +24,7 @@ namespace DarkDefenders.ConsoleClient.ViewModels
         private int _totalHeroesSpawned;
         private bool _creaturesRenderingEnabled = true;
 
-        public GameViewModel()
+        public GamePresenter()
         {
             _consoleRenderer = new EmptyConsoleRenderer();
         }
@@ -41,7 +41,7 @@ namespace DarkDefenders.ConsoleClient.ViewModels
 
         public void RigidBodyCreated(IdentityOf<RigidBody> id, Vector position)
         {
-            var creatureViewModel = new RigidBodyViewModel(_map, _consoleRenderer);
+            var creatureViewModel = new RigidBodyPresenter(_map, _consoleRenderer);
             _viewModelsMap.Add(id, creatureViewModel);
 
             creatureViewModel.RigidBodyCreated(position);

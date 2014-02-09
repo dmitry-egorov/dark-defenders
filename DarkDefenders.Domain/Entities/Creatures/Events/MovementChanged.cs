@@ -1,5 +1,6 @@
-using DarkDefenders.Domain.Data.Other;
-using DarkDefenders.Domain.Infrastructure;
+using DarkDefenders.Domain.Events;
+using DarkDefenders.Domain.Interfaces;
+using DarkDefenders.Domain.Other;
 using Infrastructure.DDDES;
 
 namespace DarkDefenders.Domain.Entities.Creatures.Events
@@ -19,7 +20,7 @@ namespace DarkDefenders.Domain.Entities.Creatures.Events
 
         protected override void Apply(Creature creature)
         {
-            creature.SetMovement(_movement);
+            creature.MovementChanged(_movement);
         }
     }
 }

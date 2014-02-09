@@ -1,5 +1,6 @@
 using DarkDefenders.Domain.Entities.RigidBodies;
-using DarkDefenders.Domain.Infrastructure;
+using DarkDefenders.Domain.Events;
+using DarkDefenders.Domain.Interfaces;
 using Infrastructure.DDDES;
 
 namespace DarkDefenders.Domain.Entities.Projectiles.Events

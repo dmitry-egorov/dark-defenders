@@ -1,6 +1,6 @@
 using DarkDefenders.Domain.Entities.Creatures;
-using DarkDefenders.Domain.Infrastructure;
-
+using DarkDefenders.Domain.Events;
+using DarkDefenders.Domain.Interfaces;
 using Infrastructure.DDDES;
 
 namespace DarkDefenders.Domain.Entities.Worlds.Events

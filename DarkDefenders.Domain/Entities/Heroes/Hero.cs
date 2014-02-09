@@ -10,6 +10,8 @@ namespace DarkDefenders.Domain.Entities.Heroes
 {
     public class Hero : Entity<Hero>
     {
+        private readonly IStorage<Hero> _storage;
+        private IHeroState _state;
         private readonly Creature _creature;
 
         internal Hero(IStorage<Hero> storage, Creature creature, Random random)
@@ -37,12 +39,9 @@ namespace DarkDefenders.Domain.Entities.Heroes
             foreach (var e in events) { yield return e; }
         }
 
-        internal void SetState(IHeroState heroState)
+        internal void StateChanged(IHeroState heroState)
         {
             _state = heroState;
         }
-
-        private readonly IStorage<Hero> _storage;
-        private IHeroState _state;
     }
 }

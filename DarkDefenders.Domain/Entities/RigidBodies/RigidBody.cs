@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using DarkDefenders.Domain.Data.Entities.RigidBodies;
-using DarkDefenders.Domain.Data.Other;
 using DarkDefenders.Domain.Entities.Clocks;
 using DarkDefenders.Domain.Entities.RigidBodies.Events;
 using DarkDefenders.Domain.Entities.Terrains;
+using DarkDefenders.Domain.Other;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
@@ -20,8 +19,8 @@ namespace DarkDefenders.Domain.Entities.RigidBodies
         private const double FrictionCoefficient = 400.0;
 
         private readonly IStorage<RigidBody> _storage;
-        private readonly IContainer<Clock> _clockContainer;
-        private readonly IContainer<Terrain> _terrainContainer;
+        private readonly Clock _clock;
+        private readonly Terrain _terrain;
 
         private readonly double _mass;
         private readonly double _topHorizontalMomentum;
@@ -43,20 +42,20 @@ namespace DarkDefenders.Domain.Entities.RigidBodies
         internal RigidBody
         (
             IStorage<RigidBody> storage, 
-            IContainer<Clock> clockContainer, 
-            IContainer<Terrain> terrainContainer, 
+            Clock clock, 
+            Terrain terrain, 
             RigidBodyInitialProperties properties
         )
         {
-            _terrainContainer = terrainContainer;
+            _storage = storage;
+            _clock = clock;
+            _terrain = terrain;
 
             var radius = properties.Properties.BoundingBoxRadius;
 
             _momentum = properties.InitialMomentum;
             _topHorizontalMomentum = properties.Properties.TopHorizontalMomentum;
             _boundingBox = new Box(properties.Position, radius, radius);
-            _storage = storage;
-            _clockContainer = clockContainer;
             _externalForce = Force.Zero;
             _mass = properties.Properties.Mass;
 
@@ -162,7 +161,7 @@ namespace DarkDefenders.Domain.Entities.RigidBodies
             var x = BoundSlotX(direction);
             var y = Level();
 
-            return _terrainContainer.Item.AnyOpenWallsAt(Axis.Vertical, y + heightStart, y + heightEnd, x);
+            return _terrain.AnyOpenWallsAt(Axis.Vertical, y + heightStart, y + heightEnd, x);
         }
 
         public int Level()
@@ -204,6 +203,20 @@ namespace DarkDefenders.Domain.Entities.RigidBodies
             return bottom.PrevInteger().ToInt();
         }
 
+        internal void Accelerated(Momentum newMomentum)
+        {
+            _momentum = newMomentum;
+
+            PrepareMomentumIsZero();
+        }
+
+        internal void Moved(Vector newPosition)
+        {
+            _boundingBox = _boundingBox.ChangePosition(newPosition);
+
+            PrepareTouching();
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool TryUpdateMomentum(out Momentum newMomentum)
         {
@@ -213,7 +226,7 @@ namespace DarkDefenders.Domain.Entities.RigidBodies
                 return false;
             }
 
-            var elapsed = _clockContainer.Item.GetElapsedSeconds();
+            var elapsed = _clock.GetElapsedSeconds();
 
             var force = GetForce(elapsed);
 
@@ -242,26 +255,12 @@ namespace DarkDefenders.Domain.Entities.RigidBodies
                 return false;
             }
 
-            var elapsedSeconds = _clockContainer.Item.GetElapsedSeconds();
+            var elapsedSeconds = _clock.GetElapsedSeconds();
 
             var positionChange = momentum * elapsedSeconds * (1.0 / _mass);
 
             newPosition = ApplyPositionChange(positionChange);
             return true;
-        }
-
-        public void Accelerated(Momentum newMomentum)
-        {
-            _momentum = newMomentum;
-
-            PrepareMomentumIsZero();
-        }
-
-        public void SetNewPosition(Vector newPosition)
-        {
-            _boundingBox = _boundingBox.ChangePosition(newPosition);
-
-            PrepareTouching();
         }
 
         private void PrepareTouching()
@@ -490,7 +489,7 @@ namespace DarkDefenders.Domain.Entities.RigidBodies
             var start = (mainCenter - radius).TolerantFloor().ToInt();
             var end = (mainCenter + radius).PrevInteger().ToInt();
 
-            return _terrainContainer.Item.AnySolidWallsAt(axis, start, end, other);
+            return _terrain.AnySolidWallsAt(axis, start, end, other);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

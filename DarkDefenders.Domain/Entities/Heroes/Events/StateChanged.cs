@@ -1,5 +1,6 @@
 ﻿using DarkDefenders.Domain.Entities.Heroes.States;
-using DarkDefenders.Domain.Infrastructure;
+using DarkDefenders.Domain.Events;
+using DarkDefenders.Domain.Interfaces;
 using Infrastructure.DDDES;
 
 namespace DarkDefenders.Domain.Entities.Heroes.Events
@@ -19,7 +20,7 @@ namespace DarkDefenders.Domain.Entities.Heroes.Events
 
         protected override void Apply(Hero hero)
         {
-            hero.SetState(_state);
+            hero.StateChanged(_state);
         }
     }
 }

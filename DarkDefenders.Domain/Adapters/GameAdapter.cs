@@ -1,5 +1,4 @@
 ﻿using System;
-using DarkDefenders.Domain.Data.Other;
 using DarkDefenders.Domain.Entities.Clocks;
 using DarkDefenders.Domain.Entities.Heroes;
 using DarkDefenders.Domain.Entities.Projectiles;
@@ -7,8 +6,8 @@ using DarkDefenders.Domain.Entities.RigidBodies;
 using DarkDefenders.Domain.Entities.Terrains;
 using DarkDefenders.Domain.Entities.Worlds;
 using DarkDefenders.Domain.Factories;
-using DarkDefenders.Domain.Infrastructure;
 using DarkDefenders.Domain.Interfaces;
+using DarkDefenders.Domain.Other;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations;
 using Infrastructure.DDDES.Implementations.Domain;
@@ -33,10 +32,19 @@ namespace DarkDefenders.Domain.Adapters
         private EntityAdapter<World> _world;
         private EntityAdapter<Clock> _clock;
 
-
-        public GameAdapter(EventsProcessor<IEventsReciever> processor, ClockFactory clockFactory, TerrainFactory terrainFactory, WorldFactory worldFactory, IContainer<World> worldContainer, IRepository<Hero> heroRepository, IRepository<RigidBody> rigidBodyRepository, IRepository<Projectile> projectileRepository, IContainer<Clock> clockContainer)
+        public GameAdapter
+        (
+            EventsProcessor<IEventsReciever> processor, 
+            ClockFactory clockFactory, 
+            TerrainFactory terrainFactory, 
+            WorldFactory worldFactory, 
+            IRepository<Hero> heroRepository, 
+            IRepository<RigidBody> rigidBodyRepository, 
+            IRepository<Projectile> projectileRepository
+        )
         {
             _processor = processor;
+
             _clockFactory = new FactoryAdapter<Clock, ClockFactory>(clockFactory, _processor);
             _terrainFactory = new FactoryAdapter<Terrain, TerrainFactory>(terrainFactory, _processor);
             _worldFactory = new FactoryAdapter<World, WorldFactory>(worldFactory, _processor);

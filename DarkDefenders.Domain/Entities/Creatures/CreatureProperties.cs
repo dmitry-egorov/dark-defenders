@@ -1,8 +1,8 @@
-﻿using DarkDefenders.Domain.Data.Entities.RigidBodies;
+﻿using DarkDefenders.Domain.Entities.RigidBodies;
 using Infrastructure.Util;
 using ProtoBuf;
 
-namespace DarkDefenders.Domain.Data.Entities.Creatures
+namespace DarkDefenders.Domain.Entities.Creatures
 {
     [ProtoContract]
     public class CreatureProperties: SlowValueObject

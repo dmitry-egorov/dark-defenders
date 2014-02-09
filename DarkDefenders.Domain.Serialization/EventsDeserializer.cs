@@ -1,126 +1,123 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using DarkDefenders.Domain.Entities.Creatures;
 using DarkDefenders.Domain.Entities.RigidBodies;
-using DarkDefenders.Domain.Infrastructure;
+using DarkDefenders.Domain.Interfaces;
 using DarkDefenders.Domain.Serialization.Internals;
 using Infrastructure.Serialization;
+using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.Serialization
 {
     public class EventsDeserializer
     {
-        private readonly IEventsReciever _reciever;
-
-        public EventsDeserializer(IEventsReciever reciever)
+        public IEnumerable<Action<IEventsReciever>> Deserialize(byte[] eventData)
         {
-            _reciever = reciever;
+            return eventData.UsingBinaryReader(reader => Read(reader).AsReadOnly());
         }
 
-        public void Deserialize(byte[] eventData)
+        private static IEnumerable<Action<IEventsReciever>> Read(BinaryReader reader)
         {
-            eventData.UsingBinaryReader(reader =>
+            while (reader.PeekChar() != -1)
             {
-                while (reader.PeekChar() != -1)
-                {
-                    var eventType = (SerializableEvents)reader.ReadInt16();
+                var eventType = (SerializableEvents) reader.ReadInt16();
 
-                    switch (eventType)
-                    {
-                        case SerializableEvents.TerrainCreated:
-                            ReadTerrainCreated(reader);
-                            break;
-                        case SerializableEvents.RigidBodyCreated:
-                            ReadRigidBodyCreated(reader);
-                            break;
-                        case SerializableEvents.RigidBodyDestroyed:
-                            ReadRigidBodyDestroyed(reader);
-                            break;
-                        case SerializableEvents.Moved:
-                            ReadMoved(reader);
-                            break;
-                        case SerializableEvents.CreatureCreated:
-                            ReadCreatureCreated(reader);
-                            break;
-                        case SerializableEvents.HeroCreated:
-                            ReadHeroCreated(reader);
-                            break;
-                        case SerializableEvents.HeroDestroyed:
-                            ReadHeroDestroyed(reader);
-                            break;
-                        case SerializableEvents.PlayerAvatarSpawned:
-                            ReadPlayerAvatarSpawned(reader);
-                            break;
-                        case SerializableEvents.ProjectileCreated:
-                            ReadProjectileCreated(reader);
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
+                switch (eventType)
+                {
+                    case SerializableEvents.TerrainCreated:
+                        yield return ReadTerrainCreated(reader);
+                        break;
+                    case SerializableEvents.RigidBodyCreated:
+                        yield return ReadRigidBodyCreated(reader);
+                        break;
+                    case SerializableEvents.RigidBodyDestroyed:
+                        yield return ReadRigidBodyDestroyed(reader);
+                        break;
+                    case SerializableEvents.Moved:
+                        yield return ReadMoved(reader);
+                        break;
+                    case SerializableEvents.CreatureCreated:
+                        yield return ReadCreatureCreated(reader);
+                        break;
+                    case SerializableEvents.HeroCreated:
+                        yield return ReadHeroCreated(reader);
+                        break;
+                    case SerializableEvents.HeroDestroyed:
+                        yield return ReadHeroDestroyed(reader);
+                        break;
+                    case SerializableEvents.PlayerAvatarSpawned:
+                        yield return ReadPlayerAvatarSpawned(reader);
+                        break;
+                    case SerializableEvents.ProjectileCreated:
+                        yield return ReadProjectileCreated(reader);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
-            });
+            }
         }
 
-        private void ReadTerrainCreated(BinaryReader reader)
+        private static Action<IEventsReciever> ReadTerrainCreated(BinaryReader reader)
         {
             var mapId = reader.ReadString();
-            _reciever.TerrainCreated(mapId);
+            return r => r.TerrainCreated(mapId);
         }
 
-        private void ReadRigidBodyCreated(BinaryReader reader)
+        private static Action<IEventsReciever> ReadRigidBodyCreated(BinaryReader reader)
         {
             var id = reader.ReadIdentityOf<RigidBody>();
             var position = reader.ReadVector();
 
-            _reciever.RigidBodyCreated(id, position);
+            return r => r.RigidBodyCreated(id, position);
         }
 
-        private void ReadRigidBodyDestroyed(BinaryReader reader)
+        private static Action<IEventsReciever> ReadRigidBodyDestroyed(BinaryReader reader)
         {
             var id = reader.ReadIdentityOf<RigidBody>();
-            _reciever.RigidBodyDestroyed(id);
+            return r => r.RigidBodyDestroyed(id);
         }
 
-        private void ReadMoved(BinaryReader reader)
+        private static Action<IEventsReciever> ReadMoved(BinaryReader reader)
         {
             var id = reader.ReadIdentityOf<RigidBody>();
             var newPosition = reader.ReadVector();
 
-            _reciever.Moved(id, newPosition);
+            return r => r.Moved(id, newPosition);
         }
 
-        private void ReadCreatureCreated(BinaryReader reader)
+        private static Action<IEventsReciever> ReadCreatureCreated(BinaryReader reader)
         {
             var id = reader.ReadIdentityOf<Creature>();
             var rigidBodyId = reader.ReadIdentityOf<RigidBody>();
 
-            _reciever.CreatureCreated(id, rigidBodyId);
+            return r => r.CreatureCreated(id, rigidBodyId);
         }
 
-        private void ReadHeroCreated(BinaryReader reader)
+        private static Action<IEventsReciever> ReadHeroCreated(BinaryReader reader)
         {
             var creatureId = reader.ReadIdentityOf<Creature>();
 
-            _reciever.HeroCreated(creatureId);
+            return r => r.HeroCreated(creatureId);
         }
 
-        private void ReadHeroDestroyed(BinaryReader reader)
+        private static Action<IEventsReciever> ReadHeroDestroyed(BinaryReader reader)
         {
-            _reciever.HeroDestroyed();
+            return r => r.HeroDestroyed();
         }
 
-        private void ReadPlayerAvatarSpawned(BinaryReader reader)
+        private static Action<IEventsReciever> ReadPlayerAvatarSpawned(BinaryReader reader)
         {
             var creatureId = reader.ReadIdentityOf<Creature>();
 
-            _reciever.PlayerAvatarSpawned(creatureId);
+            return r => r.PlayerAvatarSpawned(creatureId);
         }
 
-        private void ReadProjectileCreated(BinaryReader reader)
+        private static Action<IEventsReciever> ReadProjectileCreated(BinaryReader reader)
         {
             var rigidBodyId = reader.ReadIdentityOf<RigidBody>();
 
-            _reciever.ProjectileCreated(rigidBodyId);
+            return r => r.ProjectileCreated(rigidBodyId);
         }
     }
 }

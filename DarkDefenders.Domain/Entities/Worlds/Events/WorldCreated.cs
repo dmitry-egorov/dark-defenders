@@ -1,8 +1,8 @@
 using System;
 using DarkDefenders.Domain.Entities.Clocks;
+using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.Factories;
-using DarkDefenders.Domain.Infrastructure;
-
+using DarkDefenders.Domain.Interfaces;
 using Infrastructure.DDDES;
 
 namespace DarkDefenders.Domain.Entities.Worlds.Events

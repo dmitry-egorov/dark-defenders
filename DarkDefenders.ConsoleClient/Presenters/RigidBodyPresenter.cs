@@ -1,15 +1,14 @@
 using System;
 using System.Drawing;
 using DarkDefenders.ConsoleClient.Renderer;
-using DarkDefenders.Domain.Data.Entities.RigidBodies;
-using DarkDefenders.Domain.Data.Other;
+using DarkDefenders.Domain.Other;
 using Infrastructure.Math;
 
-namespace DarkDefenders.ConsoleClient.ViewModels
+namespace DarkDefenders.ConsoleClient.Presenters
 {
-    internal class RigidBodyViewModel
+    internal class RigidBodyPresenter
     {
-        public RigidBodyViewModel(Map<Tile> map, IConsoleRenderer consoleRenderer)
+        public RigidBodyPresenter(Map<Tile> map, IConsoleRenderer consoleRenderer)
         {
             _map = map;
             _consoleRenderer = consoleRenderer;

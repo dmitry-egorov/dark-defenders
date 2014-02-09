@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using DarkDefenders.Domain.Data.Other;
 using DarkDefenders.Domain.Entities.Terrains;
 using DarkDefenders.Domain.Entities.Terrains.Events;
+using DarkDefenders.Domain.Other;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;

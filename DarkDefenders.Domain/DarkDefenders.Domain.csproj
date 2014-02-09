@@ -50,15 +50,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\Creatures\CreatureProperties.cs" />
-    <Compile Include="Entities\Heroes\HeroState.cs" />
     <Compile Include="Entities\RigidBodies\RigidBodyInitialProperties.cs" />
     <Compile Include="Entities\RigidBodies\RigidBodyProperties.cs" />
     <Compile Include="Entities\Worlds\WorldProperties.cs" />
     <Compile Include="GameFactory.cs" />
-    <Compile Include="Infrastructure\Created.cs" />
-    <Compile Include="Infrastructure\Destroyed.cs" />
-    <Compile Include="Infrastructure\EventOf.cs" />
-    <Compile Include="Infrastructure\IEventsReciever.cs" />
+    <Compile Include="Events\Created.cs" />
+    <Compile Include="Events\Destroyed.cs" />
+    <Compile Include="Events\EventOf.cs" />
+    <Compile Include="Interfaces\IEventsReciever.cs" />
     <Compile Include="Other\Direction.cs" />
     <Compile Include="Other\DirectionExtensions.cs" />
     <Compile Include="Other\Movement.cs" />
