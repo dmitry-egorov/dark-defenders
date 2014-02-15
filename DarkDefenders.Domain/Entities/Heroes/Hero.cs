@@ -11,8 +11,9 @@ namespace DarkDefenders.Domain.Entities.Heroes
     public class Hero : Entity<Hero>
     {
         private readonly IStorage<Hero> _storage;
-        private IHeroState _state;
         private readonly Creature _creature;
+
+        private IHeroState _state;
 
         internal Hero(IStorage<Hero> storage, Creature creature, Random random)
         {

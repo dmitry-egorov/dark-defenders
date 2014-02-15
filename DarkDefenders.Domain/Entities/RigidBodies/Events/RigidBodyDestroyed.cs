@@ -6,8 +6,8 @@ namespace DarkDefenders.Domain.Entities.RigidBodies.Events
 {
     internal class RigidBodyDestroyed : Destroyed<RigidBody>
     {
-        public RigidBodyDestroyed(RigidBody root, IStorage<RigidBody> storage) 
-            : base(root, storage)
+        public RigidBodyDestroyed(RigidBody entity, IStorage<RigidBody> storage) 
+            : base(entity, storage)
         {
         }
 

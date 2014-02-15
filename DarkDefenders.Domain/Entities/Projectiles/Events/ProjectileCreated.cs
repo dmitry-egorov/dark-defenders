@@ -18,12 +18,12 @@ namespace DarkDefenders.Domain.Entities.Projectiles.Events
 
         protected override Projectile Create()
         {
-            return new Projectile(_storage, _rigidBody.Item);
+            return new Projectile(_storage, _rigidBody.Entity);
         }
 
         protected override void Accept(IEventsReciever reciever, IdentityOf<Projectile> id)
         {
-            reciever.ProjectileCreated(_rigidBody.Item.Id);
+            reciever.ProjectileCreated(_rigidBody.Entity.Id);
         }
     }
 }

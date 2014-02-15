@@ -50,7 +50,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\Creatures\CreatureProperties.cs" />
-    <Compile Include="Entities\RigidBodies\RigidBodyInitialProperties.cs" />
     <Compile Include="Entities\RigidBodies\RigidBodyProperties.cs" />
     <Compile Include="Entities\Worlds\WorldProperties.cs" />
     <Compile Include="GameFactory.cs" />

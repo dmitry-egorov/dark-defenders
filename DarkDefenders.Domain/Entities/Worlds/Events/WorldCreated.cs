@@ -37,7 +37,7 @@ namespace DarkDefenders.Domain.Entities.Worlds.Events
 
         protected override World Create()
         {
-            return new World(_heroFactory, _creatureFactory, _clockContainer.Item, _random, _worldProperties);
+            return new World(_heroFactory, _creatureFactory, _clockContainer.Entity, _random, _worldProperties);
         }
 
         protected override void Accept(IEventsReciever reciever, IdentityOf<World> id)

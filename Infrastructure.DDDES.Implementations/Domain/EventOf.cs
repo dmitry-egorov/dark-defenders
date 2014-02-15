@@ -3,23 +3,23 @@ namespace Infrastructure.DDDES.Implementations.Domain
     public abstract class EventOf<TEntity, TReciever> : IEvent, IAcceptorOf<TReciever>
         where TEntity: IEntity<TEntity>
     {
-        private readonly TEntity _root;
-        protected EventOf(TEntity root)
+        private readonly TEntity _entity;
+        protected EventOf(TEntity entity)
         {
-            _root = root;
+            _entity = entity;
         }
 
         public void Apply()
         {
-            Apply(_root);
+            Apply(_entity);
         }
 
         public void Accept(TReciever reciever)
         {
-            Accept(reciever, _root.Id);
+            Accept(reciever, _entity.Id);
         }
 
         protected abstract void Accept(TReciever reciever, IdentityOf<TEntity> id);
-        protected abstract void Apply(TEntity root);
+        protected abstract void Apply(TEntity entity);
     }
 }

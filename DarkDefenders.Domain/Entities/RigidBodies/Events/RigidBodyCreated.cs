@@ -3,6 +3,8 @@ using DarkDefenders.Domain.Entities.Terrains;
 using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.Interfaces;
 using Infrastructure.DDDES;
+using Infrastructure.Math;
+using Infrastructure.Physics;
 
 namespace DarkDefenders.Domain.Entities.RigidBodies.Events
 {
@@ -11,25 +13,29 @@ namespace DarkDefenders.Domain.Entities.RigidBodies.Events
         private readonly IStorage<RigidBody> _storage;
         private readonly IContainer<Clock> _clockContainer;
         private readonly IContainer<Terrain> _terrainContainer;
-        private readonly RigidBodyInitialProperties _rigidBodyInitialProperties;
+        private readonly Momentum _initialMomentum;
+        private readonly Vector _initialPosition;
+        private readonly RigidBodyProperties _properties;
 
-        public RigidBodyCreated(IStorage<RigidBody> storage, IContainer<Clock> clockContainer, IContainer<Terrain> terrainContainer, RigidBodyInitialProperties rigidBodyInitialProperties)
+        public RigidBodyCreated(IStorage<RigidBody> storage, IContainer<Clock> clockContainer, IContainer<Terrain> terrainContainer, Vector initialPosition, Momentum initialMomentum, RigidBodyProperties properties)
             : base(storage)
         {
             _storage = storage;
             _clockContainer = clockContainer;
             _terrainContainer = terrainContainer;
-            _rigidBodyInitialProperties = rigidBodyInitialProperties;
+            _initialPosition = initialPosition;
+            _initialMomentum = initialMomentum;
+            _properties = properties;
         }
 
         protected override RigidBody Create()
         {
-            return new RigidBody(_storage, _clockContainer.Item, _terrainContainer.Item, _rigidBodyInitialProperties);
+            return new RigidBody(_storage, _clockContainer.Entity, _terrainContainer.Entity, _initialPosition, _initialMomentum, _properties);
         }
 
         protected override void Accept(IEventsReciever reciever, IdentityOf<RigidBody> id)
         {
-            reciever.RigidBodyCreated(id, _rigidBodyInitialProperties.Position);
+            reciever.RigidBodyCreated(id, _initialPosition);
         }
     }
 }

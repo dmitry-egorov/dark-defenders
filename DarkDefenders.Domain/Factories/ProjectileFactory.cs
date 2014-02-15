@@ -39,9 +39,8 @@ namespace DarkDefenders.Domain.Factories
             var mass = Projectile.Mass;
             var topHorizontalMomentum = Math.Abs(momentum.Value.X);
             var properties = new RigidBodyProperties((float) radius, (float) mass, (float) topHorizontalMomentum);
-            var rigidBodyInitialProperties = new RigidBodyInitialProperties(momentum, position, properties);
-
-            return _rigidBodyFactory.Create(rigidBodyInitialProperties);
+            
+            return _rigidBodyFactory.Create(position, momentum, properties);
         }
     }
 }

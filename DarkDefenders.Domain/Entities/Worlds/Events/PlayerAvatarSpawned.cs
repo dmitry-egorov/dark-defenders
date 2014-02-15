@@ -16,7 +16,7 @@ namespace DarkDefenders.Domain.Entities.Worlds.Events
 
         protected override void Accept(IEventsReciever reciever, IdentityOf<World> id)
         {
-            reciever.PlayerAvatarSpawned(_creatureContainer.Item.Id);
+            reciever.PlayerAvatarSpawned(_creatureContainer.Entity.Id);
         }
 
         protected override void Apply(World world)

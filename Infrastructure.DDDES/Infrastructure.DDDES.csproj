@@ -35,6 +35,7 @@
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EventsProcessorExtensions.cs" />
     <Compile Include="IAcceptorOf.cs" />
     <Compile Include="IContainer.cs" />
     <Compile Include="ICreation.cs" />
@@ -44,10 +45,9 @@
     <Compile Include="IEventsProcessor.cs" />
     <Compile Include="IEvent.cs" />
     <Compile Include="IEventsListener.cs" />
-    <Compile Include="IRepository.cs" />
     <Compile Include="IStorage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RepositoryExtensions.cs" />
+    <Compile Include="EntitiesExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

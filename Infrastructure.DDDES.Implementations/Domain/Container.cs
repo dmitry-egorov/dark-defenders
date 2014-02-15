@@ -8,7 +8,7 @@ namespace Infrastructure.DDDES.Implementations.Domain
     {
         private T _item;
 
-        public T Item
+        public T Entity
         {
             get
             {
@@ -32,7 +32,7 @@ namespace Infrastructure.DDDES.Implementations.Domain
 
         public void Remove(T item)
         {
-            if (!ReferenceEquals(Item, item))
+            if (!ReferenceEquals(Entity, item))
             {
                 throw new InvalidOperationException("Item is not in the container");
             }

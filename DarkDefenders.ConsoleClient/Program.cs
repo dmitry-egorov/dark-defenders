@@ -45,9 +45,9 @@ namespace DarkDefenders.ConsoleClient
 
             eventDataListener.ListenAsync();
 
-            var loopRunner = new LoopRunner(100, () => Frame(stopwatch, renderer, counter, eventDataListener));
+            var loopRunner = new LoopRunner(100);
 
-            loopRunner.Run();
+            loopRunner.Run(() => Frame(stopwatch, renderer, counter, eventDataListener));
         }
 
         private static void Frame(AutoResetStopwatch stopwatch, GamePresenter renderer, CountingEventsListener<IEventsReciever> counter, EventDataListener eventDataListener)

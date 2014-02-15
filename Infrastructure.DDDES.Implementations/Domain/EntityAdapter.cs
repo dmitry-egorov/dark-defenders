@@ -5,12 +5,12 @@ namespace Infrastructure.DDDES.Implementations.Domain
 {
     public class EntityAdapter<TEntity>
     {
-        private readonly IContainer<TEntity> _rootContainer;
+        private readonly TEntity _entity;
         private readonly IEventsProcessor _processor;
 
-        public EntityAdapter(IContainer<TEntity> rootContainer, IEventsProcessor processor)
+        public EntityAdapter(TEntity entity, IEventsProcessor processor)
         {
-            _rootContainer = rootContainer;
+            _entity = entity;
             _processor = processor;
         }
 
@@ -20,12 +20,12 @@ namespace Infrastructure.DDDES.Implementations.Domain
 
             Commit(x => (IEnumerable<IEvent>)(creation = command(x)));
 
-            return new EntityAdapter<T>(creation, _processor);
+            return new EntityAdapter<T>(creation.Entity, _processor);
         }
 
         public void Commit(Func<TEntity, IEnumerable<IEvent>> command)
         {
-            var events = command(_rootContainer.Item);
+            var events = command(_entity);
             _processor.Process(events);
         }
     }

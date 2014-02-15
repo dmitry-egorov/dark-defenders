@@ -3,7 +3,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using DarkDefenders.Domain.Events;
 using DarkDefenders.Domain.Interfaces;
 using DarkDefenders.Domain.Serialization;
 using Infrastructure.DDDES;

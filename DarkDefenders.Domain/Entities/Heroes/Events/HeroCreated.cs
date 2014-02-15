@@ -21,12 +21,12 @@ namespace DarkDefenders.Domain.Entities.Heroes.Events
 
         protected override Hero Create()
         {
-            return new Hero(_storage, _creatureContainer.Item, _random);
+            return new Hero(_storage, _creatureContainer.Entity, _random);
         }
 
         protected override void Accept(IEventsReciever reciever, IdentityOf<Hero> id)
         {
-            reciever.HeroCreated(_creatureContainer.Item.Id);
+            reciever.HeroCreated(_creatureContainer.Entity.Id);
         }
     }
 }

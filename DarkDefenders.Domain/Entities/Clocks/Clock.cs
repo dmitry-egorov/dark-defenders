@@ -16,6 +16,7 @@ namespace DarkDefenders.Domain.Entities.Clocks
         internal Clock()
         {
             _currentTime = TimeSpan.Zero;
+            _elapsedSeconds = Seconds.Zero;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

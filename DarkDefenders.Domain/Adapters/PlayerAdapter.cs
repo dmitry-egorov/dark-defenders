@@ -28,6 +28,5 @@ namespace DarkDefenders.Domain.Adapters
         {
             _creature.Commit(x => x.Fire());
         }
-         
     }
 }

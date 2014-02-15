@@ -6,24 +6,22 @@ namespace Infrastructure.Runtime
     {
         private readonly TimeFiller _timeFiller;
         private volatile bool _stopped;
-        private readonly Action _action;
 
-        public LoopRunner(int maxFps, Action action)
+        public LoopRunner(int maxFps)
         {
             var minFrameElapsed = TimeSpan.FromSeconds(1.0 / maxFps);
 
-            _action = action;
 
             _timeFiller = new TimeFiller(minFrameElapsed);
         }
 
-        public void Run()
+        public void Run(Action action)
         {
             _timeFiller.Start();
 
             while (!_stopped)
             {
-                _action();
+                action();
 
                 _timeFiller.FillTimeFrame();
             }

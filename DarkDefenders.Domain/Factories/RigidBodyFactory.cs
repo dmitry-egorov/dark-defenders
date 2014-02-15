@@ -5,6 +5,8 @@ using DarkDefenders.Domain.Entities.RigidBodies.Events;
 using DarkDefenders.Domain.Entities.Terrains;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
+using Infrastructure.Math;
+using Infrastructure.Physics;
 using JetBrains.Annotations;
 
 namespace DarkDefenders.Domain.Factories
@@ -22,14 +24,14 @@ namespace DarkDefenders.Domain.Factories
             _terrainContainer = terrainContainer;
         }
 
-        public ICreation<RigidBody> Create(RigidBodyInitialProperties properties)
+        public ICreation<RigidBody> Create(Vector initialPosition, Momentum initialMomentum, RigidBodyProperties properties)
         {
-            return GetCreation(s => YieldEvents(s, properties));
+            return GetCreation(s => YieldEvents(s, initialPosition, initialMomentum, properties));
         }
 
-        private IEnumerable<IEvent> YieldEvents(IStorage<RigidBody> storage, RigidBodyInitialProperties properties)
+        private IEnumerable<IEvent> YieldEvents(IStorage<RigidBody> storage, Vector initialPosition, Momentum initialMomentum, RigidBodyProperties properties)
         {
-            yield return new RigidBodyCreated(storage, _clockContainer, _terrainContainer, properties);
+            yield return new RigidBodyCreated(storage, _clockContainer, _terrainContainer, initialPosition, initialMomentum, properties);
         }
     }
 }

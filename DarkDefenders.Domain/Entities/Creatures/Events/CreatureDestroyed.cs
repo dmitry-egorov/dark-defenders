@@ -6,7 +6,7 @@ namespace DarkDefenders.Domain.Entities.Creatures.Events
 {
     internal class CreatureDestroyed : Destroyed<Creature>
     {
-        public CreatureDestroyed(Creature root, IStorage<Creature> storage) : base(root, storage)
+        public CreatureDestroyed(Creature creature, IStorage<Creature> storage) : base(creature, storage)
         {
         }
 

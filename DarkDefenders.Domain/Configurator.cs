@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using DarkDefenders.Domain.Adapters;
 using DarkDefenders.Domain.Entities.Clocks;
 using DarkDefenders.Domain.Entities.Creatures;
@@ -62,7 +63,7 @@ namespace DarkDefenders.Domain
         private static IUnityContainer RegisterRepositoryFor<T>(this IUnityContainer container)
         {
             return container
-                .RegisterSingleton<Repository<T>, IStorage<T>, IRepository<T>>();
+                .RegisterSingleton<Repository<T>, IStorage<T>, IReadOnlyCollection<T>>();
         }
     }
 }

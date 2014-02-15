@@ -2,7 +2,7 @@
 
 namespace Infrastructure.DDDES
 {
-    public interface ICreation<out T> : IEnumerable<IEvent>, IContainer<T>
+    public interface ICreation<out TEntity> : IEnumerable<IEvent>, IContainer<TEntity>
     {
         
     }

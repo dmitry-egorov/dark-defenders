@@ -1,11 +1,9 @@
 ﻿using System.Collections.Concurrent;
-using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using DarkDefenders.Domain.Interfaces;
 using DarkDefenders.Domain.Serialization;
 using Infrastructure.DDDES;
-using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Util;
 
 namespace DarkDefenders.ConsoleClient
@@ -14,9 +12,10 @@ namespace DarkDefenders.ConsoleClient
     {
         private readonly IEventsListener<IEventsReciever> _reciever;
         private readonly UdpClient _client;
-        private volatile bool _stopped;
         private readonly ConcurrentQueue<IAcceptorOf<IEventsReciever>> _queue = new ConcurrentQueue<IAcceptorOf<IEventsReciever>>();
         private readonly EventsDeserializer _deserializer;
+
+        private volatile bool _stopped;
 
         public EventDataListener(IEventsListener<IEventsReciever> reciever)
         {
@@ -32,9 +31,7 @@ namespace DarkDefenders.ConsoleClient
                 var data = await _client.ReceiveAsync();
                 Task.Run(() =>
                 {
-                    var acceptors = _deserializer
-                                  .Deserialize(data.Buffer)
-                                  .Select(action => new ActionAcceptorOf<IEventsReciever>(action));
+                    var acceptors = _deserializer.Deserialize(data.Buffer);
 
                     foreach (var acceptor in acceptors)
                     {

@@ -5,23 +5,23 @@ namespace Infrastructure.DDDES.Implementations.Domain
     public abstract class Destroyed<TEntity, TReciever> : EventOf<TEntity, TReciever> 
         where TEntity : IEntity<TEntity>
     {
-        private readonly IdentityOf<TEntity> _rootId;
+        private readonly IdentityOf<TEntity> _entityId;
         private readonly IStorage<TEntity> _storage;
 
-        protected Destroyed(TEntity root, IStorage<TEntity> storage) : base(root)
+        protected Destroyed(TEntity entity, IStorage<TEntity> storage) : base(entity)
         {
-            _rootId = root.Id;
+            _entityId = entity.Id;
             _storage = storage;
         }
 
         public override string ToString()
         {
-            return "Root {0} destroyed: {1}".FormatWith(typeof(TEntity).Name, _rootId);
+            return "Entity {0}:{1} destroyed".FormatWith(typeof(TEntity).Name, _entityId);
         }
 
-        protected override void Apply(TEntity root)
+        protected override void Apply(TEntity entity)
         {
-            _storage.Remove(root);
+            _storage.Remove(entity);
         }
     }
 }

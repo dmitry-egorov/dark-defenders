@@ -71,6 +71,7 @@ namespace DarkDefenders.IntegrationTests
             avatar.ChangeMovement(Movement.Left);
 
             game.Update(elapsed);
+            game.Update(elapsed);
 
             reciever.VerifyAll();
         }

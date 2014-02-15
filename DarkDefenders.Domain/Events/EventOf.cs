@@ -7,7 +7,7 @@ namespace DarkDefenders.Domain.Events
     internal abstract class EventOf<TEntity> : EventOf<TEntity, IEventsReciever>
         where TEntity : IEntity<TEntity>
     {
-        protected EventOf(TEntity root) : base(root)
+        protected EventOf(TEntity entity) : base(entity)
         {
         }
     }

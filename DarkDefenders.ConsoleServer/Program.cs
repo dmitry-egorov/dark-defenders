@@ -39,37 +39,28 @@ namespace DarkDefenders.ConsoleServer
         static void Main()
         {
             var networkBroadcaster = new EventsDataBroadcaster();
-
             var game = GameFactory.Create(networkBroadcaster);
-
             var world = InitializeGame(game);
 
+            var loopRunner = new LoopRunner(60);
+            var gameTask = Task.Factory.StartNew(() =>
+            {
+                var stopwatch = AutoResetStopwatch.StartNew();
+                loopRunner.Run(() =>
+                {
+                    var elapsed = stopwatch.ElapsedSinceLastCall.LimitTo(_elapsedLimit);
+
+                    ExecuteCommands();
+
+                    game.Update(elapsed);
+                });
+            }, 
+            TaskCreationOptions.LongRunning);
+
             var textCommandsProcessor = new TextCommandsProcessor(game, world);
-
-            var stopwatch = new AutoResetStopwatch();
-
-            var loopRunner = new LoopRunner(60, () => Frame(stopwatch, game));
-
-            var gameTask = Task.Factory.StartNew(() => Run(stopwatch, loopRunner), TaskCreationOptions.LongRunning);
-
             RunConsoleCommandsProcessing(textCommandsProcessor, loopRunner);
 
             gameTask.Wait();
-        }
-
-        private static void Run(AutoResetStopwatch stopwatch, LoopRunner loopRunner)
-        {
-            stopwatch.Start();
-            loopRunner.Run();
-        }
-
-        private static void Frame(AutoResetStopwatch stopwatch, IGame game)
-        {
-            var elapsed = stopwatch.ElapsedSinceLastCall.LimitTo(_elapsedLimit);
-
-            ExecuteCommands();
-
-            game.Update(elapsed);
         }
 
         private static void ExecuteCommands()

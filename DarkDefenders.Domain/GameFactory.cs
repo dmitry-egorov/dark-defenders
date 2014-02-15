@@ -1,5 +1,4 @@
-﻿using DarkDefenders.Domain.Events;
-using DarkDefenders.Domain.Interfaces;
+﻿using DarkDefenders.Domain.Interfaces;
 using Infrastructure.DDDES;
 using Microsoft.Practices.Unity;
 

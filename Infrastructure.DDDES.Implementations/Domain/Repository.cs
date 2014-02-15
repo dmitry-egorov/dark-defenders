@@ -1,26 +1,36 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using Infrastructure.Util.Collections;
 
 namespace Infrastructure.DDDES.Implementations.Domain
 {
-    public class Repository<TRoot> : IRepository<TRoot>, IStorage<TRoot>
+    public class Repository<TEntity> : IReadOnlyCollection<TEntity>, IStorage<TEntity>
     {
-        private readonly FastList<TRoot> _allRoots = new FastList<TRoot>();
+        private readonly FastList<TEntity> _allEntities = new FastList<TEntity>();
 
-        public IEnumerable<TRoot> GetAll()
+        public int Count { get { return _allEntities.Count; } }
+
+        public void Store(TEntity item)
         {
-            return _allRoots;
+            _allEntities.Add(item);
         }
 
-        public void Store(TRoot item)
-        {
-            _allRoots.Add(item);
-        }
-
-        public void Remove(TRoot item)
+        public void Remove(TEntity item)
         {
             //TODO: optimize (store index in a map)
-            _allRoots.Remove(item);
+            _allEntities.Remove(item);
         }
+
+        public IEnumerator<TEntity> GetEnumerator()
+        {
+            return _allEntities.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
     }
 }

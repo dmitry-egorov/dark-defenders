@@ -3,20 +3,20 @@ using System.Collections.Generic;
 
 namespace Infrastructure.DDDES.Implementations.Domain
 {
-    public class EntitiesAdapter<TRoot>
+    public class EntitiesAdapter<TEntity>
     {
-        private readonly IRepository<TRoot> _rootsRepository;
+        private readonly IReadOnlyCollection<TEntity> _entitiesRepository;
         private readonly IEventsProcessor _processor;
 
-        public EntitiesAdapter(IRepository<TRoot> rootsRepository, IEventsProcessor processor)
+        public EntitiesAdapter(IReadOnlyCollection<TEntity> entitiesRepository, IEventsProcessor processor)
         {
-            _rootsRepository = rootsRepository;
+            _entitiesRepository = entitiesRepository;
             _processor = processor;
         }
 
-        public void Commit(Func<TRoot, IEnumerable<IEvent>> command)
+        public void Commit(Func<TEntity, IEnumerable<IEvent>> command)
         {
-            var events = _rootsRepository.ForAll(command);
+            var events = _entitiesRepository.ForAll(command);
             _processor.Process(events);
         }
     }

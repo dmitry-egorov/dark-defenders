@@ -38,6 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgumentAssertionExtensions.cs" />
+    <Compile Include="Concat.cs" />
     <Compile Include="ConcurrentQueueExtensions.cs" />
     <Compile Include="DictionaryExtensions.cs" />
     <Compile Include="DoubleExtensions.cs" />

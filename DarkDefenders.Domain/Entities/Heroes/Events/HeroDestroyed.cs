@@ -6,7 +6,7 @@ namespace DarkDefenders.Domain.Entities.Heroes.Events
 {
     internal class HeroDestroyed : Destroyed<Hero>
     {
-        public HeroDestroyed(Hero root, IStorage<Hero> storage) : base(root, storage)
+        public HeroDestroyed(Hero entity, IStorage<Hero> storage) : base(entity, storage)
         {
         }
 

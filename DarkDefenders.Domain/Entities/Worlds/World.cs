@@ -7,7 +7,6 @@ using DarkDefenders.Domain.Entities.Heroes;
 using DarkDefenders.Domain.Entities.Other;
 using DarkDefenders.Domain.Entities.Worlds.Events;
 using DarkDefenders.Domain.Factories;
-
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
@@ -46,8 +45,7 @@ namespace DarkDefenders.Domain.Entities.Worlds
             _heroFactory = heroFactory;
             _random = random;
             _playersAvatarProperties = properties.PlayersAvatarProperties;
-
-            _playersSpawnPositions = properties.PlayersSpawnPositions.AsReadOnly();
+            _playersSpawnPositions   = properties.PlayersSpawnPositions.AsReadOnly();
 
             _clock = clock;
             _heroSpawnCooldown = new Cooldown(clock, properties.HeroesSpawnCooldown);

@@ -9,6 +9,8 @@ namespace Infrastructure.Util.Collections
         private T[] _items = new T[0];
         private int _size;
 
+        public int Count { get { return _size; } }
+
         public IEnumerator<T> GetEnumerator()
         {
             for (var i = 0; i < _size; i++)

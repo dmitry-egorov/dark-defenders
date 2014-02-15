@@ -44,20 +44,22 @@ namespace DarkDefenders.Domain.Entities.RigidBodies
             IStorage<RigidBody> storage, 
             Clock clock, 
             Terrain terrain, 
-            RigidBodyInitialProperties properties
+            Vector initialPosition, 
+            Momentum initialMomentum, 
+            RigidBodyProperties properties
         )
         {
             _storage = storage;
             _clock = clock;
             _terrain = terrain;
 
-            var radius = properties.Properties.BoundingBoxRadius;
+            var radius = properties.BoundingBoxRadius;
 
-            _momentum = properties.InitialMomentum;
-            _topHorizontalMomentum = properties.Properties.TopHorizontalMomentum;
-            _boundingBox = new Box(properties.Position, radius, radius);
+            _momentum = initialMomentum;
+            _topHorizontalMomentum = properties.TopHorizontalMomentum;
+            _boundingBox = new Box(initialPosition, radius, radius);
             _externalForce = Force.Zero;
-            _mass = properties.Properties.Mass;
+            _mass = properties.Mass;
 
             _gravityForce = GetGravityForce();
             PrepareTouching();

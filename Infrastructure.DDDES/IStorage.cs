@@ -1,8 +1,8 @@
 ﻿namespace Infrastructure.DDDES
 {
-    public interface IStorage<in TRoot>
+    public interface IStorage<in TEntity>
     {
-        void Store(TRoot item);
-        void Remove(TRoot item);
+        void Store(TEntity item);
+        void Remove(TEntity item);
     }
 }

@@ -2,6 +2,6 @@
 {
     public interface IContainer<out T>
     {
-        T Item { get; }
+        T Entity { get; }
     }
 }

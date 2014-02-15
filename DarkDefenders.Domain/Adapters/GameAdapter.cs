@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using DarkDefenders.Domain.Entities.Clocks;
 using DarkDefenders.Domain.Entities.Heroes;
 using DarkDefenders.Domain.Entities.Projectiles;
@@ -12,6 +13,7 @@ using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
+using Infrastructure.Util;
 using JetBrains.Annotations;
 
 namespace DarkDefenders.Domain.Adapters
@@ -25,12 +27,12 @@ namespace DarkDefenders.Domain.Adapters
         private readonly FactoryAdapter<Terrain, TerrainFactory> _terrainFactory;
         private readonly FactoryAdapter<World, WorldFactory> _worldFactory;
 
-        private readonly EntitiesAdapter<RigidBody> _rigidBodies;
-        private readonly EntitiesAdapter<Projectile> _projectiles;
-        private readonly EntitiesAdapter<Hero> _heroes;
+        private readonly IReadOnlyCollection<RigidBody> _rigidBodies;
+        private readonly IReadOnlyCollection<Projectile> _projectiles;
+        private readonly IReadOnlyCollection<Hero> _heroes;
 
-        private EntityAdapter<World> _world;
-        private EntityAdapter<Clock> _clock;
+        private World _world;
+        private Clock _clock;
 
         public GameAdapter
         (
@@ -38,9 +40,9 @@ namespace DarkDefenders.Domain.Adapters
             ClockFactory clockFactory, 
             TerrainFactory terrainFactory, 
             WorldFactory worldFactory, 
-            IRepository<Hero> heroRepository, 
-            IRepository<RigidBody> rigidBodyRepository, 
-            IRepository<Projectile> projectileRepository
+            IReadOnlyCollection<Hero> heroes,
+            IReadOnlyCollection<RigidBody> rigidBodies, 
+            IReadOnlyCollection<Projectile> projectiles
         )
         {
             _processor = processor;
@@ -49,11 +51,10 @@ namespace DarkDefenders.Domain.Adapters
             _terrainFactory = new FactoryAdapter<Terrain, TerrainFactory>(terrainFactory, _processor);
             _worldFactory = new FactoryAdapter<World, WorldFactory>(worldFactory, _processor);
 
-            _rigidBodies = new EntitiesAdapter<RigidBody>(rigidBodyRepository, _processor);
-            _projectiles = new EntitiesAdapter<Projectile>(projectileRepository, _processor);
-            _heroes = new EntitiesAdapter<Hero>(heroRepository, _processor);
+            _rigidBodies = rigidBodies;
+            _projectiles = projectiles;
+            _heroes = heroes;
         }
-
 
         public IWorld Initialize(string mapId, Map<Tile> map, WorldProperties worldProperties)
         {
@@ -61,22 +62,26 @@ namespace DarkDefenders.Domain.Adapters
             _terrainFactory.Commit(x => x.Create(map, mapId));
             _world = _worldFactory.Commit(x => x.Create(worldProperties));
 
-            return new WorldAdapter(_world);
+            return new WorldAdapter(new EntityAdapter<World>(_world, _processor));
         }
+
         public void Update(TimeSpan elapsed)
         {
-            _clock.Commit(x => x.UpdateTime(elapsed));
-            _rigidBodies.Commit(x => x.UpdatePhysics());
-            _projectiles.Commit(x => x.CheckForHit());
-            _world.Commit(x => x.SpawnHeroes());
-            _heroes.Commit(x => x.Think());
+            var hevents = _heroes.ForAll(x => x.Think());
+            var wevents = _world.SpawnHeroes();
+            var pevents = _projectiles.ForAll(x => x.CheckForHit());
+            var revents = _rigidBodies.ForAll(x => x.UpdatePhysics());
+            var cevents = _clock.UpdateTime(elapsed);
 
+            var events = Concat.All(hevents, wevents, pevents, revents, cevents);
+
+            _processor.Process(events);
             _processor.Broadcast();
         }
 
         public void KillAllHeroes()
         {
-            _heroes.Commit(x => x.Kill());
+            _processor.Process(_heroes, x => x.Kill());
         }
     }
 }

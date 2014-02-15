@@ -30,12 +30,12 @@ namespace DarkDefenders.Domain.Entities.Creatures.Events
 
         protected override Creature Create()
         {
-            return new Creature(_storage, _projectileFactory, _clockContainer.Item, _terrainContainer.Item, _rigidBody.Item, _properties);
+            return new Creature(_storage, _projectileFactory, _clockContainer.Entity, _terrainContainer.Entity, _rigidBody.Entity, _properties);
         }
 
         protected override void Accept(IEventsReciever reciever, IdentityOf<Creature> id)
         {
-            reciever.CreatureCreated(id, _rigidBody.Item.Id);
+            reciever.CreatureCreated(id, _rigidBody.Entity.Id);
         }
     }
 }

@@ -20,8 +20,9 @@ namespace DarkDefenders.Domain.Entities.Creatures
     {
         private static readonly TimeSpan _fireDelay = TimeSpan.FromSeconds(0.25);
         private const double ProjectileMomentum = 150.0 * Projectile.Mass;
-
+        
         private const Direction InitialDirection = Direction.Right;
+
         private readonly Momentum _jumpMomentum;
         private readonly Force _leftMovementForce;
         private readonly Force _rightMovementForce;

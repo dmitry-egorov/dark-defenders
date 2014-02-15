@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using DarkDefenders.Domain.Entities.Creatures;
 using DarkDefenders.Domain.Entities.RigidBodies;
 using DarkDefenders.Domain.Interfaces;
 using DarkDefenders.Domain.Serialization.Internals;
+using Infrastructure.DDDES;
+using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Serialization;
 using Infrastructure.Util;
 
@@ -12,9 +15,15 @@ namespace DarkDefenders.Domain.Serialization
 {
     public class EventsDeserializer
     {
-        public IEnumerable<Action<IEventsReciever>> Deserialize(byte[] eventData)
+        public IEnumerable<IAcceptorOf<IEventsReciever>> Deserialize(byte[] eventData)
         {
-            return eventData.UsingBinaryReader(reader => Read(reader).AsReadOnly());
+            return eventData
+            .UsingBinaryReader
+            (reader => 
+                Read(reader)
+                .Select(action => new ActionAcceptorOf<IEventsReciever>(action))
+                .AsReadOnly()
+            );
         }
 
         private static IEnumerable<Action<IEventsReciever>> Read(BinaryReader reader)

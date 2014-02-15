@@ -20,9 +20,9 @@ namespace Infrastructure.DDDES.Implementations.Domain
             return _events.GetEnumerator();
         }
 
-        public T Item
+        public T Entity
         {
-            get { return _container.Item; }
+            get { return _container.Entity; }
         }
 
         IEnumerator IEnumerable.GetEnumerator()

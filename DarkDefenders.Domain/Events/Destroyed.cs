@@ -7,7 +7,7 @@ namespace DarkDefenders.Domain.Events
     internal abstract class Destroyed<TEntity> : Destroyed<TEntity, IEventsReciever> 
         where TEntity : IEntity<TEntity>
     {
-        protected Destroyed(TEntity root, IStorage<TEntity> storage) : base(root, storage)
+        protected Destroyed(TEntity entity, IStorage<TEntity> storage) : base(entity, storage)
         {
         }
     }
