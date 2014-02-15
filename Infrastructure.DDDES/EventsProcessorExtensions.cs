@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Infrastructure.Util;
 
 namespace Infrastructure.DDDES
 {
@@ -9,6 +10,12 @@ namespace Infrastructure.DDDES
         {
             processor.Process(entities.ForAll(command));
         }
-        
+
+        public static void Process(this IEventsProcessor processor, params IEnumerable<IEvent>[] eventPacks)
+        {
+            var events = Concat.All(eventPacks);
+
+            processor.Process(events);
+        }
     }
 }

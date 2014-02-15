@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using DarkDefenders.Domain.Interfaces;
+using DarkDefenders.Domain.Model;
 using DarkDefenders.Domain.Serialization.Internals;
 using Infrastructure.DDDES;
 using Infrastructure.Serialization;

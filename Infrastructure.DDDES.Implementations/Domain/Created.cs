@@ -1,38 +1,32 @@
-﻿using System;
-using Infrastructure.Util;
+﻿using Infrastructure.Util;
 
 namespace Infrastructure.DDDES.Implementations.Domain
 {
-    public abstract class Created<TEntity, TReciever> : IEvent, IAcceptorOf<TReciever> 
+    public abstract class Created<TEntity, TReciever> : IEvent, IAcceptorOf<TReciever>
         where TEntity : IEntity<TEntity>
     {
-        private readonly Lazy<TEntity> _lazyEntity;
+        private readonly TEntity _entity;
         private readonly IStorage<TEntity> _storage;
 
-        protected Created(IStorage<TEntity> storage)
+        protected Created(TEntity entity, IStorage<TEntity> storage)
         {
-            _lazyEntity = new Lazy<TEntity>(Create);
+            _entity = entity;
             _storage = storage;
         }
 
         public void Apply()
         {
-            var entity = _lazyEntity.Value;
-
-            _storage.Store(entity);
-        }
-
-        public void Accept(TReciever reciever)
-        {
-            Accept(reciever, _lazyEntity.Value.Id);
+            _storage.Store(_entity);
+            ApplyTo(_entity);
         }
 
         public override string ToString()
         {
-            return "Entity {0}:{1} created".FormatWith(typeof(TEntity).Name, _lazyEntity.Value.Id);
+            return "Entity {0}:{1} created".FormatWith(typeof(TEntity).Name, _entity.Id);
         }
 
-        protected abstract TEntity Create();
-        protected abstract void Accept(TReciever reciever, IdentityOf<TEntity> id);
+        protected abstract void ApplyTo(TEntity entity);
+
+        public abstract void Accept(TReciever reciever);
     }
 }

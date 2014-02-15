@@ -1,5 +1,5 @@
 ﻿using System;
-using DarkDefenders.Domain.Interfaces;
+using DarkDefenders.Game.Interfaces;
 using Infrastructure.Util;
 
 namespace DarkDefenders.ConsoleServer
@@ -7,12 +7,10 @@ namespace DarkDefenders.ConsoleServer
     internal class TextCommandsProcessor
     {
         private readonly IGame _game;
-        private readonly IWorld _world;
 
-        public TextCommandsProcessor(IGame game, IWorld world)
+        public TextCommandsProcessor(IGame game)
         {
             _game = game;
-            _world = world;
         }
 
         public Result ProcessTextCommand(string commandText, out Action action)
@@ -31,7 +29,7 @@ namespace DarkDefenders.ConsoleServer
 
             if (commandText == "hero")
             {
-                action = _world.SpawnHero;
+                action = _game.SpawnHero;
                 return Result.CommandFound;
             }
 
@@ -40,7 +38,7 @@ namespace DarkDefenders.ConsoleServer
             if (commandTextParts.Length == 2 && commandTextParts[0] == "spawn")
             {
                 var enable = commandTextParts[1] == "enable";
-                action = () => _world.ChangeSpawnHeroes(enable);
+                action = () => _game.ChangeSpawnHeroes(enable);
                 return Result.CommandFound;
             }
 

@@ -19,11 +19,11 @@ namespace Infrastructure.DDDES.Implementations
 
         public void Process(IEnumerable<IEvent> events)
         {
-            foreach (var e in events)
-            {
-                e.Apply();
-                _queue.Enqueue((IAcceptorOf<TReciever>) e);
-            }
+            var all = events.AsReadOnly();
+
+            all.ApplyAll();
+
+            _queue.Enqueue(all.Cast<IAcceptorOf<TReciever>>());
         }
 
         public void Broadcast()

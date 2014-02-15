@@ -72,5 +72,13 @@ namespace Infrastructure.Util.Collections
 
             _items = newArray;
         }
+
+        public T this[int index]
+        {
+            get
+            {
+                return _items[index];
+            }
+        }
     }
 }

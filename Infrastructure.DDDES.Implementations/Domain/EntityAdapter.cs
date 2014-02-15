@@ -14,15 +14,6 @@ namespace Infrastructure.DDDES.Implementations.Domain
             _processor = processor;
         }
 
-        public EntityAdapter<T> Commit<T>(Func<TEntity, ICreation<T>> command)
-        {
-            ICreation<T> creation = null;
-
-            Commit(x => (IEnumerable<IEvent>)(creation = command(x)));
-
-            return new EntityAdapter<T>(creation.Entity, _processor);
-        }
-
         public void Commit(Func<TEntity, IEnumerable<IEvent>> command)
         {
             var events = command(_entity);

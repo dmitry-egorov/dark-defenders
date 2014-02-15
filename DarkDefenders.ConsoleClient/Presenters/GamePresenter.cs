@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Globalization;
 using DarkDefenders.ConsoleClient.Renderer;
-using DarkDefenders.Domain.Entities.Creatures;
-using DarkDefenders.Domain.Entities.RigidBodies;
-using DarkDefenders.Domain.Files;
-using DarkDefenders.Domain.Interfaces;
-using DarkDefenders.Domain.Other;
+using DarkDefenders.Domain.Model;
+using DarkDefenders.Domain.Model.Entities.Creatures;
+using DarkDefenders.Domain.Model.Entities.RigidBodies;
+using DarkDefenders.Domain.Model.Other;
+using DarkDefenders.Domain.Resources;
+using DarkDefenders.Domain.Resources.Internals;
 using Infrastructure.DDDES;
 using Infrastructure.Math;
 
@@ -15,7 +16,7 @@ namespace DarkDefenders.ConsoleClient.Presenters
     internal class GamePresenter : IEventsReciever
     {
         private IConsoleRenderer _consoleRenderer;
-        private readonly Dictionary<IdentityOf<RigidBody>, RigidBodyPresenter> _viewModelsMap = new Dictionary<IdentityOf<RigidBody>, RigidBodyPresenter>();
+        private readonly Dictionary<IdentityOf<RigidBody>, RigidBodyPresenter> _presentersMap = new Dictionary<IdentityOf<RigidBody>, RigidBodyPresenter>();
         private readonly Dictionary<IdentityOf<Creature>, IdentityOf<RigidBody>> _rigidBodyIdsMap = new Dictionary<IdentityOf<Creature>, IdentityOf<RigidBody>>();
 
         private Vector _lastCreaturePosition = Vector.Zero;
@@ -41,17 +42,18 @@ namespace DarkDefenders.ConsoleClient.Presenters
 
         public void RigidBodyCreated(IdentityOf<RigidBody> id, Vector position)
         {
-            var creatureViewModel = new RigidBodyPresenter(_map, _consoleRenderer);
-            _viewModelsMap.Add(id, creatureViewModel);
+            var creaturePresenter = new RigidBodyPresenter(_map, _consoleRenderer);
 
-            creatureViewModel.RigidBodyCreated(position);
+            _presentersMap.Add(id, creaturePresenter);
+
+            creaturePresenter.RigidBodyCreated(position);
         }
 
         public void RigidBodyDestroyed(IdentityOf<RigidBody> id)
         {
-            var vm = _viewModelsMap[id];
+            var vm = _presentersMap[id];
             vm.Remove();
-            _viewModelsMap.Remove(id);
+            _presentersMap.Remove(id);
         }
 
         public void Moved(IdentityOf<RigidBody> id, Vector newPosition)
@@ -67,9 +69,13 @@ namespace DarkDefenders.ConsoleClient.Presenters
                 return;
             }
 
-            var viewModel = _viewModelsMap[id];
+            RigidBodyPresenter presenter;
+            if (!_presentersMap.TryGetValue(id, out presenter))
+            {
+                return;
+            }
 
-            viewModel.SetNewPosition(newPosition);
+            presenter.SetNewPosition(newPosition);
         }
 
         public void CreatureCreated(IdentityOf<Creature> id, IdentityOf<RigidBody> rigidBodyId)
@@ -81,7 +87,7 @@ namespace DarkDefenders.ConsoleClient.Presenters
         {
             var rigidBodyId = _rigidBodyIdsMap[creatureId];
 
-            var vm = _viewModelsMap[rigidBodyId];
+            var vm = _presentersMap[rigidBodyId];
 
             vm.SetAsHero();
 
@@ -95,11 +101,11 @@ namespace DarkDefenders.ConsoleClient.Presenters
             RenderHeroesCount();
         }
 
-        public void PlayerAvatarSpawned(IdentityOf<Creature> creatureId)
+        public void PlayerCreated(IdentityOf<Creature> creatureId)
         {
             var rigidBodyId = _rigidBodyIdsMap[creatureId];
 
-            var vm = _viewModelsMap[rigidBodyId];
+            var vm = _presentersMap[rigidBodyId];
 
             vm.SetAsPlayersAvatar();
 
@@ -108,7 +114,7 @@ namespace DarkDefenders.ConsoleClient.Presenters
 
         public void ProjectileCreated(IdentityOf<RigidBody> rigidBodyId)
         {
-            var vm = _viewModelsMap[rigidBodyId];
+            var vm = _presentersMap[rigidBodyId];
             vm.SetAsProjectile();
         }
 
@@ -138,7 +144,7 @@ namespace DarkDefenders.ConsoleClient.Presenters
                 return;
             }
 
-            foreach (var vm in _viewModelsMap.Values)
+            foreach (var vm in _presentersMap.Values)
             {
                 vm.Render();
             }

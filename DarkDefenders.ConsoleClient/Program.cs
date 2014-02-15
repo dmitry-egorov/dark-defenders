@@ -1,6 +1,6 @@
 ﻿using System;
 using DarkDefenders.ConsoleClient.Presenters;
-using DarkDefenders.Domain.Interfaces;
+using DarkDefenders.Domain.Model;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Runtime;
 using Infrastructure.Util;
@@ -45,7 +45,7 @@ namespace DarkDefenders.ConsoleClient
 
             eventDataListener.ListenAsync();
 
-            var loopRunner = new LoopRunner(100);
+            var loopRunner = new Loop(100);
 
             loopRunner.Run(() => Frame(stopwatch, renderer, counter, eventDataListener));
         }

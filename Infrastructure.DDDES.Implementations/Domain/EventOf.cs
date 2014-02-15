@@ -4,6 +4,7 @@ namespace Infrastructure.DDDES.Implementations.Domain
         where TEntity: IEntity<TEntity>
     {
         private readonly TEntity _entity;
+
         protected EventOf(TEntity entity)
         {
             _entity = entity;

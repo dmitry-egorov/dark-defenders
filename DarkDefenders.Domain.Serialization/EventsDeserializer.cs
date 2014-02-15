@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using DarkDefenders.Domain.Entities.Creatures;
-using DarkDefenders.Domain.Entities.RigidBodies;
-using DarkDefenders.Domain.Interfaces;
+using DarkDefenders.Domain.Model;
+using DarkDefenders.Domain.Model.Entities.Creatures;
+using DarkDefenders.Domain.Model.Entities.RigidBodies;
 using DarkDefenders.Domain.Serialization.Internals;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
@@ -119,7 +119,7 @@ namespace DarkDefenders.Domain.Serialization
         {
             var creatureId = reader.ReadIdentityOf<Creature>();
 
-            return r => r.PlayerAvatarSpawned(creatureId);
+            return r => r.PlayerCreated(creatureId);
         }
 
         private static Action<IEventsReciever> ReadProjectileCreated(BinaryReader reader)

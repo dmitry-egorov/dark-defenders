@@ -13,19 +13,19 @@ namespace Infrastructure.DDDES.Implementations.Domain
         }
 
 
-        public void Store(T item)
+        public void Store(T entity)
         {
             foreach (var storage in _storages)
             {
-                storage.Store(item);
+                storage.Store(entity);
             }
         }
 
-        public void Remove(T item)
+        public void Remove(T entity)
         {
             foreach (var storage in _storages)
             {
-                storage.Remove(item);
+                storage.Remove(entity);
             }
         }
     }

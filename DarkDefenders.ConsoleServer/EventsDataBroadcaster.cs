@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using DarkDefenders.Domain.Interfaces;
+using DarkDefenders.Domain.Model;
 using DarkDefenders.Domain.Serialization;
 using Infrastructure.DDDES;
 
@@ -33,6 +33,11 @@ namespace DarkDefenders.ConsoleServer
                 var buffer = _buffers.Value;
 
                 var bytes = _serializer.Serialize(buffer, events);
+
+                if (bytes == 0)
+                {
+                    return;
+                }
 
                 _client.SendAsync(buffer, bytes, _ipEndPoint);
             });

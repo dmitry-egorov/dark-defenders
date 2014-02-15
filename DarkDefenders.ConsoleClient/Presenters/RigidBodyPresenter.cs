@@ -1,13 +1,22 @@
 using System;
 using System.Drawing;
 using DarkDefenders.ConsoleClient.Renderer;
-using DarkDefenders.Domain.Other;
+using DarkDefenders.Domain.Model.Other;
 using Infrastructure.Math;
 
 namespace DarkDefenders.ConsoleClient.Presenters
 {
     internal class RigidBodyPresenter
     {
+        private readonly Map<Tile> _map;
+        private readonly IConsoleRenderer _consoleRenderer;
+
+        private char? _character;
+        private ConsoleColor? _color;
+        private Point _currentPosition;
+        private Point _lastRenderingPosition;
+        private bool _renderImmediately;
+
         public RigidBodyPresenter(Map<Tile> map, IConsoleRenderer consoleRenderer)
         {
             _map = map;
@@ -41,27 +50,6 @@ namespace DarkDefenders.ConsoleClient.Presenters
             RenderInternal();
         }
 
-        private void RenderInternal()
-        {
-            if (!_character.HasValue || !_color.HasValue)
-            {
-                throw new InvalidOperationException("Rigid body type not set");
-            }
-
-            var newRenderingPosition = _currentPosition;
-
-            if (newRenderingPosition == _lastRenderingPosition)
-            {
-                return;
-            }
-
-            var transformedPosition = Transform(newRenderingPosition);
-            _consoleRenderer.Render(transformedPosition, _character.Value, _color.Value);
-            Remove();
-
-            _lastRenderingPosition = newRenderingPosition;
-        }
-
         public void RigidBodyCreated(Vector position)
         {
             var point = position.ToPoint();
@@ -89,6 +77,27 @@ namespace DarkDefenders.ConsoleClient.Presenters
             _consoleRenderer.Render(transformedPosition, c, ConsoleColor.DarkGray);
         }
 
+        private void RenderInternal()
+        {
+            if (!_character.HasValue || !_color.HasValue)
+            {
+                throw new InvalidOperationException("Rigid body type not set");
+            }
+
+            var newRenderingPosition = _currentPosition;
+
+            if (newRenderingPosition == _lastRenderingPosition)
+            {
+                return;
+            }
+
+            var transformedPosition = Transform(newRenderingPosition);
+            _consoleRenderer.Render(transformedPosition, _character.Value, _color.Value);
+            Remove();
+
+            _lastRenderingPosition = newRenderingPosition;
+        }
+
         private void SetType(char character, ConsoleColor color)
         {
             _character = character;
@@ -108,14 +117,5 @@ namespace DarkDefenders.ConsoleClient.Presenters
 
             return new Point(cx, cy);
         }
-
-        private readonly Map<Tile> _map;
-        private readonly IConsoleRenderer _consoleRenderer;
-
-        private char? _character;
-        private ConsoleColor? _color;
-        private Point _currentPosition;
-        private Point _lastRenderingPosition;
-        private bool _renderImmediately;
     }
 }

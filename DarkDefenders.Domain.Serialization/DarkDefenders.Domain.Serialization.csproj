@@ -46,9 +46,9 @@
     <Compile Include="Internals\SerializingReciever.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DarkDefenders.Domain\DarkDefenders.Domain.csproj">
-      <Project>{27F91716-3957-49C9-94BB-8AA160BF96AA}</Project>
-      <Name>DarkDefenders.Domain</Name>
+    <ProjectReference Include="..\DarkDefenders.Domain.Model\DarkDefenders.Domain.Model.csproj">
+      <Project>{9C13B1FF-5E35-4D3A-8D48-C4BCCE96F8CE}</Project>
+      <Name>DarkDefenders.Domain.Model</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.DDDES.Implementations\Infrastructure.DDDES.Implementations.csproj">
       <Project>{5E4CA423-37F5-4B6A-B00C-0ADC06EC0378}</Project>

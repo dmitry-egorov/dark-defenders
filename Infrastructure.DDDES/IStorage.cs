@@ -2,7 +2,7 @@
 {
     public interface IStorage<in TEntity>
     {
-        void Store(TEntity item);
-        void Remove(TEntity item);
+        void Store(TEntity entity);
+        void Remove(TEntity entity);
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using DarkDefenders.Domain.Interfaces;
+using DarkDefenders.Domain.Model;
 using DarkDefenders.Domain.Serialization;
 using Infrastructure.DDDES;
 using Infrastructure.Util;

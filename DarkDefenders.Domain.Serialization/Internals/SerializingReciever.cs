@@ -1,7 +1,7 @@
 using System.IO;
-using DarkDefenders.Domain.Entities.Creatures;
-using DarkDefenders.Domain.Entities.RigidBodies;
-using DarkDefenders.Domain.Interfaces;
+using DarkDefenders.Domain.Model;
+using DarkDefenders.Domain.Model.Entities.Creatures;
+using DarkDefenders.Domain.Model.Entities.RigidBodies;
 using Infrastructure.DDDES;
 using Infrastructure.Math;
 using Infrastructure.Serialization;
@@ -61,7 +61,7 @@ namespace DarkDefenders.Domain.Serialization.Internals
             _writer.Write((short)SerializableEvents.HeroDestroyed);
         }
 
-        public void PlayerAvatarSpawned(IdentityOf<Creature> creatureId)
+        public void PlayerCreated(IdentityOf<Creature> creatureId)
         {
             _writer.Write((short)SerializableEvents.PlayerAvatarSpawned);
             _writer.Write(creatureId);
