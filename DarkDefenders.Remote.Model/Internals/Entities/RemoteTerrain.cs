@@ -1,20 +1,19 @@
 ﻿using DarkDefenders.Domain.Model.Events;
-using DarkDefenders.Remote.Model.Interface;
 
 namespace DarkDefenders.Remote.Model.Internals.Entities
 {
     internal class RemoteTerrain: ITerrainEvents
     {
-        private readonly IRemoteEvents _reciever;
+        private readonly RemoteEventsPacker _packer;
 
-        public RemoteTerrain(IRemoteEvents reciever)
+        public RemoteTerrain(RemoteEventsPacker packer)
         {
-            _reciever = reciever;
+            _packer = packer;
         }
 
         public void Created(string mapId)
         {
-            _reciever.MapLoaded(mapId);
+            _packer.MapLoaded(mapId);
         }
 
         public void Destroyed()

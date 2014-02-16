@@ -1,21 +1,20 @@
 ﻿using System;
 using DarkDefenders.Domain.Model.Events;
-using DarkDefenders.Remote.Model.Interface;
 
 namespace DarkDefenders.Remote.Model.Internals.Entities
 {
     public class RemoteClock: IClockEvents
     {
-        private readonly IRemoteEvents _reciever;
+        private readonly RemoteEventsPacker _packer;
 
-        public RemoteClock(IRemoteEvents reciever)
+        public RemoteClock(RemoteEventsPacker packer)
         {
-            _reciever = reciever;
+            _packer = packer;
         }
 
         public void TimeChanged(TimeSpan newTime)
         {
-            _reciever.Tick(newTime);
+            _packer.Tick(newTime);
         }
 
         public void Destroyed()

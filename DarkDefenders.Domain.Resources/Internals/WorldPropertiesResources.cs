@@ -4,7 +4,7 @@ using Infrastructure.DDDES;
 
 namespace DarkDefenders.Domain.Resources
 {
-    public class WorldPropertiesResources : IResources<WorldProperties>
+    internal class WorldPropertiesResources : IResources<WorldProperties>
     {
         public WorldProperties this[string resourceId]
         {

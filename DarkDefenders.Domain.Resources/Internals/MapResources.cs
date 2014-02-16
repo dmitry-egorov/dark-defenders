@@ -5,7 +5,7 @@ using Infrastructure.Math;
 
 namespace DarkDefenders.Domain.Resources
 {
-    public class MapResources : IResources<Map<Tile>>
+    internal class MapResources : IResources<Map<Tile>>
     {
         public Map<Tile> this[string resourceId]
         {

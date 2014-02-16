@@ -68,8 +68,7 @@ namespace DarkDefenders.IntegrationTests
 
             .RegisterResource(_mapResources)
             .RegisterResource(_propertiesResources)
-            .RegisterResource(new RigidBodyPropertiesResources())
-            .RegisterResource(new CreaturePropertiesResources())
+            .RegisterHardcodedResources()
 
             .RegisterListener(() => _clock.Object)
             .RegisterListener(() => _terrain.Object)

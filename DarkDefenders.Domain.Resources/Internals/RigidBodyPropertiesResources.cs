@@ -4,7 +4,7 @@ using Infrastructure.DDDES;
 
 namespace DarkDefenders.Domain.Resources
 {
-    public class RigidBodyPropertiesResources: IResources<RigidBodyProperties>
+    internal class RigidBodyPropertiesResources: IResources<RigidBodyProperties>
     {
         private readonly Dictionary<string, RigidBodyProperties> _map = new Dictionary<string, RigidBodyProperties>
         {

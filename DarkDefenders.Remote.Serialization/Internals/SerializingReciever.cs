@@ -37,11 +37,6 @@ namespace DarkDefenders.Remote.Serialization.Internals
             _writer.Write(id);
         }
 
-        public void Tick(TimeSpan newTime)
-        {
-
-        }
-
         public void Moved(IdentityOf<RigidBody> id, Vector newPosition)
         {
             _writer.Write((short)SerializableEvents.Moved);

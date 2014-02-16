@@ -71,11 +71,6 @@ namespace DarkDefenders.ConsoleClient.Presenters
             }
         }
 
-        public void Tick(TimeSpan newTime)
-        {
-            
-        }
-
         public void Moved(IdentityOf<RigidBody> id, Vector newPosition)
         {
             var isPlayer = id == _playersRigidBodyId;

@@ -4,7 +4,7 @@ using Infrastructure.DDDES;
 
 namespace DarkDefenders.Domain.Resources
 {
-    public class CreaturePropertiesResources : IResources<CreatureProperties>
+    internal class CreaturePropertiesResources : IResources<CreatureProperties>
     {
         private readonly Dictionary<string, CreatureProperties> _map = new Dictionary<string, CreatureProperties>
         {

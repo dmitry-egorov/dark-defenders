@@ -9,6 +9,7 @@ namespace DarkDefenders.Remote.Model.Internals.Entities
     internal class RemoteRigidBody: IRigidBodyEvents
     {
         private readonly RemoteEventAdapter _adapter;
+
         private IdentityOf<RigidBody> _rigidBodyId;
 
         public RemoteRigidBody(RemoteEventAdapter adapter)
