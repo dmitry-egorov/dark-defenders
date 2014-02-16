@@ -34,7 +34,6 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EventsProcessorExtensions.cs" />
     <Compile Include="IdentityOf.cs" />
     <Compile Include="IdentityValueGenerator.cs" />
     <Compile Include="IEntity.cs" />

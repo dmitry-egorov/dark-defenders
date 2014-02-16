@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
 using DarkDefenders.Remote.Model.Interface;
 using DarkDefenders.Remote.Serialization;
@@ -12,14 +11,12 @@ namespace DarkDefenders.ConsoleServer
 {
     internal class EventsDataBroadcaster : IEventsListener<IRemoteEvents>
     {
-        private readonly ThreadLocal<byte[]> _buffers;
         private readonly UdpClient _client;
         private readonly IPEndPoint _ipEndPoint;
         private readonly EventsSerializer _serializer;
 
         public EventsDataBroadcaster()
         {
-            _buffers = new ThreadLocal<byte[]>(() => new byte[1000000]);
             _client = new UdpClient();
 
             _ipEndPoint = new IPEndPoint(new IPAddress(new byte[] {127, 0, 0, 1}), 1337);
@@ -31,9 +28,8 @@ namespace DarkDefenders.ConsoleServer
         {
             Task.Run(() =>
             {
-                var buffer = _buffers.Value;
-
-                var bytes = _serializer.Serialize(buffer, events);
+                var buffer = _serializer.Serialize(events);
+                var bytes = buffer.Length;
 
                 if (bytes == 0)
                 {

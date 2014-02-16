@@ -9,5 +9,6 @@ namespace DarkDefenders.Domain.Model.Events
         void Created(Vector position);
         void ActivationTimeChanged(TimeSpan time);
         void SpawnHeroesChanged(bool enabled);
+        void QueuedForSpawnCountChanged(int newQueuedForSpawnCount);
     }
 }

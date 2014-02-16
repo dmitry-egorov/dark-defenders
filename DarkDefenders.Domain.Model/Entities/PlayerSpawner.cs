@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using DarkDefenders.Domain.Model.EntityProperties;
 using DarkDefenders.Domain.Model.Events;
@@ -18,35 +17,39 @@ namespace DarkDefenders.Domain.Model.Entities
         private readonly IResources<WorldProperties> _resources;
 
         private ReadOnlyCollection<Vector> _playersSpawnPositions;
+        private readonly IFactory<Player> _playerFactory;
 
-        public PlayerSpawner(IPlayerSpawnerEvents external, IStorage<PlayerSpawner> storage, Random random, IResources<WorldProperties> resources) 
-            : base(external, storage)
+        public PlayerSpawner
+        (
+            Random random, 
+            IResources<WorldProperties> resources, 
+            IFactory<Player> playerFactory
+        )
         {
             _random = random;
             _resources = resources;
+            _playerFactory = playerFactory;
         }
 
-        public IEnumerable<IEvent> Create(string mapId)
+        public void Create(string mapId)
         {
-            yield return CreationEvent(x => x.Created(mapId));
+            CreationEvent(x => x.Created(mapId));
         }
 
-        public IEnumerable<IEvent> Spawn(Player player)
+        public Player Spawn()
         {
+            var player = _playerFactory.Create();
+
             var position = _random.ElementFrom(_playersSpawnPositions);
 
-            var events = player.Create(position);
+            player.Create(position);
 
-            foreach (var e in events) { yield return e; }
+            return player;
         }
 
         void IPlayerSpawnerEvents.Created(string mapId)
         {
             _playersSpawnPositions = _resources[mapId].PlayersSpawnPositions;
-        }
-
-        void IEntityEvents.Destroyed()
-        {
         }
     }
 }

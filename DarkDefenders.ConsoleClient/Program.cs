@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Forms;
 using DarkDefenders.ConsoleClient.Presenters;
 using DarkDefenders.Domain.Model;
 using DarkDefenders.Remote.Model;
@@ -47,16 +48,16 @@ namespace DarkDefenders.ConsoleClient
 
             eventDataListener.ListenAsync();
 
-            var loopRunner = new Loop(100);
+            var loop = new Loop(100);
 
-            loopRunner.Run(() => Frame(stopwatch, renderer, counter, eventDataListener));
+            loop.Run(() => Frame(stopwatch, renderer, counter, eventDataListener));
         }
 
         private static void Frame(AutoResetStopwatch stopwatch, GamePresenter renderer, CountingEventsListener<IRemoteEvents> counter, EventDataListener eventDataListener)
         {
             var elapsed = stopwatch.ElapsedSinceLastCall.LimitTo(_elapsedLimit);
 
-            //_keyBoardExecutor.Tick(elapsed, () => ProcessKeyboard(game, player, world));
+            _keyBoardExecutor.Tick(elapsed, ProcessKeyboard);
             //_testHeroSpawnExecutor.Tick(elapsed, world.SpawnHero);
 
             _heroRenderingExecutor.Tick(elapsed, renderer.RenderCreatures);
@@ -67,8 +68,8 @@ namespace DarkDefenders.ConsoleClient
             eventDataListener.ProcessEvents();
         }
 
-//        private static void ProcessKeyboard(IGame game, IPlayer player, IWorld world)
-//        {
+        private static void ProcessKeyboard()
+        {
 //            var leftIsPressed = NativeKeyboard.IsKeyDown(Keys.Left);
 //            var rightIsPressed = NativeKeyboard.IsKeyDown(Keys.Right);
 //            if (leftIsPressed && !rightIsPressed)
@@ -98,13 +99,13 @@ namespace DarkDefenders.ConsoleClient
 //            _killHeroesButton.State(NativeKeyboard.IsKeyDown(Keys.K), game.KillAllHeroes);
 //
 //            _limitFpsSwitch.State(NativeKeyboard.IsKeyDown(Keys.L));
-//            _heroRenderingExecutor.State(NativeKeyboard.IsKeyDown(Keys.R));
+            _heroRenderingExecutor.State(NativeKeyboard.IsKeyDown(Keys.F1));
 //            _testHeroSpawnExecutor.State(NativeKeyboard.IsKeyDown(Keys.T));
 //
 //            if (NativeKeyboard.IsKeyDown(Keys.Escape))
 //            {
 //                _escape = true;
 //            }
-//        }
+        }
     }
 }

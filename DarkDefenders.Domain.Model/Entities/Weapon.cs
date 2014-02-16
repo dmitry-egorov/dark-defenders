@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using DarkDefenders.Domain.Model.Events;
 using DarkDefenders.Domain.Model.Other;
 using Infrastructure.DDDES;
@@ -26,33 +25,30 @@ namespace DarkDefenders.Domain.Model.Entities
 
         private RigidBody _rigidBody;
 
-        public Weapon(IWeaponEvents external, IStorage<Weapon> storage, Clock clock, IFactory<Projectile> projectileFactory)
-            : base(external, storage)
+        public Weapon(Clock clock, IFactory<Projectile> projectileFactory)
         {
             _clock = clock;
             _projectileFactory = projectileFactory;
             _fireCooldown = new Cooldown(clock, _fireDelay);
         }
 
-        public IEnumerable<IEvent> Create(RigidBody rigidBody)
+        public void Create(RigidBody rigidBody)
         {
-            yield return CreationEvent(x => x.Created(rigidBody));
+            CreationEvent(x => x.Created(rigidBody));
         }
 
-        public IEnumerable<IEvent> Fire(Direction direction)
+        public void Fire(Direction direction)
         {
             if (_fireCooldown.IsInEffect())
             {
-                yield break;
+                return;
             }
 
-            var events = CreateProjectile(direction);
-
-            foreach (var e in events) { yield return e; }
+            CreateProjectile(direction);
 
             var currentTime = _clock.GetCurrentTime();
 
-            yield return Event(x => x.Fired(currentTime));
+            Event(x => x.Fired(currentTime));
         }
 
         void IWeaponEvents.Created(RigidBody rigidBody)
@@ -65,16 +61,14 @@ namespace DarkDefenders.Domain.Model.Entities
             _fireCooldown.SetLastActivationTime(activationTime);
         }
 
-        private IEnumerable<IEvent> CreateProjectile(Direction direction)
+        private void CreateProjectile(Direction direction)
         {
             var projectilePosition = GetProjectilePosition(direction);
             var projectileMomentum = GetProjectileMomentum(direction);
 
             var projectile = _projectileFactory.Create();
 
-            var events = projectile.Create(projectilePosition, projectileMomentum);
-
-            foreach (var e in events) { yield return e; }
+            projectile.Create(projectilePosition, projectileMomentum);
         }
 
         private Vector GetProjectilePosition(Direction direction)
@@ -102,10 +96,6 @@ namespace DarkDefenders.Domain.Model.Entities
             return direction == Direction.Right
                    ? _rightProjectileMomentum
                    : _leftProjectileMomentum;
-        }
-
-        void IEntityEvents.Destroyed()
-        {
         }
     }
 }

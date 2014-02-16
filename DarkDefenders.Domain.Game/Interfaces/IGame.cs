@@ -8,7 +8,7 @@ namespace DarkDefenders.Domain.Game.Interfaces
         void KillAllHeroes();
         void Update(TimeSpan elapsed);
         IPlayer AddPlayer();
-        void SpawnHero();
+        void SpawnHeros(int count);
         void ChangeSpawnHeroes(bool enabled);
     }
 }

@@ -6,7 +6,7 @@ namespace DarkDefenders.Domain.Model.Events
 {
     public interface ICreatureEvents: IEntityEvents
     {
-        void Created(IdentityOf<Creature> creatureId, IdentityOf<RigidBody> rigidBody, string properties);
+        void Created(Creature creature, RigidBody rigidBody, string properties);
         void MovementChanged(Movement movement);
     }
 }

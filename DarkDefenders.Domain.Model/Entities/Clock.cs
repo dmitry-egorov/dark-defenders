@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using DarkDefenders.Domain.Model.Events;
-using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Physics;
 using JetBrains.Annotations;
@@ -15,31 +12,25 @@ namespace DarkDefenders.Domain.Model.Entities
         private Seconds _elapsedSeconds;
         private TimeSpan _currentTime;
 
-        public Clock(IClockEvents external, IStorage<Clock> storage) : base(external, storage)
+        public void Create()
         {
+            CreationEvent(r => r.Created());
         }
 
-        public IEnumerable<IEvent> Create()
+        public void UpdateTime(TimeSpan elapsed)
         {
-            yield return CreationEvent(r => r.Created());
+            var newTime = _currentTime + elapsed;
+            Event(x => x.TimeChanged(newTime));
         }
-            
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         public TimeSpan GetCurrentTime()
         {
             return _currentTime;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Seconds GetElapsedSeconds()
         {
             return _elapsedSeconds;
-        }
-
-        public IEnumerable<IEvent> UpdateTime(TimeSpan elapsed)
-        {
-            var newTime = _currentTime + elapsed;
-            yield return Event(x => x.TimeChanged(newTime));
         }
 
         void IClockEvents.Created()
@@ -52,10 +43,6 @@ namespace DarkDefenders.Domain.Model.Entities
         {
             _elapsedSeconds = (newTime - _currentTime).ToSeconds();
             _currentTime = newTime;
-        }
-
-        void IEntityEvents.Destroyed()
-        {
         }
     }
 }

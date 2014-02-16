@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,6 +38,8 @@ namespace DarkDefenders.ConsoleServer
             var networkBroadcaster = new EventsDataBroadcaster();
             var game = InitializeGame(networkBroadcaster);
 
+            var textCommandsProcessor = new TextCommandsProcessor(game);
+
             var loop = new Loop(MaxFps);
             var gameTask = Task.Factory.StartNew(() =>
             {
@@ -45,14 +48,18 @@ namespace DarkDefenders.ConsoleServer
                 {
                     var elapsed = stopwatch.ElapsedSinceLastCall.LimitTo(_elapsedLimit);
 
-                    ExecuteCommands();
+                    var actualElapsed = Measure.Time(() =>
+                    {
+                        ExecuteCommands();
 
-                    game.Update(elapsed);
+                        game.Update(elapsed);
+                    });
+
+                    textCommandsProcessor.SetActualElapsed(actualElapsed);
                 });
             }, 
             TaskCreationOptions.LongRunning);
 
-            var textCommandsProcessor = new TextCommandsProcessor(game);
             RunConsoleCommandsProcessing(textCommandsProcessor, loop);
 
             gameTask.Wait();

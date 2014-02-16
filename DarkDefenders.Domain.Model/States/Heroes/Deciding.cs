@@ -1,9 +1,6 @@
 using System;
-using System.Collections.Generic;
 using DarkDefenders.Domain.Model.Entities;
 using DarkDefenders.Domain.Model.Other;
-using Infrastructure.DDDES;
-using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.Model.States.Heroes
 {
@@ -20,23 +17,20 @@ namespace DarkDefenders.Domain.Model.States.Heroes
             _creature = creature;
         }
 
-        public IEnumerable<IEvent> Update()
+        public void Update()
         {
             if (_creature.IsInTheAir())
             {
-                yield break;
+                return;
             }
 
             var bit = _random.Next(2);
 
             var movement = bit == 0 ? Movement.Left : Movement.Right;
 
-            var mevents = _creature.ChangeMovementTo(movement);
+            _creature.ChangeMovementTo(movement);
 
-            var sevents = _factory.CreateMovingEvent();
-
-            var events = Concat.All(mevents, sevents);
-            foreach (var e in events) { yield return e; }
+            _factory.Moving();
         }
     }
 }

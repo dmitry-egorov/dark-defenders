@@ -7,11 +7,21 @@ namespace Infrastructure.DDDES.Implementations
     [UsedImplicitly]
     public class EventsProcessor : IEventsProcessor
     {
-        public void Process(IEnumerable<IEvent> events)
-        {
-            var all = events.AsReadOnly();
+        private readonly Queue<IEvent> _queue = new Queue<IEvent>();
 
-            all.ApplyAll();
+        public void Publish(IEvent e)
+        {
+            _queue.Enqueue(e);
+        }
+
+        public void Process()
+        {
+            var all = _queue.DequeueAll();
+
+            foreach (var @event in all)
+            {
+                @event.Apply();
+            }
         }
     }
 }

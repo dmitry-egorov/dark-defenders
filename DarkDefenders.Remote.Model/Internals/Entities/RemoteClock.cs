@@ -3,7 +3,7 @@ using DarkDefenders.Domain.Model.Events;
 
 namespace DarkDefenders.Remote.Model.Internals.Entities
 {
-    public class RemoteClock: IClockEvents
+    internal class RemoteClock: IClockEvents
     {
         private readonly RemoteEventsPacker _packer;
 
@@ -14,7 +14,7 @@ namespace DarkDefenders.Remote.Model.Internals.Entities
 
         public void TimeChanged(TimeSpan newTime)
         {
-            _packer.Tick(newTime);
+            _packer.Pack();
         }
 
         public void Destroyed()

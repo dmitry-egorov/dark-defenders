@@ -8,9 +8,9 @@ namespace DarkDefenders.Remote.Serialization
 {
     public class EventsSerializer
     {
-        public int Serialize(byte[] buffer, IEnumerable<Action<IRemoteEvents>> events)
+        public byte[] Serialize(IEnumerable<Action<IRemoteEvents>> events)
         {
-            return (int)buffer.UsingBinaryWriter(writer =>
+            return Using.GZipBinaryWriter(writer =>
             {
                 var reciever = new SerializingReciever(writer);
 

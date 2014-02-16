@@ -1,32 +1,31 @@
 ﻿using DarkDefenders.Domain.Game.Interfaces;
 using DarkDefenders.Domain.Model.Entities;
 using DarkDefenders.Domain.Model.Other;
-using Infrastructure.DDDES.Implementations.Domain;
 
 namespace DarkDefenders.Domain.Game.Adapters
 {
     internal class PlayerAdapter : IPlayer
     {
-        private readonly EntityAdapter<Player> _palyer;
+        private readonly Player _palyer;
 
-        public PlayerAdapter(EntityAdapter<Player> palyer)
+        public PlayerAdapter(Player palyer)
         {
             _palyer = palyer;
         }
 
         public void ChangeMovement(Movement movement)
         {
-            _palyer.Commit(x => x.ChangeMovement(movement));
+            _palyer.ChangeMovement(movement);
         }
 
         public void Jump()
         {
-            _palyer.Commit(x => x.Jump());
+            _palyer.Jump();
         }
 
         public void Fire()
         {
-            _palyer.Commit(x => x.Fire());
+            _palyer.Fire();
         }
     }
 }

@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using DarkDefenders.Domain.Model.Entities;
-using Infrastructure.DDDES;
 
 namespace DarkDefenders.Domain.Model.States.Heroes
 {
@@ -26,40 +24,32 @@ namespace DarkDefenders.Domain.Model.States.Heroes
             _hero = hero;
         }
 
-        public IEnumerable<IEvent> CreateMovingEvent()
+        public void Moving()
         {
             var state = CreateMoving();
 
-            var events = _hero.ChangeState(state);
-
-            foreach (var e in events) { yield return e; }
+            _hero.ChangeState(state);
         }
 
-        public IEnumerable<IEvent> CreateFallingEvent(Point fallenFrom)
+        public void Falling(Point fallenFrom)
         {
             var state = CreateFalling(fallenFrom);
 
-            var events = _hero.ChangeState(state);
-
-            foreach (var e in events) { yield return e; }
+            _hero.ChangeState(state);
         }
 
-        public IEnumerable<IEvent> CreateJumpingEvent()
+        public void Jumping()
         {
             var state = CreateJumping();
 
-            var events = _hero.ChangeState(state);
-
-            foreach (var e in events) { yield return e; }
+            _hero.ChangeState(state);
         }
 
-        public IEnumerable<IEvent> CreateDecidingEvent()
+        public void Deciding()
         {
             var state = CreateDeciding();
 
-            var events = _hero.ChangeState(state);
-
-            foreach (var e in events) { yield return e; }
+            _hero.ChangeState(state);
         }
 
         private IHeroState CreateDeciding()

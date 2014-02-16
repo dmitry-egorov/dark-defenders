@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using DarkDefenders.Domain.Model.Events;
 using DarkDefenders.Domain.Model.States.Heroes;
-using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
 using JetBrains.Annotations;
@@ -16,55 +14,44 @@ namespace DarkDefenders.Domain.Model.Entities
 
         private IHeroState _state;
 
-        public Hero(IHeroEvents external, IStorage<Hero> storage, Random random, Creature creature)
-            : base(external, storage)
+        public Hero(Random random, Creature creature)
         {
             _creature = creature;
 
             _state = HeroStateFactory.CreateInitial(random, this, _creature);
         }
 
-        public IEnumerable<IEvent> Create(Vector initialPosition)
+        public void Create(Vector initialPosition)
         {
-            var events = _creature.Create(initialPosition, "Hero");
+            _creature.Create(initialPosition, "Hero");
 
-            foreach (var e in events) { yield return e; }
-
-            yield return CreationEvent(x => x.Created(_creature.Id));
+            CreationEvent(x => x.Created(_creature));
         }
 
-        public IEnumerable<IEvent> Think()
+        public void Think()
         {
-            var events = _state.Update();
-
-            foreach (var e in events) { yield return e; }
+            _state.Update();
         }
 
-        public IEnumerable<IEvent> Kill()
+        public void Kill()
         {
-            yield return DestructionEvent();
+            DestructionEvent();
 
-            var events = _creature.Kill();
-
-            foreach (var e in events) { yield return e; }
+            _creature.Kill();
         }
 
-        internal IEnumerable<IEvent> ChangeState(IHeroState state)
+        internal void ChangeState(IHeroState state)
         {
-            yield return Event(x => x.StateChanged(state));
+            Event(x => x.StateChanged(state));
         }
 
-        void IHeroEvents.Created(IdentityOf<Creature> creatureId)
+        void IHeroEvents.Created(Creature creature)
         {
         }
 
         void IHeroEvents.StateChanged(IHeroState heroState)
         {
             _state = heroState;
-        }
-
-        void IEntityEvents.Destroyed()
-        {
         }
     }
 }

@@ -46,14 +46,9 @@
   <ItemGroup>
     <Compile Include="Configuration\DomainConfigurator.cs" />
     <Compile Include="Domain\CompositeEventsListener.cs" />
-    <Compile Include="Domain\CompositeStorage.cs" />
     <Compile Include="Domain\CountingEventsListener.cs" />
     <Compile Include="Domain\DelegatingEventsListener.cs" />
-    <Compile Include="Domain\DestroyedData.cs" />
     <Compile Include="Domain\Entity.cs" />
-    <Compile Include="Domain\EntityAdapter.cs" />
-    <Compile Include="Domain\EntitiesAdapter.cs" />
-    <Compile Include="EventsExtensions.cs" />
     <Compile Include="EventsProcessor.cs" />
     <Compile Include="Domain\Created.cs" />
     <Compile Include="Domain\Destroyed.cs" />

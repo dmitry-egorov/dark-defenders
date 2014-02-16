@@ -1,6 +1,5 @@
 ﻿using DarkDefenders.Domain.Model.Entities;
 using DarkDefenders.Domain.Model.Events;
-using Infrastructure.DDDES;
 using Infrastructure.Math;
 using Infrastructure.Physics;
 
@@ -10,17 +9,17 @@ namespace DarkDefenders.Remote.Model.Internals.Entities
     {
         private readonly RemoteEventAdapter _adapter;
 
-        private IdentityOf<RigidBody> _rigidBodyId;
+        private RigidBody _rigidBody;
 
         public RemoteRigidBody(RemoteEventAdapter adapter)
         {
             _adapter = adapter;
         }
 
-        public void Created(IdentityOf<RigidBody> rigidBodyId, Vector initialPosition, Momentum initialMomentum, string properties)
+        public void Created(RigidBody rigidBody, Vector initialPosition, Momentum initialMomentum, string properties)
         {
-            _adapter.RigidBodyCreated(rigidBodyId, initialPosition);
-            _rigidBodyId = rigidBodyId;
+            _adapter.RigidBodyCreated(rigidBody, initialPosition);
+            _rigidBody = rigidBody;
         }
 
         public void Accelerated(Momentum newMomentum)
@@ -29,7 +28,7 @@ namespace DarkDefenders.Remote.Model.Internals.Entities
 
         public void Moved(Vector newPosition)
         {
-            _adapter.Moved(_rigidBodyId, newPosition);
+            _adapter.Moved(_rigidBody, newPosition);
         }
 
         public void ExternalForceChanged(Force externalForce)
@@ -38,7 +37,7 @@ namespace DarkDefenders.Remote.Model.Internals.Entities
 
         public void Destroyed()
         {
-            _adapter.RigidBodyDestroyed(_rigidBodyId);
+            _adapter.RigidBodyDestroyed(_rigidBody);
         }
     }
 }

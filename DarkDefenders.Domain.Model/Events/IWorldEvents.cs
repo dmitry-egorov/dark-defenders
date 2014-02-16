@@ -4,6 +4,6 @@ namespace DarkDefenders.Domain.Model.Events
 {
     public interface IWorldEvents: IEntityEvents
     {
-        void Created(string mapId);
+        void Created();
     }
 }

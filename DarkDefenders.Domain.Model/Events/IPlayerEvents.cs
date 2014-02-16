@@ -5,6 +5,6 @@ namespace DarkDefenders.Domain.Model.Events
 {
     public interface IPlayerEvents: IEntityEvents
     {
-        void Created(IdentityOf<Creature> creatureId);
+        void Created(Creature creature);
     }
 }

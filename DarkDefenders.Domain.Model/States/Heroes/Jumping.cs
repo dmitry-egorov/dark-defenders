@@ -15,15 +15,14 @@ namespace DarkDefenders.Domain.Model.States.Heroes
             _stateFactory = stateFactory;
         }
 
-        public IEnumerable<IEvent> Update()
+        public void Update()
         {
             if (_creature.IsInTheAir())
             {
-                yield break;
+                return;
             }
 
-            var events = _stateFactory.CreateMovingEvent();
-            foreach (var e in events) { yield return e; }
+            _stateFactory.Moving();
         }
     }
 }

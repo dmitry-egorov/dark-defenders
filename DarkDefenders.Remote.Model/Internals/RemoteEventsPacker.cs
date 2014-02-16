@@ -38,9 +38,9 @@ namespace DarkDefenders.Remote.Model.Internals
             _actionsQueue.Enqueue(r => r.Destroyed(id));
         }
 
-        public void Tick(TimeSpan newTime)
+        public void Pack()
         {
-            var actions = _actionsQueue.DequeueAll();
+            var actions = _actionsQueue.DequeueAll().AsReadOnly();
 
             _listener.Recieve(actions);
         }

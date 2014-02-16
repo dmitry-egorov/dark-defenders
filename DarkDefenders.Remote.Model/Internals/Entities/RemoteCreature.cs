@@ -1,7 +1,6 @@
 ﻿using DarkDefenders.Domain.Model.Entities;
 using DarkDefenders.Domain.Model.Events;
 using DarkDefenders.Domain.Model.Other;
-using Infrastructure.DDDES;
 
 namespace DarkDefenders.Remote.Model.Internals.Entities
 {
@@ -14,9 +13,9 @@ namespace DarkDefenders.Remote.Model.Internals.Entities
             _adapter = adapter;
         }
 
-        public void Created(IdentityOf<Creature> creatureId, IdentityOf<RigidBody> rigidBodyId, string properties)
+        public void Created(Creature creature, RigidBody rigidBody, string properties)
         {
-            _adapter.CreatureCreated(creatureId, rigidBodyId);
+            _adapter.CreatureCreated(creature, rigidBody);
         }
 
         public void MovementChanged(Movement movement)

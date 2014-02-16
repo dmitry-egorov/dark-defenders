@@ -1,7 +1,7 @@
 using System;
 using System.Drawing;
 
-namespace DarkDefenders.ConsoleClient.Renderer
+namespace DarkDefenders.ConsoleClient.Renderers
 {
     class EmptyConsoleRenderer : IConsoleRenderer
     {

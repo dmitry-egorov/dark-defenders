@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using DarkDefenders.ConsoleClient.Renderer;
+using DarkDefenders.ConsoleClient.Renderers;
 using DarkDefenders.Domain.Model.Entities;
 using DarkDefenders.Domain.Model.Other;
 using DarkDefenders.Domain.Resources.Internals;

@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using System.Drawing;
 using DarkDefenders.Domain.Model.Entities;
-using Infrastructure.DDDES;
 
 namespace DarkDefenders.Domain.Model.States.Heroes
 {
@@ -18,22 +16,20 @@ namespace DarkDefenders.Domain.Model.States.Heroes
             _factory = factory;
         }
 
-        public IEnumerable<IEvent> Update()
+        public void Update()
         {
             if (_creature.IsInTheAir())
             {
-                yield break;
+                return;
             }
 
             if (_creature.CanMoveBackwardsAfterFall(_fallenFrom))
             {
-                var events = _factory.CreateDecidingEvent();
-                foreach (var e in events) { yield return e; }
+                _factory.Deciding();
             }
             else
             {
-                var events = _factory.CreateMovingEvent();
-                foreach (var e in events) { yield return e; }
+                _factory.Moving();
             }
         }
     }

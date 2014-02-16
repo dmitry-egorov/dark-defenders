@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using DarkDefenders.Domain.Model.Events;
-using Infrastructure.DDDES;
+﻿using DarkDefenders.Domain.Model.Events;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
 using Infrastructure.Physics;
@@ -15,40 +13,31 @@ namespace DarkDefenders.Domain.Model.Entities
 
         private readonly RigidBody _rigidBody;
 
-        public Projectile(IProjectileEvents external, IStorage<Projectile> storage, RigidBody rigidBody)
-            : base(external, storage)
+        public Projectile(RigidBody rigidBody)
         {
             _rigidBody = rigidBody;
         }
 
-        public IEnumerable<IEvent> Create(Vector position, Momentum momentum)
+        public void Create(Vector position, Momentum momentum)
         {
-            var events = _rigidBody.Create(position, momentum, "Projectile");
+            _rigidBody.Create(position, momentum, "Projectile");
 
-            foreach (var e in events) { yield return e; }
-
-            yield return CreationEvent(x => x.Created(_rigidBody.Id));
+            CreationEvent(x => x.Created(_rigidBody));
         }
 
-        public IEnumerable<IEvent> CheckForHit()
+        public void CheckForHit()
         {
             if (!_rigidBody.IsTouchingAnyWalls())
             {
-                yield break;
+                return;
             }
 
-            yield return DestructionEvent();
+            DestructionEvent();
 
-            var events = _rigidBody.Destroy();
-
-            foreach (var e in events) { yield return e; }
+            _rigidBody.Destroy();
         }
 
-        void IProjectileEvents.Created(IdentityOf<RigidBody> rigidBody)
-        {
-        }
-
-        void IEntityEvents.Destroyed()
+        void IProjectileEvents.Created(RigidBody rigidBody)
         {
         }
     }

@@ -15,14 +15,14 @@ namespace DarkDefenders.Remote.Model
             var adapter = new RemoteEventAdapter(packer);
 
             return bootstrapper
-                .RegisterListener<IClockEvents>     (() => new RemoteClock(packer))
-                .RegisterListener<ITerrainEvents>   (() => new RemoteTerrain(packer))
-                .RegisterListener<IRigidBodyEvents> (() => new RemoteRigidBody(adapter))
-                .RegisterListener<ICreatureEvents>  (() => new RemoteCreature(adapter))
-                .RegisterListener<IPlayerEvents>    (() => new RemotePlayer(adapter))
-                .RegisterListener<IHeroEvents>      (() => new RemoteHero(adapter))
-                .RegisterListener<IProjectileEvents>(() => new RemoteProjectile(adapter))
-                ;
+            .RegisterListener<IClockEvents>     (() => new RemoteClock(packer))
+            .RegisterListener<ITerrainEvents>   (() => new RemoteTerrain(packer))
+            .RegisterListener<IRigidBodyEvents> (() => new RemoteRigidBody(adapter))
+            .RegisterListener<ICreatureEvents>  (() => new RemoteCreature(adapter))
+            .RegisterListener<IPlayerEvents>    (() => new RemotePlayer(adapter))
+            .RegisterListener<IHeroEvents>      (() => new RemoteHero(adapter))
+            .RegisterListener<IProjectileEvents>(() => new RemoteProjectile(adapter))
+            ;
         }
     }
 }

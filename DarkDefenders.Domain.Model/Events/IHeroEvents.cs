@@ -6,7 +6,7 @@ namespace DarkDefenders.Domain.Model.Events
 {
     public interface IHeroEvents: IEntityEvents
     {
-        void Created(IdentityOf<Creature> creatureId);
+        void Created(Creature creature);
         void StateChanged(IHeroState heroState);
     }
 }

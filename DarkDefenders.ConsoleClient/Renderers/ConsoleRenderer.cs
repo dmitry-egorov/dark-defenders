@@ -2,7 +2,7 @@ using System;
 using System.Drawing;
 using System.Linq;
 
-namespace DarkDefenders.ConsoleClient.Renderer
+namespace DarkDefenders.ConsoleClient.Renderers
 {
     public class ConsoleRenderer : IConsoleRenderer
     {

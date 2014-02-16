@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using DarkDefenders.Domain.Model.Entities;
 using DarkDefenders.Remote.Model.Interface;
-using Infrastructure.DDDES;
 using Infrastructure.Math;
 
 namespace DarkDefenders.Remote.Model.Internals
@@ -10,63 +9,64 @@ namespace DarkDefenders.Remote.Model.Internals
     {
         private readonly IRemoteEvents _reciever;
         
-        private readonly Dictionary<IdentityOf<RigidBody>, Vector> _positionsMap = new Dictionary<IdentityOf<RigidBody>, Vector>();
-        private readonly Dictionary<IdentityOf<Creature>, IdentityOf<RigidBody>> _rigidBodiesMap = new Dictionary<IdentityOf<Creature>, IdentityOf<RigidBody>>();
+        private readonly Dictionary<RigidBody, Vector> _positionsMap = new Dictionary<RigidBody, Vector>();
+        private readonly Dictionary<Creature, RigidBody> _rigidBodiesMap = new Dictionary<Creature, RigidBody>();
 
         public RemoteEventAdapter(IRemoteEvents reciever)
         {
             _reciever = reciever;
         }
 
-        public void RigidBodyCreated(IdentityOf<RigidBody> rigidBodyId, Vector position)
+        public void RigidBodyCreated(RigidBody rigidBody, Vector position)
         {
-            _positionsMap[rigidBodyId] = position;
+            _positionsMap[rigidBody] = position;
         }
 
-        public void RigidBodyDestroyed(IdentityOf<RigidBody> rigidBodyId)
+        public void RigidBodyDestroyed(RigidBody rigidBody)
         {
-            _positionsMap.Remove(rigidBodyId);
-            _reciever.Destroyed(rigidBodyId);
+            _positionsMap.Remove(rigidBody);
+
+            _reciever.Destroyed(rigidBody.Id);
         }
 
-        public void Moved(IdentityOf<RigidBody> rigidBodyId, Vector newPosition)
+        public void Moved(RigidBody rigidBody, Vector newPosition)
         {
-            _reciever.Moved(rigidBodyId, newPosition);
+            _reciever.Moved(rigidBody.Id, newPosition);
         }
 
-        public void CreatureCreated(IdentityOf<Creature> creatureId, IdentityOf<RigidBody> rigidBodyId)
+        public void CreatureCreated(Creature creature, RigidBody rigidBody)
         {
-            _rigidBodiesMap[creatureId] = rigidBodyId;
+            _rigidBodiesMap[creature] = rigidBody;
         }
 
-        public void HeroCreated(IdentityOf<Creature> creatureId)
+        public void HeroCreated(Creature creature)
         {
-            RigidBodyCreatedInternal(creatureId, RemoteEntityType.Hero);
+            RigidBodyCreatedInternal(creature, RemoteEntityType.Hero);
         }
 
-        public void PlayerCreated(IdentityOf<Creature> creatureId)
+        public void PlayerCreated(Creature creature)
         {
-            RigidBodyCreatedInternal(creatureId, RemoteEntityType.Player);
+            RigidBodyCreatedInternal(creature, RemoteEntityType.Player);
         }
 
-        public void ProjectileCreated(IdentityOf<RigidBody> rigidBodyId)
+        public void ProjectileCreated(RigidBody rigidBody)
         {
-            RigidBodyCreatedInternal(rigidBodyId, RemoteEntityType.Projectile);
+            RigidBodyCreatedInternal(rigidBody, RemoteEntityType.Projectile);
         }
 
-        private void RigidBodyCreatedInternal(IdentityOf<RigidBody> rigidBodyId, RemoteEntityType type)
+        private void RigidBodyCreatedInternal(RigidBody rigidBody, RemoteEntityType type)
         {
-            var initialPosition = _positionsMap[rigidBodyId];
+            var initialPosition = _positionsMap[rigidBody];
 
-            _reciever.Created(rigidBodyId, initialPosition, type);
+            _reciever.Created(rigidBody.Id, initialPosition, type);
         }
 
-        private void RigidBodyCreatedInternal(IdentityOf<Creature> creatureId, RemoteEntityType type)
+        private void RigidBodyCreatedInternal(Creature creature, RemoteEntityType type)
         {
-            var rigidBodyId = _rigidBodiesMap[creatureId];
-            var initialPosition = _positionsMap[rigidBodyId];
+            var rigidBody = _rigidBodiesMap[creature];
+            var initialPosition = _positionsMap[rigidBody];
 
-            _reciever.Created(rigidBodyId, initialPosition, type);
+            _reciever.Created(rigidBody.Id, initialPosition, type);
         }
     }
 }

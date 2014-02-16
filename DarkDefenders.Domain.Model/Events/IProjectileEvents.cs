@@ -5,6 +5,6 @@ namespace DarkDefenders.Domain.Model.Events
 {
     public interface IProjectileEvents: IEntityEvents
     {
-        void Created(IdentityOf<RigidBody> rigidBody);
+        void Created(RigidBody rigidBody);
     }
 }

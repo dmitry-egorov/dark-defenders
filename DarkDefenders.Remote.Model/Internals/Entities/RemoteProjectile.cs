@@ -1,6 +1,5 @@
 ﻿using DarkDefenders.Domain.Model.Entities;
 using DarkDefenders.Domain.Model.Events;
-using Infrastructure.DDDES;
 
 namespace DarkDefenders.Remote.Model.Internals.Entities
 {
@@ -13,7 +12,7 @@ namespace DarkDefenders.Remote.Model.Internals.Entities
             _adapter = adapter;
         }
 
-        public void Created(IdentityOf<RigidBody> rigidBodyId)
+        public void Created(RigidBody rigidBodyId)
         {
             _adapter.ProjectileCreated(rigidBodyId);
         }

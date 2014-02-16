@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using DarkDefenders.Domain.Model.EntityProperties;
 using DarkDefenders.Domain.Model.Events;
 using Infrastructure.DDDES;
@@ -20,67 +19,50 @@ namespace DarkDefenders.Domain.Model.Entities
 
         private IReadOnlyList<HeroSpawnPoint> _spawnPoints;
 
-        public HeroSpawner(IHeroSpawnerEvents external, IStorage<HeroSpawner> storage, IFactory<HeroSpawnPoint> heroSpawnPointFactory, Random random, IResources<WorldProperties> resources) 
-            : base(external, storage)
+        public HeroSpawner(IFactory<HeroSpawnPoint> heroSpawnPointFactory, Random random, IResources<WorldProperties> resources)
         {
             _random = random;
             _resources = resources;
             _heroSpawnPointFactory = heroSpawnPointFactory;
         }
 
-        public IEnumerable<IEvent> Create(string mapId)
+        public void Create(string mapId)
         {
             var positions = _resources[mapId].HeroesSpawnPositions;
 
             var heroSpawnPoints = new List<HeroSpawnPoint>();
-            var hspevents = Enumerable.Empty<IEvent>();
             foreach (var position in positions)
             {
                 var spawnPoint = _heroSpawnPointFactory.Create();
-                var sevents = spawnPoint.Create(position);
 
-                hspevents = hspevents.Concat(sevents);
+                spawnPoint.Create(position);
 
                 heroSpawnPoints.Add(spawnPoint);
             }
 
-            foreach (var e in hspevents) { yield return e; }
-
-            yield return CreationEvent(x => x.Created(heroSpawnPoints.AsReadOnly()));
+            CreationEvent(x => x.Created(heroSpawnPoints.AsReadOnly()));
         }
 
-        public IEnumerable<IEvent> Update()
+        public void Update()
         {
-            var spawnPoint = _random.ElementFrom(_spawnPoints);
-
-            var events = spawnPoint.Update();
-
-            foreach (var e in events) { yield return e; }
+            _spawnPoints.ForAll(x => x.Update());
         }
 
-        public IEnumerable<IEvent> ChangeSpawnHeroes(bool enabled)
+        public void ChangeSpawnHeroes(bool enabled)
         {
-            var events = _spawnPoints.ForAll(x => x.ChangeSpawnHeroes(enabled));
-            
-            foreach (var e in events) { yield return e; }
+            _spawnPoints.ForAll(x => x.ChangeSpawnHeroes(enabled));
         }
 
-        public IEnumerable<IEvent> Spawn()
+        public void SpawnHeroes(int count)
         {
             var spawner = _random.ElementFrom(_spawnPoints);
             
-            var events = spawner.ForceSpawn();
-            
-            foreach (var e in events) { yield return e; }
+            spawner.SpawnHeroes(count);
         }
 
         void IHeroSpawnerEvents.Created(ReadOnlyCollection<HeroSpawnPoint> spawnPoints)
         {
             _spawnPoints = spawnPoints;
-        }
-
-        void IEntityEvents.Destroyed()
-        {
         }
     }
 }

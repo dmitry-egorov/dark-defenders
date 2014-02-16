@@ -97,19 +97,16 @@ namespace DarkDefenders.IntegrationTests
 
         private void Expect()
         {
-            var rigidBodyId = new IdentityOf<RigidBody>(7);
-            var creatureId = new IdentityOf<Creature>(9);
-
             _clock         .Setup(x => x.Created());
             _terrain       .Setup(x => x.Created(ResourceId));
             _playerSpawner .Setup(x => x.Created(ResourceId));
             _heroSpawner   .Setup(x => x.Created(It.IsAny<ReadOnlyCollection<HeroSpawnPoint>>()));
             _heroSpawnPoint.Setup(x => x.Created(_spawnPosition));
-            _world         .Setup(x => x.Created(ResourceId));
-            _rigidBody     .Setup(x => x.Created(rigidBodyId, _spawnPosition, Momentum.Zero, "Player"));
+            _world         .Setup(x => x.Created());
+            _rigidBody     .Setup(x => x.Created(It.IsAny<RigidBody>(), _spawnPosition, Momentum.Zero, "Player"));
             _weapon        .Setup(x => x.Created(It.IsAny<RigidBody>()));
-            _creature      .Setup(x => x.Created(creatureId, rigidBodyId, "Player"));
-            _player        .Setup(x => x.Created(creatureId));
+            _creature      .Setup(x => x.Created(It.IsAny<Creature>(), It.IsAny<RigidBody>(), "Player"));
+            _player        .Setup(x => x.Created(It.IsAny<Creature>()));
             _creature      .Setup(x => x.MovementChanged(Movement.Left));
             _rigidBody     .Setup(x => x.ExternalForceChanged(new Force(-180, 0)));
             _clock         .Setup(x => x.TimeChanged(_elapsed));

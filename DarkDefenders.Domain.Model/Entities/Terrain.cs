@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using DarkDefenders.Domain.Model.Events;
 using DarkDefenders.Domain.Model.Other;
 using Infrastructure.DDDES;
@@ -16,15 +15,14 @@ namespace DarkDefenders.Domain.Model.Entities
         
         private Map<Tile> _map;
 
-        public Terrain(ITerrainEvents external, IStorage<Terrain> storage, IResources<Map<Tile>> mapResources)
-            : base(external, storage)
+        public Terrain(IResources<Map<Tile>> mapResources)
         {
             _mapResources = mapResources;
         }
 
-        public IEnumerable<IEvent> Create(string mapId)
+        public void Create(string mapId)
         {
-            yield return CreationEvent(x => x.Created(mapId));
+            CreationEvent(x => x.Created(mapId));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -47,11 +45,6 @@ namespace DarkDefenders.Domain.Model.Entities
         void ITerrainEvents.Created(string mapId)
         {
             _map = _mapResources[mapId];
-        }
-
-        void IEntityEvents.Destroyed()
-        {
-            
         }
     }
 }

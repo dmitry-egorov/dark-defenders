@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using DarkDefenders.Domain.Model.Events;
+﻿using DarkDefenders.Domain.Model.Events;
 using DarkDefenders.Domain.Model.Other;
-using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
 using JetBrains.Annotations;
@@ -13,41 +11,34 @@ namespace DarkDefenders.Domain.Model.Entities
     {
         private readonly Creature _creature;
 
-        public Player(IPlayerEvents external, IStorage<Player> storage, Creature creature) 
-            : base(external, storage)
+        public Player(Creature creature)
         {
             _creature = creature;
         }
 
-        public IEnumerable<IEvent> Create(Vector initialPosition)
+        public void Create(Vector initialPosition)
         {
-            var events = _creature.Create(initialPosition, "Player");
+            _creature.Create(initialPosition, "Player");
 
-            foreach (var e in events) { yield return e; }
-
-            yield return CreationEvent(x => x.Created(_creature.Id));
+            CreationEvent(x => x.Created(_creature));
         }
 
-        public IEnumerable<IEvent> ChangeMovement(Movement movement)
+        public void ChangeMovement(Movement movement)
         {
-            return _creature.ChangeMovementTo(movement);
+            _creature.ChangeMovementTo(movement);
         }
 
-        public IEnumerable<IEvent> Jump()
+        public void Jump()
         {
-            return _creature.Jump();
+            _creature.Jump();
         }
 
-        public IEnumerable<IEvent> Fire()
+        public void Fire()
         {
-            return _creature.Fire();
+            _creature.Fire();
         }
 
-        void IPlayerEvents.Created(IdentityOf<Creature> creatureId)
-        {
-        }
-
-        void IEntityEvents.Destroyed()
+        void IPlayerEvents.Created(Creature creature)
         {
         }
     }

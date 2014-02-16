@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using DarkDefenders.Domain.Model.EntityProperties;
 using DarkDefenders.Domain.Model.Events;
@@ -42,25 +41,22 @@ namespace DarkDefenders.Domain.Model.Entities
 
         public RigidBody
         (
-            IRigidBodyEvents external, 
-            IStorage<RigidBody> storage, 
             IResources<RigidBodyProperties> resources,
             Clock clock, 
             Terrain terrain
         )
-        : base(external, storage)
         {
             _clock = clock;
             _terrain = terrain;
             _resources = resources;
         }
 
-        public IEnumerable<IEvent> Create(Vector initialPosition, Momentum initialMomentum, string propertiesId)
+        public void Create(Vector initialPosition, Momentum initialMomentum, string propertiesId)
         {
-            yield return CreationEvent(x => x.Created(Id, initialPosition, initialMomentum, propertiesId));
+            CreationEvent(x => x.Created(this, initialPosition, initialMomentum, propertiesId));
         }
 
-        public IEnumerable<IEvent> UpdatePhysics()
+        public void UpdatePhysics()
         {
             Momentum momentum;
             var momentumUpdated = TryUpdateMomentum(out momentum);
@@ -70,39 +66,39 @@ namespace DarkDefenders.Domain.Model.Entities
 
             if(momentumUpdated)
             {
-                yield return Event(x => x.Accelerated(momentum));
+                Event(x => x.Accelerated(momentum));
             }
             if(positionUpdated)
             {
-                yield return Event(x => x.Moved(position));
+                Event(x => x.Moved(position));
             }
         }
 
-        public IEnumerable<IEvent> AddMomentum(Momentum additionalMomentum)
+        public void AddMomentum(Momentum additionalMomentum)
         {
             if (additionalMomentum.EqualsZero())
             {
-                yield break;
+                return;
             }
             
             var newMomentum = _momentum + additionalMomentum;
 
-            yield return Event(x => x.Accelerated(newMomentum));
+            Event(x => x.Accelerated(newMomentum));
         }
 
-        public IEnumerable<IEvent> ChangeExternalForce(Force force)
+        public void ChangeExternalForce(Force force)
         {
             if (_externalForce.Equals(force))
             {
-                yield break;
+                return;
             }
 
-            yield return Event(x => x.ExternalForceChanged(force));
+            Event(x => x.ExternalForceChanged(force));
         }
 
-        public IEnumerable<IEvent> Destroy()
+        public void Destroy()
         {
-            yield return DestructionEvent();
+            DestructionEvent();
         }
 
         public bool IsInTheAir()
@@ -187,7 +183,7 @@ namespace DarkDefenders.Domain.Model.Entities
             return bottom.PrevInteger().ToInt();
         }
 
-        void IRigidBodyEvents.Created(IdentityOf<RigidBody> rigidBodyId, Vector initialPosition, Momentum initialMomentum, string propertiesId)
+        void IRigidBodyEvents.Created(RigidBody rigidBody, Vector initialPosition, Momentum initialMomentum, string propertiesId)
         {
             var properties = _resources[propertiesId];
 
@@ -225,10 +221,6 @@ namespace DarkDefenders.Domain.Model.Entities
             _externalForce = externalForce;
 
             PrepareForceIsZero();
-        }
-
-        void IEntityEvents.Destroyed()
-        {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

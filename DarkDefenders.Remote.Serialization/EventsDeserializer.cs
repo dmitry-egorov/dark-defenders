@@ -14,7 +14,7 @@ namespace DarkDefenders.Remote.Serialization
         public IEnumerable<Action<IRemoteEvents>> Deserialize(byte[] eventData)
         {
             return eventData
-            .UsingBinaryReader
+            .UsingGZipBinaryReader
             (reader => 
                 Read(reader)
                 .AsReadOnly()

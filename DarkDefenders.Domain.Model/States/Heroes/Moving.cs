@@ -1,7 +1,4 @@
-using System.Collections.Generic;
 using DarkDefenders.Domain.Model.Entities;
-using Infrastructure.DDDES;
-using Infrastructure.Util;
 
 namespace DarkDefenders.Domain.Model.States.Heroes
 {
@@ -16,38 +13,31 @@ namespace DarkDefenders.Domain.Model.States.Heroes
             _stateFactory = stateFactory;
         }
 
-        public IEnumerable<IEvent> Update()
+        public void Update()
         {
             if (_creature.IsInTheAir())
             {
                 var fallenFrom = _creature.GetFallingFrom();
 
-                var events = _stateFactory.CreateFallingEvent(fallenFrom);
-                foreach (var e in events) { yield return e; }
+                _stateFactory.Falling(fallenFrom);
 
-                yield break;
+                return;
             }
 
             if (!_creature.IsMovingIntoAWall())
             {
-                yield break;
+                return;
             }
 
             if (_creature.CanJumpOver())
             {
-                var jevents = _creature.Jump();
+                _creature.Jump();
 
-                var sevents = _stateFactory.CreateJumpingEvent();
-
-                var events = Concat.All(jevents, sevents);
-
-                foreach (var e in events) { yield return e; }
+                _stateFactory.Jumping();
             }
             else
             {
-                var stop = _creature.InvertMovement();
-
-                foreach (var e in stop) yield return e;
+                _creature.InvertMovement();
             }
         }
     }

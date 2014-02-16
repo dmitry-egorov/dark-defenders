@@ -37,6 +37,7 @@
     <Compile Include="AutoResetStopwatch.cs" />
     <Compile Include="Button.cs" />
     <Compile Include="Loop.cs" />
+    <Compile Include="Measure.cs" />
     <Compile Include="OnOffSwitch.cs" />
     <Compile Include="PerformanceCounter.cs" />
     <Compile Include="PeriodicExecutor.cs" />

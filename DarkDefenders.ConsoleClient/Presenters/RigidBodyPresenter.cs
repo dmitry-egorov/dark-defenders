@@ -1,6 +1,6 @@
 using System;
 using System.Drawing;
-using DarkDefenders.ConsoleClient.Renderer;
+using DarkDefenders.ConsoleClient.Renderers;
 using DarkDefenders.Domain.Model.Other;
 using DarkDefenders.Remote.Model.Interface;
 using Infrastructure.Math;

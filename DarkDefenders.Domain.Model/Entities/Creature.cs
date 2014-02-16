@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using DarkDefenders.Domain.Model.EntityProperties;
 using DarkDefenders.Domain.Model.Events;
@@ -8,7 +7,6 @@ using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
 using Infrastructure.Physics;
-using Infrastructure.Util;
 using JetBrains.Annotations;
 
 namespace DarkDefenders.Domain.Model.Entities
@@ -18,6 +16,7 @@ namespace DarkDefenders.Domain.Model.Entities
     {
         private const Direction InitialDirection = Direction.Right;
 
+        private readonly IResources<CreatureProperties> _resources;
         private readonly Terrain _terrain;
         private readonly RigidBody _rigidBody;
         private readonly Weapon _weapon;
@@ -28,18 +27,14 @@ namespace DarkDefenders.Domain.Model.Entities
 
         private Force _leftMovementForce;
         private Force _rightMovementForce;
-        private readonly IResources<CreatureProperties> _resources;
 
         public Creature
         (
-            ICreatureEvents external, 
-            IStorage<Creature> storage, 
             IResources<CreatureProperties> resources, 
             RigidBody rigidBody, 
             Weapon weapon, 
             Terrain terrain
         )
-        : base(external, storage)
         {
             _rigidBody = rigidBody;
 
@@ -51,64 +46,53 @@ namespace DarkDefenders.Domain.Model.Entities
             _direction = InitialDirection;
         }
 
-        public IEnumerable<IEvent> Create(Vector initialPosition, string propertiesId)
+        public void Create(Vector initialPosition, string propertiesId)
         {
-            var revents = _rigidBody.Create(initialPosition, Momentum.Zero, propertiesId);
-            var wevents = _weapon.Create(_rigidBody);
+            _rigidBody.Create(initialPosition, Momentum.Zero, propertiesId);
+            _weapon.Create(_rigidBody);
 
-            var events = Concat.All(revents, wevents);
-            foreach (var e in events) { yield return e; }
-
-            yield return CreationEvent(x => x.Created(Id, _rigidBody.Id, propertiesId));
+            CreationEvent(x => x.Created(this, _rigidBody, propertiesId));
         }
 
-        public IEnumerable<IEvent> ChangeMovementTo(Movement movement)
+        public void ChangeMovementTo(Movement movement)
         {
             if (_movement == movement)
             {
-                yield break;
+                return;
             }
 
-            yield return Event(x => x.MovementChanged(movement));
+            Event(x => x.MovementChanged(movement));
 
             var movementForce = GetMovementForceFor(movement);
 
-            var events = _rigidBody.ChangeExternalForce(movementForce);
-
-            foreach (var e in events) { yield return e; }
+            _rigidBody.ChangeExternalForce(movementForce);
         }
 
-        public IEnumerable<IEvent> Jump()
+        public void Jump()
         {
             if (CantJump())
             {
-                yield break;
+                return;
             }
 
-            var events = AddJumpMomentum();
-
-            foreach (var e in events) { yield return e; }
+            AddJumpMomentum();
         }
 
-        public IEnumerable<IEvent> Fire()
+        public void Fire()
         {
-            var events = _weapon.Fire(_direction);
-
-            foreach (var e in events) { yield return e; }
+            _weapon.Fire(_direction);
         }
 
-        public IEnumerable<IEvent> InvertMovement()
+        public void InvertMovement()
         {
-            return ChangeMovementTo(_movement.Other());
+            ChangeMovementTo(_movement.Other());
         }
 
-        public IEnumerable<IEvent> Kill()
+        public void Kill()
         {
-            yield return DestructionEvent();
+            DestructionEvent();
 
-            var events = _rigidBody.Destroy();
-
-            foreach (var e in events) { yield return e; }
+            _rigidBody.Destroy();
         }
 
         public bool IsInTheAir()
@@ -175,7 +159,7 @@ namespace DarkDefenders.Domain.Model.Entities
             return true;
         }
 
-        void ICreatureEvents.Created(IdentityOf<Creature> creatureId, IdentityOf<RigidBody> rigidBody, string propertiesId)
+        void ICreatureEvents.Created(Creature creature, RigidBody rigidBody, string propertiesId)
         {
             var properties = _resources[propertiesId];
 
@@ -190,18 +174,14 @@ namespace DarkDefenders.Domain.Model.Entities
             _direction = GetDirection();
         }
 
-        void IEntityEvents.Destroyed()
-        {
-        }
-
         private bool CantJump()
         {
             return _rigidBody.IsInTheAir() || _rigidBody.HasVerticalMomentum();
         }
 
-        private IEnumerable<IEvent> AddJumpMomentum()
+        private void AddJumpMomentum()
         {
-            return _rigidBody.AddMomentum(_jumpMomentum);
+            _rigidBody.AddMomentum(_jumpMomentum);
         }
 
         private Direction GetDirection()
