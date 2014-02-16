@@ -1,6 +1,8 @@
 ﻿using System;
 using DarkDefenders.ConsoleClient.Presenters;
 using DarkDefenders.Domain.Model;
+using DarkDefenders.Remote.Model;
+using DarkDefenders.Remote.Model.Interface;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Runtime;
 using Infrastructure.Util;
@@ -35,7 +37,7 @@ namespace DarkDefenders.ConsoleClient
 
             var rendererListener = DelegatingEventsListener.Create(renderer);
 
-            var counter = new CountingEventsListener<IEventsReciever>();
+            var counter = new CountingEventsListener<IRemoteEvents>();
 
             var composite = CompositeEventsListener.Create(rendererListener, counter);
 
@@ -50,7 +52,7 @@ namespace DarkDefenders.ConsoleClient
             loopRunner.Run(() => Frame(stopwatch, renderer, counter, eventDataListener));
         }
 
-        private static void Frame(AutoResetStopwatch stopwatch, GamePresenter renderer, CountingEventsListener<IEventsReciever> counter, EventDataListener eventDataListener)
+        private static void Frame(AutoResetStopwatch stopwatch, GamePresenter renderer, CountingEventsListener<IRemoteEvents> counter, EventDataListener eventDataListener)
         {
             var elapsed = stopwatch.ElapsedSinceLastCall.LimitTo(_elapsedLimit);
 

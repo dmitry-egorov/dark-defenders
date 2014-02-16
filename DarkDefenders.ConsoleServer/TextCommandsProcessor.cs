@@ -1,5 +1,5 @@
 ﻿using System;
-using DarkDefenders.Game.Interfaces;
+using DarkDefenders.Domain.Game.Interfaces;
 using Infrastructure.Util;
 
 namespace DarkDefenders.ConsoleServer

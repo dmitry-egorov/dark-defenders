@@ -1,5 +1,5 @@
 ﻿using System;
-using DarkDefenders.Domain.Model.Entities.Clocks;
+using DarkDefenders.Domain.Model.Entities;
 using JetBrains.Annotations;
 
 namespace DarkDefenders.Domain.Model.Other

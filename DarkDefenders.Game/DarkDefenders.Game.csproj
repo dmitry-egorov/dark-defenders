@@ -48,16 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Adapters\GameAdapter.cs" />
-    <Compile Include="Adapters\PlayerAdapter.cs" />
-    <Compile Include="Configurator.cs" />
-    <Compile Include="GameFactory.cs" />
-    <Compile Include="Interfaces\IGame.cs" />
-    <Compile Include="Interfaces\IPlayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DarkDefenders.Domain.Model\DarkDefenders.Domain.Model.csproj">

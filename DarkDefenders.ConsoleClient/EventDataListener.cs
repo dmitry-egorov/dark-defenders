@@ -1,8 +1,9 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using DarkDefenders.Domain.Model;
-using DarkDefenders.Domain.Serialization;
+using DarkDefenders.Remote.Model.Interface;
+using DarkDefenders.Remote.Serialization;
 using Infrastructure.DDDES;
 using Infrastructure.Util;
 
@@ -10,14 +11,14 @@ namespace DarkDefenders.ConsoleClient
 {
     internal class EventDataListener
     {
-        private readonly IEventsListener<IEventsReciever> _reciever;
+        private readonly IEventsListener<IRemoteEvents> _reciever;
         private readonly UdpClient _client;
-        private readonly ConcurrentQueue<IAcceptorOf<IEventsReciever>> _queue = new ConcurrentQueue<IAcceptorOf<IEventsReciever>>();
+        private readonly ConcurrentQueue<Action<IRemoteEvents>> _queue = new ConcurrentQueue<Action<IRemoteEvents>>();
         private readonly EventsDeserializer _deserializer;
 
         private volatile bool _stopped;
 
-        public EventDataListener(IEventsListener<IEventsReciever> reciever)
+        public EventDataListener(IEventsListener<IRemoteEvents> reciever)
         {
             _reciever = reciever;
             _deserializer = new EventsDeserializer();

@@ -11,7 +11,7 @@ namespace DarkDefenders.Domain.Resources
         {
             get
             {
-                var terrainData = TerrainDataCache.Get(resourceId);
+                var terrainData = WorldDataCache.Get(resourceId);
 
                 return terrainData.Map;
             }

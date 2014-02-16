@@ -17,10 +17,10 @@ namespace DarkDefenders.ConsoleClient.Renderer
 
         public void InitializeScreen()
         {
-            System.Console.BufferWidth = System.Console.WindowWidth = Math.Max(_width, 80);
-            System.Console.BufferHeight = System.Console.WindowHeight = Math.Max(_height, 50);
+            Console.BufferWidth = Console.WindowWidth = Math.Max(_width, 80);
+            Console.BufferHeight = Console.WindowHeight = Math.Max(_height, 50);
 
-            System.Console.CursorVisible = false;
+            Console.CursorVisible = false;
         }
 
         public void RenderHorizontalLine(int top, int left, int length)
@@ -55,12 +55,12 @@ namespace DarkDefenders.ConsoleClient.Renderer
                 return;
             }
 
-            var previousColor = System.Console.ForegroundColor;
+            var previousColor = Console.ForegroundColor;
 
-            System.Console.ForegroundColor = color;
-            System.Console.SetCursorPosition(x, y);
-            System.Console.Write(c);
-            System.Console.ForegroundColor = previousColor;
+            Console.ForegroundColor = color;
+            Console.SetCursorPosition(x, y);
+            Console.Write(c);
+            Console.ForegroundColor = previousColor;
         }
 
         private bool IsOutOfScreen(int x, int y)
@@ -71,12 +71,12 @@ namespace DarkDefenders.ConsoleClient.Renderer
         public void Render(int left, int top, char[] line, ConsoleColor color = ConsoleColor.White)
         {
             
-            var previousColor = System.Console.ForegroundColor;
+            var previousColor = Console.ForegroundColor;
 
-            System.Console.ForegroundColor = color;
-            System.Console.SetCursorPosition(left, top);
-            System.Console.Write(line);
-            System.Console.ForegroundColor = previousColor;
+            Console.ForegroundColor = color;
+            Console.SetCursorPosition(left, top);
+            Console.Write(line);
+            Console.ForegroundColor = previousColor;
         }
 
         public void Render(Point position, char c, ConsoleColor color = ConsoleColor.White)
@@ -86,8 +86,8 @@ namespace DarkDefenders.ConsoleClient.Renderer
 
         public void Render(int left, int top, string str)
         {
-            System.Console.SetCursorPosition(left, top);
-            System.Console.Write(str);
+            Console.SetCursorPosition(left, top);
+            Console.Write(str);
         }
     }
 }

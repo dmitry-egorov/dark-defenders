@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Infrastructure.DDDES.Implementations.Domain
@@ -8,20 +9,18 @@ namespace Infrastructure.DDDES.Implementations.Domain
         private long _totalCount;
         private long _lastCount;
 
-        public long TotalCount { get { return _totalCount; } }
-
         public int EventsSinceLastCall
         {
             get
             {
-                var count = TotalCount - _lastCount;
-                _lastCount = TotalCount;
+                var count = _totalCount - _lastCount;
+                _lastCount = _totalCount;
 
                 return (int)count;
             }
         }
 
-        public void Recieve(IEnumerable<IAcceptorOf<TReciever>> entityEvents)
+        public void Recieve(IEnumerable<Action<TReciever>> entityEvents)
         {
             _totalCount += entityEvents.Count();
         }

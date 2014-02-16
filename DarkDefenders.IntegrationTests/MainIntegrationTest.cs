@@ -1,15 +1,17 @@
 ﻿using System;
-using DarkDefenders.Domain.Model;
-using DarkDefenders.Domain.Model.Entities.Creatures;
-using DarkDefenders.Domain.Model.Entities.RigidBodies;
-using DarkDefenders.Domain.Model.Entities.Worlds;
+using System.Collections.ObjectModel;
+using DarkDefenders.Domain.Game;
+using DarkDefenders.Domain.Game.Interfaces;
+using DarkDefenders.Domain.Model.Entities;
+using DarkDefenders.Domain.Model.EntityProperties;
+using DarkDefenders.Domain.Model.Events;
 using DarkDefenders.Domain.Model.Other;
-using DarkDefenders.Game;
-using DarkDefenders.Game.Interfaces;
+using DarkDefenders.Domain.Resources;
 using Infrastructure.DDDES;
-using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
+using Infrastructure.Physics;
 using Infrastructure.Util;
+using Moq;
 using NSubstitute;
 using NUnit.Framework;
 
@@ -21,27 +23,32 @@ namespace DarkDefenders.IntegrationTests
         private const string ResourceId = "mapId";
         private static readonly Vector _spawnPosition = new Vector(50, 0.4f);
 
-        private readonly IEventsReciever _reciever;
-        private readonly IResources<Map<Tile>> _mapResources;
-        private readonly IResources<WorldProperties> _propertiesResources;
+        private readonly Mock<IClockEvents> _clock = new Mock<IClockEvents>(MockBehavior.Strict);
+        private readonly Mock<ITerrainEvents> _terrain = new Mock<ITerrainEvents>(MockBehavior.Strict);
+        private readonly Mock<IPlayerSpawnerEvents> _playerSpawner = new Mock<IPlayerSpawnerEvents>(MockBehavior.Strict);
+        private readonly Mock<IHeroSpawnerEvents> _heroSpawner = new Mock<IHeroSpawnerEvents>(MockBehavior.Strict);
+        private readonly Mock<IHeroSpawnPointEvents> _heroSpawnPoint = new Mock<IHeroSpawnPointEvents>(MockBehavior.Strict);
+        private readonly Mock<IWorldEvents> _world = new Mock<IWorldEvents>(MockBehavior.Strict);
+        private readonly Mock<IRigidBodyEvents> _rigidBody = new Mock<IRigidBodyEvents>(MockBehavior.Strict);
+        private readonly Mock<IWeaponEvents> _weapon = new Mock<IWeaponEvents>(MockBehavior.Strict);
+        private readonly Mock<ICreatureEvents> _creature = new Mock<ICreatureEvents>(MockBehavior.Strict);
+        private readonly Mock<IPlayerEvents> _player = new Mock<IPlayerEvents>(MockBehavior.Strict);
+
+        private readonly IResources<Map<Tile>> _mapResources = Substitute.For<IResources<Map<Tile>>>();
+        private readonly IResources<WorldProperties> _propertiesResources = Substitute.For<IResources<WorldProperties>>();
+        private readonly ReadOnlyCollection<Vector> _heroesSpawnPositions = _spawnPosition.EnumerateOnce().AsReadOnly();
+        private readonly ReadOnlyCollection<Vector> _playersSpawnPositions = _spawnPosition.EnumerateOnce().AsReadOnly();
+        private readonly TimeSpan _elapsed = TimeSpan.FromMilliseconds(100);
 
         public MainIntegrationTest()
         {
-            var playersSpawnPositions = _spawnPosition.EnumerateOnce().AsReadOnly();
-            var heroesSpawnPositions = _spawnPosition.EnumerateOnce().AsReadOnly();
-
-            var worldProperties = new WorldProperties(playersSpawnPositions, heroesSpawnPositions);
+            var worldProperties = new WorldProperties(_playersSpawnPositions, _heroesSpawnPositions);
 
             var dimensions = new Dimensions(100, 100);
             var map = new Map<Tile>(dimensions, default(Tile));
             map.Fill(Tile.Open);
 
-            _reciever = Substitute.For<IEventsReciever>();
-
-            _mapResources = Substitute.For<IResources<Map<Tile>>>();
             _mapResources[ResourceId].Returns(map);
-
-            _propertiesResources = Substitute.For<IResources<WorldProperties>>();
             _propertiesResources[ResourceId].Returns(worldProperties);
         }
 
@@ -50,42 +57,66 @@ namespace DarkDefenders.IntegrationTests
         {
             var game = Setup();
 
-            Act(game);
+            Expect();
 
-            Verify();
+            Act(game);
         }
 
         private IGame Setup()
         {
-            var eventsProcessor = DelegatingEventsListener.Create(_reciever);
-            return GameFactory.Create(eventsProcessor, _mapResources, _propertiesResources);
+            return new GameBootstrapper()
+
+            .RegisterResource(_mapResources)
+            .RegisterResource(_propertiesResources)
+            .RegisterResource(new RigidBodyPropertiesResources())
+            .RegisterResource(new CreaturePropertiesResources())
+
+            .RegisterListener(() => _clock.Object)
+            .RegisterListener(() => _terrain.Object)
+            .RegisterListener(() => _playerSpawner.Object)
+            .RegisterListener(() => _heroSpawner.Object)
+            .RegisterListener(() => _heroSpawnPoint.Object)
+            .RegisterListener(() => _world.Object)
+            .RegisterListener(() => _rigidBody.Object)
+            .RegisterListener(() => _weapon.Object)
+            .RegisterListener(() => _creature.Object)
+            .RegisterListener(() => _player.Object)
+
+            .Bootstrap();
         }
 
         private void Act(IGame game)
         {
-            var elapsed = TimeSpan.FromMilliseconds(100);
-
             game.Initialize(ResourceId);
             var avatar = game.AddPlayer();
 
             avatar.ChangeMovement(Movement.Left);
 
-            game.Update(elapsed);
-            game.Update(elapsed);
+            game.Update(_elapsed);
+            game.Update(_elapsed);
         }
 
-        private void Verify()
+        private void Expect()
         {
-            var newPosition = Vector.XY(48.2, 0.40000000596046448);
+            var rigidBodyId = new IdentityOf<RigidBody>(7);
+            var creatureId = new IdentityOf<Creature>(9);
 
-            var expectedRigidBodyId = new IdentityOf<RigidBody>(7);
-            var expectedCreatureId = new IdentityOf<Creature>(9);
-
-            _reciever.Received().TerrainCreated(ResourceId);
-            _reciever.Received().RigidBodyCreated(expectedRigidBodyId, _spawnPosition);
-            _reciever.Received().CreatureCreated(expectedCreatureId, expectedRigidBodyId);
-            _reciever.Received().PlayerCreated(expectedCreatureId);
-            _reciever.Received().Moved(expectedRigidBodyId, newPosition);
+            _clock         .Setup(x => x.Created());
+            _terrain       .Setup(x => x.Created(ResourceId));
+            _playerSpawner .Setup(x => x.Created(ResourceId));
+            _heroSpawner   .Setup(x => x.Created(It.IsAny<ReadOnlyCollection<HeroSpawnPoint>>()));
+            _heroSpawnPoint.Setup(x => x.Created(_spawnPosition));
+            _world         .Setup(x => x.Created(ResourceId));
+            _rigidBody     .Setup(x => x.Created(rigidBodyId, _spawnPosition, Momentum.Zero, "Player"));
+            _weapon        .Setup(x => x.Created(It.IsAny<RigidBody>()));
+            _creature      .Setup(x => x.Created(creatureId, rigidBodyId, "Player"));
+            _player        .Setup(x => x.Created(creatureId));
+            _creature      .Setup(x => x.MovementChanged(Movement.Left));
+            _rigidBody     .Setup(x => x.ExternalForceChanged(new Force(-180, 0)));
+            _clock         .Setup(x => x.TimeChanged(_elapsed));
+            _rigidBody     .Setup(x => x.Accelerated(new Momentum(-18, 0)));
+            _rigidBody     .Setup(x => x.Moved(Vector.XY(48.2, 0.40000000596046448)));
+            _clock         .Setup(x => x.TimeChanged(_elapsed + _elapsed));
         }
     }
 }

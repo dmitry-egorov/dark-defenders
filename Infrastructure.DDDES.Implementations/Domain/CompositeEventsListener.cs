@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Infrastructure.Util;
@@ -27,7 +28,7 @@ namespace Infrastructure.DDDES.Implementations.Domain
             _listeners = linsteners.ShouldNotBeNull("listeners").AsReadOnly();
         }
 
-        public void Recieve(IEnumerable<IAcceptorOf<TReciever>> entityEvents)
+        public void Recieve(IEnumerable<Action<TReciever>> entityEvents)
         {
             var readOnly = entityEvents.AsReadOnly();
             foreach (var linstener in _listeners)

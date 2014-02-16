@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Infrastructure.Util.Collections;
+using JetBrains.Annotations;
 
 namespace Infrastructure.DDDES.Implementations.Internals
 {
+    [UsedImplicitly]
     internal class Repository<TEntity> : IReadOnlyList<TEntity>, IStorage<TEntity>
     {
         private readonly FastList<TEntity> _allEntities = new FastList<TEntity>();

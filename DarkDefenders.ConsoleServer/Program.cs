@@ -3,10 +3,11 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DarkDefenders.Domain.Model;
+using DarkDefenders.Domain.Game;
+using DarkDefenders.Domain.Game.Interfaces;
 using DarkDefenders.Domain.Resources;
-using DarkDefenders.Game;
-using DarkDefenders.Game.Interfaces;
+using DarkDefenders.Remote.Model;
+using DarkDefenders.Remote.Model.Interface;
 using Infrastructure.DDDES;
 using Infrastructure.Runtime;
 using Infrastructure.Util;
@@ -88,17 +89,21 @@ namespace DarkDefenders.ConsoleServer
             }
         }
 
-        private static IGame InitializeGame(IEventsListener<IEventsReciever> networkBroadcaster)
+        private static IGame InitializeGame(IEventsListener<IRemoteEvents> networkBroadcaster)
         {
-            var mapResources = new MapResources();
-
-            var propertiesResources = new WorldPropertiesResources();
-
-            var game = GameFactory.Create(networkBroadcaster, mapResources, propertiesResources);
+            var game = CreateGame(networkBroadcaster);
 
             game.Initialize(WorldFileName);
 
             return game;
+        }
+
+        private static IGame CreateGame(IEventsListener<IRemoteEvents> networkBroadcaster)
+        {
+            return new GameBootstrapper()
+            .RegisterResources()
+            .RegisterRemoteEvents(networkBroadcaster)
+            .Bootstrap();
         }
     }
 }

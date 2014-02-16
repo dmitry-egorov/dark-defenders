@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using DarkDefenders.ConsoleClient.Renderer;
 using DarkDefenders.Domain.Model.Other;
+using DarkDefenders.Remote.Model.Interface;
 using Infrastructure.Math;
 
 namespace DarkDefenders.ConsoleClient.Presenters
@@ -23,22 +24,7 @@ namespace DarkDefenders.ConsoleClient.Presenters
             _consoleRenderer = consoleRenderer;
         }
 
-        public void SetAsPlayersAvatar()
-        {
-            SetType('@', ConsoleColor.Cyan);
-            _renderImmediately = true;
-        }
-
-        public void SetAsHero()
-        {
-            SetType('H', ConsoleColor.White);
-        }
-
-        public void SetAsProjectile()
-        {
-            SetType('*', ConsoleColor.Cyan);
-            _renderImmediately = true;
-        }
+        public RemoteEntityType Type { get; private set; }
 
         public void Render()
         {
@@ -50,11 +36,28 @@ namespace DarkDefenders.ConsoleClient.Presenters
             RenderInternal();
         }
 
-        public void RigidBodyCreated(Vector position)
+        public void RigidBodyCreated(Vector position, RemoteEntityType type)
         {
             var point = position.ToPoint();
 
             _currentPosition = point;
+
+            switch (type)
+            {
+                case RemoteEntityType.Player:
+                    SetAsPlayersAvatar();
+                    break;
+                case RemoteEntityType.Hero:
+                    SetAsHero();
+                    break;
+                case RemoteEntityType.Projectile:
+                    SetAsProjectile();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("type");
+            }
+
+            Type = type;
         }
 
         public void SetNewPosition(Vector newPosition)
@@ -75,6 +78,23 @@ namespace DarkDefenders.ConsoleClient.Presenters
             var transformedPosition = Transform(position);
 
             _consoleRenderer.Render(transformedPosition, c, ConsoleColor.DarkGray);
+        }
+
+        private void SetAsPlayersAvatar()
+        {
+            SetType('@', ConsoleColor.Cyan);
+            _renderImmediately = true;
+        }
+
+        private void SetAsHero()
+        {
+            SetType('H', ConsoleColor.White);
+        }
+
+        private void SetAsProjectile()
+        {
+            SetType('*', ConsoleColor.Cyan);
+            _renderImmediately = true;
         }
 
         private void RenderInternal()

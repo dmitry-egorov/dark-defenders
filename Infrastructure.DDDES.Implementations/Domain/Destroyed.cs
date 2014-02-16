@@ -2,26 +2,32 @@ using Infrastructure.Util;
 
 namespace Infrastructure.DDDES.Implementations.Domain
 {
-    public abstract class Destroyed<TEntity, TReciever> : EventOf<TEntity, TReciever> 
-        where TEntity : IEntity<TEntity>
+    public sealed class Destroyed<TEntity, TEntityEvents>: IEvent
+        where TEntity : IEntity<TEntity>, TEntityEvents
+        where TEntityEvents: IEntityEvents
     {
-        private readonly IdentityOf<TEntity> _entityId;
+        private readonly TEntity _entity;
+        private readonly TEntityEvents _externalReciever;
         private readonly IStorage<TEntity> _storage;
 
-        protected Destroyed(TEntity entity, IStorage<TEntity> storage) : base(entity)
+        public Destroyed(TEntity entity, TEntityEvents externalReciever, IStorage<TEntity> storage)
         {
-            _entityId = entity.Id;
+            _entity = entity;
+            _externalReciever = externalReciever;
             _storage = storage;
         }
 
         public override string ToString()
         {
-            return "Entity {0}:{1} destroyed".FormatWith(typeof(TEntity).Name, _entityId);
+            return "Entity {0}:{1} destroyed".FormatWith(typeof(TEntity).Name, _entity.Id);
         }
 
-        protected override void Apply(TEntity entity)
+        public void Apply()
         {
-            _storage.Remove(entity);
+            _entity.Destroyed();
+            _externalReciever.Destroyed();
+
+            _storage.Remove(_entity);
         }
     }
 }

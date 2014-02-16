@@ -1,5 +1,5 @@
 ﻿using System;
-using DarkDefenders.Domain.Model.Entities.Clocks;
+using DarkDefenders.Domain.Model.Entities;
 
 namespace DarkDefenders.Domain.Model.Other
 {

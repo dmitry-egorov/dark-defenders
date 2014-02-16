@@ -1,15 +1,16 @@
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using DarkDefenders.Domain.Model;
-using DarkDefenders.Domain.Serialization;
+using DarkDefenders.Remote.Model.Interface;
+using DarkDefenders.Remote.Serialization;
 using Infrastructure.DDDES;
 
 namespace DarkDefenders.ConsoleServer
 {
-    internal class EventsDataBroadcaster : IEventsListener<IEventsReciever>
+    internal class EventsDataBroadcaster : IEventsListener<IRemoteEvents>
     {
         private readonly ThreadLocal<byte[]> _buffers;
         private readonly UdpClient _client;
@@ -26,7 +27,7 @@ namespace DarkDefenders.ConsoleServer
             _serializer = new EventsSerializer();
         }
 
-        public void Recieve(IEnumerable<IAcceptorOf<IEventsReciever>> events)
+        public void Recieve(IEnumerable<Action<IRemoteEvents>> events)
         {
             Task.Run(() =>
             {

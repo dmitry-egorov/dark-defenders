@@ -11,6 +11,10 @@ namespace Infrastructure.Physics
 
         public Vector Value { get; private set; }
 
+        public Momentum(double x, double y): this (Vector.XY(x, y))
+        {
+        }
+
         public Momentum(Vector value)
             : this()
         {

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Infrastructure.DDDES.Implementations.Domain
@@ -19,11 +20,11 @@ namespace Infrastructure.DDDES.Implementations.Domain
             _reciever = reciever;
         }
 
-        public void Recieve(IEnumerable<IAcceptorOf<TReciever>> entityEvents)
+        public void Recieve(IEnumerable<Action<TReciever>> entityEvents)
         {
             foreach (var entityEvent in entityEvents)
             {
-                entityEvent.Accept(_reciever);
+                entityEvent(_reciever);
             }
         }
     }

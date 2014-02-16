@@ -1,32 +1,35 @@
-﻿using Infrastructure.Util;
+﻿using System;
+using Infrastructure.Util;
 
 namespace Infrastructure.DDDES.Implementations.Domain
 {
-    public abstract class Created<TEntity, TReciever> : IEvent, IAcceptorOf<TReciever>
-        where TEntity : IEntity<TEntity>
+    public sealed class Created<TEntity, TEntityEvents> : IEvent
+        where TEntity : IEntity<TEntity>, TEntityEvents
     {
         private readonly TEntity _entity;
+        private readonly TEntityEvents _externalReciever;
         private readonly IStorage<TEntity> _storage;
+        private readonly Action<TEntityEvents> _eventAction;
 
-        protected Created(TEntity entity, IStorage<TEntity> storage)
+        public Created(TEntity entity, TEntityEvents externalReciever, IStorage<TEntity> storage, Action<TEntityEvents> eventAction)
         {
             _entity = entity;
             _storage = storage;
+            _eventAction = eventAction;
+            _externalReciever = externalReciever;
         }
 
         public void Apply()
         {
             _storage.Store(_entity);
-            ApplyTo(_entity);
+
+            _eventAction(_entity);
+            _eventAction(_externalReciever);
         }
 
         public override string ToString()
         {
             return "Entity {0}:{1} created".FormatWith(typeof(TEntity).Name, _entity.Id);
         }
-
-        protected abstract void ApplyTo(TEntity entity);
-
-        public abstract void Accept(TReciever reciever);
     }
 }

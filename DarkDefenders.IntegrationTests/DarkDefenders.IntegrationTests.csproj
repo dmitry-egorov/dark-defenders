@@ -38,9 +38,6 @@
     <Reference Include="Microsoft.Practices.Unity">
       <HintPath>..\packages\Unity.3.0.1304.1\lib\Net45\Microsoft.Practices.Unity.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Practices.Unity.Configuration">
-      <HintPath>..\packages\Unity.3.0.1304.1\lib\Net45\Microsoft.Practices.Unity.Configuration.dll</HintPath>
-    </Reference>
     <Reference Include="Moq">
       <HintPath>..\packages\Moq.4.2.1312.1622\lib\net40\Moq.dll</HintPath>
     </Reference>
@@ -65,13 +62,17 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DarkDefenders.Domain.Game\DarkDefenders.Domain.Game.csproj">
+      <Project>{874002FC-BA10-4918-8B0E-3CDC871ADC31}</Project>
+      <Name>DarkDefenders.Domain.Game</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DarkDefenders.Domain.Model\DarkDefenders.Domain.Model.csproj">
       <Project>{9C13B1FF-5E35-4D3A-8D48-C4BCCE96F8CE}</Project>
       <Name>DarkDefenders.Domain.Model</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DarkDefenders.Game\DarkDefenders.Game.csproj">
-      <Project>{ABA9F9C7-7E8A-4C13-8217-3EB7CF44DF55}</Project>
-      <Name>DarkDefenders.Game</Name>
+    <ProjectReference Include="..\DarkDefenders.Domain.Resources\DarkDefenders.Domain.Resources.csproj">
+      <Project>{419EBFB5-87B4-4A65-9686-679CF26E384D}</Project>
+      <Name>DarkDefenders.Domain.Resources</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.DDDES.Implementations\Infrastructure.DDDES.Implementations.csproj">
       <Project>{5E4CA423-37F5-4B6A-B00C-0ADC06EC0378}</Project>

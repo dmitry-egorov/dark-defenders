@@ -10,7 +10,9 @@ namespace Infrastructure.Physics
         public static Force Right = Vector.Right.ToForce();
 
         public Vector Value { get; private set; }
-
+        public Force(double x, double y): this (Vector.XY(x, y))
+        {
+        }
         public Force(Vector value)
             : this()
         {

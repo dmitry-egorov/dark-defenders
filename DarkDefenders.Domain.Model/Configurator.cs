@@ -1,46 +1,36 @@
 ﻿using System;
-using DarkDefenders.Domain.Model.Entities.Clocks;
-using DarkDefenders.Domain.Model.Entities.Creatures;
-using DarkDefenders.Domain.Model.Entities.Heroes;
-using DarkDefenders.Domain.Model.Entities.HeroSpawners;
-using DarkDefenders.Domain.Model.Entities.HeroSpawnPoints;
-using DarkDefenders.Domain.Model.Entities.Players;
-using DarkDefenders.Domain.Model.Entities.PlayerSpawners;
-using DarkDefenders.Domain.Model.Entities.Projectiles;
-using DarkDefenders.Domain.Model.Entities.RigidBodies;
-using DarkDefenders.Domain.Model.Entities.Terrains;
-using DarkDefenders.Domain.Model.Entities.Weapons;
-using DarkDefenders.Domain.Model.Entities.Worlds;
+using System.Collections.Generic;
+using DarkDefenders.Domain.Model.Entities;
 using DarkDefenders.Domain.Model.Other;
-using Infrastructure.DDDES.Implementations;
-using Infrastructure.Unity;
+using Infrastructure.DDDES.Implementations.Configuration;
 using Microsoft.Practices.Unity;
 
 namespace DarkDefenders.Domain.Model
 {
     public static class Configurator
     {
-        public static IUnityContainer RegisterDomain(this IUnityContainer container)
+        public static IUnityContainer RegisterDomain(this IUnityContainer container, IEnumerable<Type> registeredListeners)
         {
-            return container
-                .RegisterProcessor<IEventsReciever>()
+            new DomainConfigurator(container, registeredListeners)
 
-                .RegisterEntity<RigidBody>()
-                .RegisterEntity<Creature>()
-                .RegisterEntity<Weapon>()
-                .RegisterEntity<Projectile>()
-                .RegisterEntity<Player>()
-                .RegisterEntity<Hero>()
-                .RegisterEntity<HeroSpawnPoint>()
-                .RegisterSingletonEntity<HeroSpawner>()
-                .RegisterSingletonEntity<PlayerSpawner>()
-                .RegisterSingletonEntity<Terrain>()
-                .RegisterSingletonEntity<Clock>()
-                .RegisterSingletonEntity<World>()
+            .RegisterEntity<RigidBody>()
+            .RegisterEntity<Creature>()
+            .RegisterEntity<Weapon>()
+            .RegisterEntity<Projectile>()
+            .RegisterEntity<Player>()
+            .RegisterEntity<Hero>()
+            .RegisterEntity<HeroSpawnPoint>()
+            .RegisterSingletonEntity<HeroSpawner>()
+            .RegisterSingletonEntity<PlayerSpawner>()
+            .RegisterSingletonEntity<Terrain>()
+            .RegisterSingletonEntity<Clock>()
+            .RegisterSingletonEntity<World>()
 
-                .RegisterSingleton<CooldownFactory>()
-                .RegisterSingleton<Random>(new InjectionConstructor())
-                ;
+            .RegisterSingleton<CooldownFactory>()
+            .RegisterSingleton<Random>(new InjectionConstructor())
+            ;
+
+            return container;
         }
     }
 }

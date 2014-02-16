@@ -32,24 +32,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Practices.Unity">
-      <HintPath>..\packages\Unity.3.0.1304.1\lib\Net45\Microsoft.Practices.Unity.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Unity.Configuration">
-      <HintPath>..\packages\Unity.3.0.1304.1\lib\Net45\Microsoft.Practices.Unity.Configuration.dll</HintPath>
-    </Reference>
-    <Reference Include="protobuf-net">
-      <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Renderer\ConsoleRenderer.cs" />
@@ -58,6 +44,7 @@
     <Compile Include="NativeKeyboard.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Renderer\EmptyConsoleRenderer.cs" />
     <Compile Include="Renderer\IConsoleRenderer.cs" />
     <Compile Include="Presenters\GamePresenter.cs" />
     <Compile Include="Presenters\RigidBodyPresenter.cs" />
@@ -116,13 +103,13 @@
       <Project>{419EBFB5-87B4-4A65-9686-679CF26E384D}</Project>
       <Name>DarkDefenders.Domain.Resources</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DarkDefenders.Domain.Serialization\DarkDefenders.Domain.Serialization.csproj">
-      <Project>{DFA440DE-826F-4CEE-919E-61EEB14AA7FA}</Project>
-      <Name>DarkDefenders.Domain.Serialization</Name>
+    <ProjectReference Include="..\DarkDefenders.Remote.Model\DarkDefenders.Remote.Model.csproj">
+      <Project>{E13E986E-AFCD-42BB-ACAB-FC3DFE947C51}</Project>
+      <Name>DarkDefenders.Remote.Model</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DarkDefenders.Game\DarkDefenders.Game.csproj">
-      <Project>{ABA9F9C7-7E8A-4C13-8217-3EB7CF44DF55}</Project>
-      <Name>DarkDefenders.Game</Name>
+    <ProjectReference Include="..\DarkDefenders.Remote.Serialization\DarkDefenders.Remote.Serialization.csproj">
+      <Project>{521626FD-F55A-4156-847E-F3FD60CF6658}</Project>
+      <Name>DarkDefenders.Remote.Serialization</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.DDDES.Implementations\Infrastructure.DDDES.Implementations.csproj">
       <Project>{5E4CA423-37F5-4B6A-B00C-0ADC06EC0378}</Project>
@@ -136,17 +123,9 @@
       <Project>{9DA761FD-492C-4BF7-A50D-10930664021D}</Project>
       <Name>Infrastructure.Math</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.Physics\Infrastructure.Physics.csproj">
-      <Project>{305e7c2a-4803-47cd-84b8-5c9df6134395}</Project>
-      <Name>Infrastructure.Physics</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Runtime\Infrastructure.Runtime.csproj">
       <Project>{46C6CCD9-0683-4A63-82B8-D9C48D5A20C9}</Project>
       <Name>Infrastructure.Runtime</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.Serialization\Infrastructure.Serialization.csproj">
-      <Project>{75E3B4B6-49F0-4064-967F-3C125C7CE19D}</Project>
-      <Name>Infrastructure.Serialization</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Util\Infrastructure.Util.csproj">
       <Project>{0B407BC3-7B5B-431A-96E7-A41F25AB27BE}</Project>

@@ -32,14 +32,13 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EventsProcessorExtensions.cs" />
-    <Compile Include="IAcceptorOf.cs" />
     <Compile Include="IdentityOf.cs" />
     <Compile Include="IdentityValueGenerator.cs" />
     <Compile Include="IEntity.cs" />
+    <Compile Include="IEntityEvents.cs" />
     <Compile Include="IEventsProcessor.cs" />
     <Compile Include="IEvent.cs" />
     <Compile Include="IEventsListener.cs" />

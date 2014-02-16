@@ -2,22 +2,19 @@
 using System.Collections.Generic;
 using System.Globalization;
 using DarkDefenders.ConsoleClient.Renderer;
-using DarkDefenders.Domain.Model;
-using DarkDefenders.Domain.Model.Entities.Creatures;
-using DarkDefenders.Domain.Model.Entities.RigidBodies;
+using DarkDefenders.Domain.Model.Entities;
 using DarkDefenders.Domain.Model.Other;
-using DarkDefenders.Domain.Resources;
 using DarkDefenders.Domain.Resources.Internals;
+using DarkDefenders.Remote.Model.Interface;
 using Infrastructure.DDDES;
 using Infrastructure.Math;
 
 namespace DarkDefenders.ConsoleClient.Presenters
 {
-    internal class GamePresenter : IEventsReciever
+    internal class GamePresenter : IRemoteEvents
     {
         private IConsoleRenderer _consoleRenderer;
         private readonly Dictionary<IdentityOf<RigidBody>, RigidBodyPresenter> _presentersMap = new Dictionary<IdentityOf<RigidBody>, RigidBodyPresenter>();
-        private readonly Dictionary<IdentityOf<Creature>, IdentityOf<RigidBody>> _rigidBodyIdsMap = new Dictionary<IdentityOf<Creature>, IdentityOf<RigidBody>>();
 
         private Vector _lastCreaturePosition = Vector.Zero;
         private IdentityOf<RigidBody> _playersRigidBodyId;
@@ -30,9 +27,9 @@ namespace DarkDefenders.ConsoleClient.Presenters
             _consoleRenderer = new EmptyConsoleRenderer();
         }
 
-        public void TerrainCreated(string mapId)
+        public void MapLoaded(string mapId)
         {
-            var data = TerrainLoader.LoadFromFile(mapId);
+            var data = WorldLoader.LoadFromFile(mapId);
 
             _map = data.Map;
 
@@ -40,20 +37,43 @@ namespace DarkDefenders.ConsoleClient.Presenters
             RenderWorld();
         }
 
-        public void RigidBodyCreated(IdentityOf<RigidBody> id, Vector position)
+        public void Created(IdentityOf<RigidBody> id, Vector position, RemoteEntityType type)
         {
-            var creaturePresenter = new RigidBodyPresenter(_map, _consoleRenderer);
+            var presenter = new RigidBodyPresenter(_map, _consoleRenderer);
 
-            _presentersMap.Add(id, creaturePresenter);
+            _presentersMap.Add(id, presenter);
 
-            creaturePresenter.RigidBodyCreated(position);
+            presenter.RigidBodyCreated(position, type);
+
+            if (type == RemoteEntityType.Hero)
+            {
+                _totalHeroesSpawned++;
+                RenderHeroesCount();
+            }
+            else if(type == RemoteEntityType.Player)
+            {
+                _playersRigidBodyId = id;
+            }
         }
 
-        public void RigidBodyDestroyed(IdentityOf<RigidBody> id)
+        public void Destroyed(IdentityOf<RigidBody> id)
         {
             var vm = _presentersMap[id];
             vm.Remove();
             _presentersMap.Remove(id);
+
+            var type = vm.Type;
+
+            if (type == RemoteEntityType.Hero)
+            {
+                _totalHeroesSpawned--;
+                RenderHeroesCount();
+            }
+        }
+
+        public void Tick(TimeSpan newTime)
+        {
+            
         }
 
         public void Moved(IdentityOf<RigidBody> id, Vector newPosition)
@@ -76,46 +96,6 @@ namespace DarkDefenders.ConsoleClient.Presenters
             }
 
             presenter.SetNewPosition(newPosition);
-        }
-
-        public void CreatureCreated(IdentityOf<Creature> id, IdentityOf<RigidBody> rigidBodyId)
-        {
-            _rigidBodyIdsMap[id] = rigidBodyId;
-        }
-
-        public void HeroCreated(IdentityOf<Creature> creatureId)
-        {
-            var rigidBodyId = _rigidBodyIdsMap[creatureId];
-
-            var vm = _presentersMap[rigidBodyId];
-
-            vm.SetAsHero();
-
-            _totalHeroesSpawned++;
-            RenderHeroesCount();
-        }
-
-        public void HeroDestroyed()
-        {
-            _totalHeroesSpawned--;
-            RenderHeroesCount();
-        }
-
-        public void PlayerCreated(IdentityOf<Creature> creatureId)
-        {
-            var rigidBodyId = _rigidBodyIdsMap[creatureId];
-
-            var vm = _presentersMap[rigidBodyId];
-
-            vm.SetAsPlayersAvatar();
-
-            _playersRigidBodyId = rigidBodyId;
-        }
-
-        public void ProjectileCreated(IdentityOf<RigidBody> rigidBodyId)
-        {
-            var vm = _presentersMap[rigidBodyId];
-            vm.SetAsProjectile();
         }
 
         public void RenderFps(double fps, long totalFrames)

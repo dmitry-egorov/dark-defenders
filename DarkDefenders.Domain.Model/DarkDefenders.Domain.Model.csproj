@@ -36,74 +36,47 @@
     <Reference Include="Microsoft.Practices.Unity">
       <HintPath>..\packages\Unity.3.0.1304.1\lib\Net45\Microsoft.Practices.Unity.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Practices.Unity.Configuration">
-      <HintPath>..\packages\Unity.3.0.1304.1\lib\Net45\Microsoft.Practices.Unity.Configuration.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configurator.cs" />
-    <Compile Include="Entities\Clocks\Clock.cs" />
-    <Compile Include="Entities\Clocks\Events\ClockCreated.cs" />
-    <Compile Include="Entities\Clocks\Events\TimeChanged.cs" />
-    <Compile Include="Entities\Creatures\Creature.cs" />
-    <Compile Include="Entities\Creatures\CreatureProperties.cs" />
-    <Compile Include="Entities\Creatures\Events\CreatureCreated.cs" />
-    <Compile Include="Entities\Creatures\Events\CreatureDestroyed.cs" />
-    <Compile Include="Entities\Weapons\Events\Fired.cs" />
-    <Compile Include="Entities\Creatures\Events\MovementChanged.cs" />
-    <Compile Include="Entities\Heroes\Events\HeroCreated.cs" />
-    <Compile Include="Entities\Heroes\Events\HeroDestroyed.cs" />
-    <Compile Include="Entities\Heroes\Events\StateChanged.cs" />
-    <Compile Include="Entities\Heroes\Hero.cs" />
-    <Compile Include="Entities\Heroes\States\Deciding.cs" />
-    <Compile Include="Entities\Heroes\States\Falling.cs" />
-    <Compile Include="Entities\Heroes\States\HeroStateFactory.cs" />
-    <Compile Include="Entities\Heroes\States\IHeroState.cs" />
-    <Compile Include="Entities\Heroes\States\Jumping.cs" />
-    <Compile Include="Entities\Heroes\States\Moving.cs" />
-    <Compile Include="Entities\HeroSpawners\Events\HeroSpawnerCreated.cs" />
-    <Compile Include="Entities\HeroSpawners\HeroSpawner.cs" />
-    <Compile Include="Entities\HeroSpawnPoints\Events\ActivationTimeChanged.cs" />
-    <Compile Include="Entities\HeroSpawnPoints\Events\HeroSpawnPointCreated.cs" />
-    <Compile Include="Entities\HeroSpawnPoints\HeroSpawnPoint.cs" />
-    <Compile Include="Entities\Weapons\Weapon.cs" />
-    <Compile Include="Entities\Weapons\Events\WeaponCreated.cs" />
-    <Compile Include="IEventsReciever.cs" />
+    <Compile Include="Entities\Clock.cs" />
+    <Compile Include="Events\IClockEvents.cs" />
+    <Compile Include="Entities\Creature.cs" />
+    <Compile Include="EntityProperties\CreatureProperties.cs" />
+    <Compile Include="Events\ICreatureEvents.cs" />
+    <Compile Include="Events\IHeroEvents.cs" />
+    <Compile Include="Events\IHeroSpawnerEvents.cs" />
+    <Compile Include="Events\IHeroSpawnPointEvents.cs" />
+    <Compile Include="Events\IPlayerSpawnerEvents.cs" />
+    <Compile Include="Events\IPlayerEvents.cs" />
+    <Compile Include="Events\IProjectileEvents.cs" />
+    <Compile Include="Events\IRigidBodyEvents.cs" />
+    <Compile Include="Events\ITerrainEvents.cs" />
+    <Compile Include="Entities\Hero.cs" />
+    <Compile Include="States\Heroes\Deciding.cs" />
+    <Compile Include="States\Heroes\Falling.cs" />
+    <Compile Include="States\Heroes\HeroStateFactory.cs" />
+    <Compile Include="States\Heroes\IHeroState.cs" />
+    <Compile Include="States\Heroes\Jumping.cs" />
+    <Compile Include="States\Heroes\Moving.cs" />
+    <Compile Include="Entities\HeroSpawner.cs" />
+    <Compile Include="Entities\HeroSpawnPoint.cs" />
+    <Compile Include="Events\IWeaponEvents.cs" />
+    <Compile Include="Entities\Weapon.cs" />
+    <Compile Include="Events\IWorldEvents.cs" />
     <Compile Include="Other\Cooldown.cs" />
     <Compile Include="Other\CooldownFactory.cs" />
-    <Compile Include="Entities\PlayerSpawners\Events\PlayerSpawnerCreated.cs" />
-    <Compile Include="Entities\PlayerSpawners\PlayerSpawner.cs" />
-    <Compile Include="Entities\Players\Events\PlayerCreated.cs" />
-    <Compile Include="Entities\Players\Player.cs" />
-    <Compile Include="Entities\Projectiles\Events\ProjectileCreated.cs" />
-    <Compile Include="Entities\Projectiles\Events\ProjectileDestroyed.cs" />
-    <Compile Include="Entities\Projectiles\Projectile.cs" />
-    <Compile Include="Entities\RigidBodies\Events\Accelerated.cs" />
-    <Compile Include="Entities\RigidBodies\Events\AcceleratedAndMoved.cs" />
-    <Compile Include="Entities\RigidBodies\Events\ExternalForceChanged.cs" />
-    <Compile Include="Entities\RigidBodies\Events\Moved.cs" />
-    <Compile Include="Entities\RigidBodies\Events\RigidBodyCreated.cs" />
-    <Compile Include="Entities\RigidBodies\Events\RigidBodyDestroyed.cs" />
-    <Compile Include="Entities\RigidBodies\RigidBody.cs" />
-    <Compile Include="Entities\RigidBodies\RigidBodyProperties.cs" />
-    <Compile Include="Entities\Terrains\Events\TerrainCreated.cs" />
-    <Compile Include="Entities\Terrains\Terrain.cs" />
-    <Compile Include="Entities\Worlds\Events\PlayerAvatarSpawned.cs" />
-    <Compile Include="Entities\Worlds\Events\SpawnHeroesChanged.cs" />
-    <Compile Include="Entities\Worlds\Events\WorldCreated.cs" />
-    <Compile Include="Entities\Worlds\World.cs" />
-    <Compile Include="Entities\Worlds\WorldProperties.cs" />
-    <Compile Include="Events\Created.cs" />
-    <Compile Include="Events\Destroyed.cs" />
-    <Compile Include="Events\EventOf.cs" />
+    <Compile Include="Entities\PlayerSpawner.cs" />
+    <Compile Include="Entities\Player.cs" />
+    <Compile Include="Entities\Projectile.cs" />
+    <Compile Include="Entities\RigidBody.cs" />
+    <Compile Include="EntityProperties\RigidBodyProperties.cs" />
+    <Compile Include="Entities\Terrain.cs" />
+    <Compile Include="Entities\World.cs" />
+    <Compile Include="EntityProperties\WorldProperties.cs" />
     <Compile Include="Other\Direction.cs" />
     <Compile Include="Other\DirectionExtensions.cs" />
     <Compile Include="Other\Movement.cs" />
@@ -127,10 +100,6 @@
     <ProjectReference Include="..\Infrastructure.Physics\Infrastructure.Physics.csproj">
       <Project>{305E7C2A-4803-47CD-84B8-5C9DF6134395}</Project>
       <Name>Infrastructure.Physics</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.Unity\Infrastructure.Unity.csproj">
-      <Project>{3CE8AEC8-8016-4431-ACCD-564E0DF56FE6}</Project>
-      <Name>Infrastructure.Unity</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Util\Infrastructure.Util.csproj">
       <Project>{0B407BC3-7B5B-431A-96E7-A41F25AB27BE}</Project>

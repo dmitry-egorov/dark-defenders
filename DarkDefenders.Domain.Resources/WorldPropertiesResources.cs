@@ -1,4 +1,4 @@
-﻿using DarkDefenders.Domain.Model.Entities.Worlds;
+﻿using DarkDefenders.Domain.Model.EntityProperties;
 using DarkDefenders.Domain.Resources.Internals;
 using Infrastructure.DDDES;
 
@@ -10,7 +10,7 @@ namespace DarkDefenders.Domain.Resources
         {
             get
             {
-                var terrainData = TerrainDataCache.Get(resourceId);
+                var terrainData = WorldDataCache.Get(resourceId);
 
                 return new WorldProperties(terrainData.PlayerSpawns, terrainData.HeroSpawns);
             }
