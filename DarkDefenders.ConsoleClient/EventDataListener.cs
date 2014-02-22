@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using DarkDefenders.Remote.Model.Interface;
+using DarkDefenders.Remote.Model;
 using DarkDefenders.Remote.Serialization;
 using Infrastructure.DDDES;
 using Infrastructure.Util;

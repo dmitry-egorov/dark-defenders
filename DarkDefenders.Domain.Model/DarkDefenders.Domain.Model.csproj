@@ -41,47 +41,6 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configurator.cs" />
-    <Compile Include="Entities\Clock.cs" />
-    <Compile Include="Entities\Creature.cs" />
-    <Compile Include="Events\IRigidBodyEvents.cs" />
-    <Compile Include="Events\ITerrainEvents.cs" />
-    <Compile Include="Events\IWeaponEvents.cs" />
-    <Compile Include="Events\IWorldEvents.cs" />
-    <Compile Include="Events\IProjectileEvents.cs" />
-    <Compile Include="Events\IPlayerSpawnerEvents.cs" />
-    <Compile Include="Events\ICreatureEvents.cs" />
-    <Compile Include="Events\IHeroSpawnPointEvents.cs" />
-    <Compile Include="Events\IHeroSpawnerEvents.cs" />
-    <Compile Include="Events\IHeroEvents.cs" />
-    <Compile Include="Events\IPlayerEvents.cs" />
-    <Compile Include="Events\ICooldownEvents.cs" />
-    <Compile Include="Events\IClockEvents.cs" />
-    <Compile Include="EntityProperties\CreatureProperties.cs" />
-    <Compile Include="Entities\Hero.cs" />
-    <Compile Include="Other\Direction.cs" />
-    <Compile Include="Other\DirectionExtensions.cs" />
-    <Compile Include="Other\Movement.cs" />
-    <Compile Include="Other\MovementExtensions.cs" />
-    <Compile Include="Other\Tile.cs" />
-    <Compile Include="States\Heroes\Deciding.cs" />
-    <Compile Include="States\Heroes\Falling.cs" />
-    <Compile Include="States\Heroes\HeroStateFactory.cs" />
-    <Compile Include="States\Heroes\IHeroState.cs" />
-    <Compile Include="States\Heroes\Jumping.cs" />
-    <Compile Include="States\Heroes\Moving.cs" />
-    <Compile Include="Entities\HeroSpawner.cs" />
-    <Compile Include="Entities\HeroSpawnPoint.cs" />
-    <Compile Include="Entities\Weapon.cs" />
-    <Compile Include="Entities\Cooldown.cs" />
-    <Compile Include="Entities\PlayerSpawner.cs" />
-    <Compile Include="Entities\Player.cs" />
-    <Compile Include="Entities\Projectile.cs" />
-    <Compile Include="Entities\RigidBody.cs" />
-    <Compile Include="EntityProperties\RigidBodyProperties.cs" />
-    <Compile Include="Entities\Terrain.cs" />
-    <Compile Include="Entities\World.cs" />
-    <Compile Include="EntityProperties\WorldProperties.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

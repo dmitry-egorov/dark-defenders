@@ -1,7 +1,5 @@
-using System;
 using System.IO;
-using DarkDefenders.Domain.Model.Entities;
-using DarkDefenders.Remote.Model.Interface;
+using DarkDefenders.Remote.Model;
 using Infrastructure.DDDES;
 using Infrastructure.Math;
 using Infrastructure.Serialization;
@@ -23,7 +21,7 @@ namespace DarkDefenders.Remote.Serialization.Internals
             _writer.Write(mapId);
         }
 
-        public void Created(IdentityOf<RigidBody> id, Vector position, RemoteEntityType type)
+        public void Created(IdentityOf<RemoteRigidBody> id, Vector position, RemoteEntityType type)
         {
             _writer.Write((short)SerializableEvents.Created);
             _writer.Write(id);
@@ -31,13 +29,13 @@ namespace DarkDefenders.Remote.Serialization.Internals
             _writer.Write((byte)type);
         }
 
-        public void Destroyed(IdentityOf<RigidBody> id)
+        public void Destroyed(IdentityOf<RemoteRigidBody> id)
         {
             _writer.Write((short)SerializableEvents.Destroyed);
             _writer.Write(id);
         }
 
-        public void Moved(IdentityOf<RigidBody> id, Vector newPosition)
+        public void Moved(IdentityOf<RemoteRigidBody> id, Vector newPosition)
         {
             _writer.Write((short)SerializableEvents.Moved);
             _writer.Write(id);

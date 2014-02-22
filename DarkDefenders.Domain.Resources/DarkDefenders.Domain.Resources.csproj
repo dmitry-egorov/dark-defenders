@@ -39,24 +39,16 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configurator.cs" />
-    <Compile Include="Internals\CreaturePropertiesResources.cs" />
-    <Compile Include="Internals\MapResources.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Internals\WorldData.cs" />
-    <Compile Include="Internals\WorldLoader.cs" />
-    <Compile Include="Internals\WorldDataCache.cs" />
-    <Compile Include="Internals\RigidBodyPropertiesResources.cs" />
-    <Compile Include="Internals\WorldPropertiesResources.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DarkDefenders.Domain.Game\DarkDefenders.Domain.Game.csproj">
-      <Project>{874002FC-BA10-4918-8B0E-3CDC871ADC31}</Project>
-      <Name>DarkDefenders.Domain.Game</Name>
-    </ProjectReference>
     <ProjectReference Include="..\DarkDefenders.Domain.Model\DarkDefenders.Domain.Model.csproj">
       <Project>{9C13B1FF-5E35-4D3A-8D48-C4BCCE96F8CE}</Project>
       <Name>DarkDefenders.Domain.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DarkDefenders.Game.App\DarkDefenders.Game.App.csproj">
+      <Project>{9159F40E-E6E4-4F65-966B-2B77CCF0E584}</Project>
+      <Name>DarkDefenders.Game.App</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.DDDES\Infrastructure.DDDES.csproj">
       <Project>{457CCF4D-7E52-4A7F-867C-13BAC32E13F0}</Project>

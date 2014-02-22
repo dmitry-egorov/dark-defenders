@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using DarkDefenders.Domain.Game;
-using DarkDefenders.Domain.Game.Interfaces;
-using DarkDefenders.Domain.Model.Entities;
-using DarkDefenders.Domain.Model.EntityProperties;
-using DarkDefenders.Domain.Model.Events;
-using DarkDefenders.Domain.Model.Other;
-using DarkDefenders.Domain.Resources;
+using DarkDefenders.Game.App;
+using DarkDefenders.Game.App.Interfaces;
+using DarkDefenders.Game.Model.Entities;
+using DarkDefenders.Game.Model.EntityProperties;
+using DarkDefenders.Game.Model.Events;
+using DarkDefenders.Game.Model.Other;
+using DarkDefenders.Game.Resources;
 using Infrastructure.DDDES;
 using Infrastructure.Math;
 using Infrastructure.Physics;
@@ -62,7 +62,7 @@ namespace DarkDefenders.IntegrationTests
             Act(game);
         }
 
-        private IGame Setup()
+        private IGameService Setup()
         {
             return new GameBootstrapper()
 
@@ -84,7 +84,7 @@ namespace DarkDefenders.IntegrationTests
             .Bootstrap();
         }
 
-        private void Act(IGame game)
+        private void Act(IGameService game)
         {
             game.Initialize(ResourceId);
             var avatar = game.AddPlayer();

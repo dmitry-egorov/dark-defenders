@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using DarkDefenders.Remote.Model.Interface;
+using DarkDefenders.Remote.Model;
 using DarkDefenders.Remote.Serialization;
 using Infrastructure.DDDES;
 

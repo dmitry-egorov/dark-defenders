@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using DarkDefenders.ConsoleClient.Renderers;
-using DarkDefenders.Domain.Model.Entities;
-using DarkDefenders.Domain.Model.Other;
-using DarkDefenders.Domain.Resources.Internals;
-using DarkDefenders.Remote.Model.Interface;
+using DarkDefenders.Game.Model.Other;
+using DarkDefenders.Game.Resources.Internals;
+using DarkDefenders.Remote.Model;
 using Infrastructure.DDDES;
 using Infrastructure.Math;
 
@@ -14,10 +13,10 @@ namespace DarkDefenders.ConsoleClient.Presenters
     internal class GamePresenter : IRemoteEvents
     {
         private IConsoleRenderer _consoleRenderer;
-        private readonly Dictionary<IdentityOf<RigidBody>, RigidBodyPresenter> _presentersMap = new Dictionary<IdentityOf<RigidBody>, RigidBodyPresenter>();
+        private readonly Dictionary<IdentityOf<RemoteRigidBody>, RigidBodyPresenter> _presentersMap = new Dictionary<IdentityOf<RemoteRigidBody>, RigidBodyPresenter>();
 
         private Vector _lastCreaturePosition = Vector.Zero;
-        private IdentityOf<RigidBody> _playersRigidBodyId;
+        private IdentityOf<RemoteRigidBody> _playersRigidBodyId;
         private Map<Tile> _map;
         private int _totalHeroesSpawned;
         private bool _creaturesRenderingEnabled = true;
@@ -37,7 +36,7 @@ namespace DarkDefenders.ConsoleClient.Presenters
             RenderWorld();
         }
 
-        public void Created(IdentityOf<RigidBody> id, Vector position, RemoteEntityType type)
+        public void Created(IdentityOf<RemoteRigidBody> id, Vector position, RemoteEntityType type)
         {
             var presenter = new RigidBodyPresenter(_map, _consoleRenderer);
 
@@ -56,7 +55,7 @@ namespace DarkDefenders.ConsoleClient.Presenters
             }
         }
 
-        public void Destroyed(IdentityOf<RigidBody> id)
+        public void Destroyed(IdentityOf<RemoteRigidBody> id)
         {
             var vm = _presentersMap[id];
             vm.Remove();
@@ -71,7 +70,7 @@ namespace DarkDefenders.ConsoleClient.Presenters
             }
         }
 
-        public void Moved(IdentityOf<RigidBody> id, Vector newPosition)
+        public void Moved(IdentityOf<RemoteRigidBody> id, Vector newPosition)
         {
             var isPlayer = id == _playersRigidBodyId;
             if (isPlayer)

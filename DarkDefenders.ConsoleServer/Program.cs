@@ -2,11 +2,11 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
-using DarkDefenders.Domain.Game;
-using DarkDefenders.Domain.Game.Interfaces;
-using DarkDefenders.Domain.Resources;
+using DarkDefenders.Game.App;
+using DarkDefenders.Game.App.Interfaces;
+using DarkDefenders.Game.Resources;
+using DarkDefenders.Remote.AdapterFromGame;
 using DarkDefenders.Remote.Model;
-using DarkDefenders.Remote.Model.Interface;
 using Infrastructure.DDDES;
 using Infrastructure.Runtime;
 using Infrastructure.Util;
@@ -33,7 +33,7 @@ namespace DarkDefenders.ConsoleServer
         {
             Thread.Sleep(1000);//TODO: remove
 
-            var game = InitializeGame();
+            var game = InitializeGameService();
 
             var textCommandsProcessor = new TextCommandsProcessor(game);
 
@@ -86,18 +86,18 @@ namespace DarkDefenders.ConsoleServer
             }
         }
 
-        private static IGame InitializeGame()
+        private static IGameService InitializeGameService()
         {
             var networkBroadcaster = new EventsDataBroadcaster();
 
-            var game = CreateGame(networkBroadcaster);
+            var game = CreateGameService(networkBroadcaster);
 
             game.Initialize(WorldFileName);
 
             return game;
         }
 
-        private static IGame CreateGame(IEventsListener<IRemoteEvents> networkBroadcaster)
+        private static IGameService CreateGameService(IEventsListener<IRemoteEvents> networkBroadcaster)
         {
             return new GameBootstrapper()
             .RegisterResources()

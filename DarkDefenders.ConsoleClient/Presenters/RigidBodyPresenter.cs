@@ -1,8 +1,8 @@
 using System;
 using System.Drawing;
 using DarkDefenders.ConsoleClient.Renderers;
-using DarkDefenders.Domain.Model.Other;
-using DarkDefenders.Remote.Model.Interface;
+using DarkDefenders.Game.Model.Other;
+using DarkDefenders.Remote.Model;
 using Infrastructure.Math;
 
 namespace DarkDefenders.ConsoleClient.Presenters

@@ -1,15 +1,15 @@
 ﻿using System;
-using DarkDefenders.Domain.Game.Interfaces;
+using DarkDefenders.Game.App.Interfaces;
 using Infrastructure.Util;
 
 namespace DarkDefenders.ConsoleServer
 {
     internal class TextCommandsProcessor
     {
-        private readonly IGame _game;
+        private readonly IGameService _game;
         private TimeSpan _lastActualElapsed;
 
-        public TextCommandsProcessor(IGame game)
+        public TextCommandsProcessor(IGameService game)
         {
             _game = game;
         }

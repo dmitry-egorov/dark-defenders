@@ -40,12 +40,6 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Adapters\GameAdapter.cs" />
-    <Compile Include="Adapters\PlayerAdapter.cs" />
-    <Compile Include="GameBootstrapper.cs" />
-    <Compile Include="Interfaces\IGame.cs" />
-    <Compile Include="Interfaces\IPlayer.cs" />
-    <Compile Include="Internals\Configurator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

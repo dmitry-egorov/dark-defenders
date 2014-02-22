@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using DarkDefenders.ConsoleClient.Presenters;
-using DarkDefenders.Domain.Model;
 using DarkDefenders.Remote.Model;
-using DarkDefenders.Remote.Model.Interface;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Runtime;
 using Infrastructure.Util;
@@ -34,11 +32,11 @@ namespace DarkDefenders.ConsoleClient
 
         static void Main()
         {
-            var renderer = new GamePresenter();
+            var gamePresenter = new GamePresenter();
 
             var counter = new CountingEventsListener<IRemoteEvents>();
             
-            var rendererListener = DelegatingEventsListener.Create(renderer);
+            var rendererListener = DelegatingEventsListener.Create(gamePresenter);
 
             var composite = CompositeEventsListener.Create(rendererListener, counter);
 
@@ -46,7 +44,7 @@ namespace DarkDefenders.ConsoleClient
 
             eventDataListener.ListenAsync();
 
-            new Loop(100, _elapsedLimit).Run(elapsed => Frame(renderer, counter, eventDataListener, elapsed));
+            new Loop(100, _elapsedLimit).Run(elapsed => Frame(gamePresenter, counter, eventDataListener, elapsed));
         }
 
         private static void Frame(GamePresenter renderer, CountingEventsListener<IRemoteEvents> counter, EventDataListener eventDataListener, TimeSpan elapsed)

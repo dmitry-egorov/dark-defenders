@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using DarkDefenders.Remote.Model.Interface;
+using DarkDefenders.Remote.Model;
 using DarkDefenders.Remote.Serialization.Internals;
 using Infrastructure.Serialization;
 

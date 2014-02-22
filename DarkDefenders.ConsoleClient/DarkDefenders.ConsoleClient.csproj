@@ -95,13 +95,13 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DarkDefenders.Domain.Model\DarkDefenders.Domain.Model.csproj">
-      <Project>{9C13B1FF-5E35-4D3A-8D48-C4BCCE96F8CE}</Project>
-      <Name>DarkDefenders.Domain.Model</Name>
+    <ProjectReference Include="..\DarkDefenders.Game.Model\DarkDefenders.Game.Model.csproj">
+      <Project>{ECE63230-99C3-42F9-A87E-D9FEAED42004}</Project>
+      <Name>DarkDefenders.Game.Model</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DarkDefenders.Domain.Resources\DarkDefenders.Domain.Resources.csproj">
-      <Project>{419EBFB5-87B4-4A65-9686-679CF26E384D}</Project>
-      <Name>DarkDefenders.Domain.Resources</Name>
+    <ProjectReference Include="..\DarkDefenders.Game.Resources\DarkDefenders.Game.Resources.csproj">
+      <Project>{5696DAC5-7730-42D4-BF7D-C3DAB7BCC083}</Project>
+      <Name>DarkDefenders.Game.Resources</Name>
     </ProjectReference>
     <ProjectReference Include="..\DarkDefenders.Remote.Model\DarkDefenders.Remote.Model.csproj">
       <Project>{E13E986E-AFCD-42BB-ACAB-FC3DFE947C51}</Project>
