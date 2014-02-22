@@ -18,13 +18,14 @@ namespace DarkDefenders.Domain.Model.Entities
         private const double GravityAcceleration = 200.0;
         private const double FrictionCoefficient = 400.0;
 
-        private readonly Clock _clock;
+        private readonly IResources<RigidBodyProperties> _resources;
         private readonly Terrain _terrain;
 
         private double _mass;
         private double _topHorizontalMomentum;
         private Force _gravityForce;
         
+        private Vector _position;
         private Box _boundingBox;
         private Momentum _momentum;
         private Force _externalForce;
@@ -35,18 +36,13 @@ namespace DarkDefenders.Domain.Model.Entities
         private bool _isTouchingTheGround;
         private bool _momentumIsZero;
         private bool _externalForceIsZero;
-        private readonly IResources<RigidBodyProperties> _resources;
-
-        public Vector Position { get { return _boundingBox.Center; } }
 
         public RigidBody
         (
             IResources<RigidBodyProperties> resources,
-            Clock clock, 
             Terrain terrain
         )
         {
-            _clock = clock;
             _terrain = terrain;
             _resources = resources;
         }
@@ -56,13 +52,15 @@ namespace DarkDefenders.Domain.Model.Entities
             CreationEvent(x => x.Created(this, initialPosition, initialMomentum, propertiesId));
         }
 
-        public void UpdatePhysics()
+        public void UpdatePhysics(TimeSpan elapsed)
         {
+            var elapsedSeconds = elapsed.ToSeconds();
+
             Momentum momentum;
-            var momentumUpdated = TryUpdateMomentum(out momentum);
+            var momentumUpdated = TryUpdateMomentum(elapsedSeconds, out momentum);
 
             Vector position;
-            var positionUpdated = TryUpdatePosition(momentum, out position);
+            var positionUpdated = TryUpdatePosition(elapsedSeconds, momentum, out position);
 
             if(momentumUpdated)
             {
@@ -146,7 +144,7 @@ namespace DarkDefenders.Domain.Model.Entities
 
         public int Level()
         {
-            return (_boundingBox.Center.Y - _boundingBox.HeightRadius).TolerantFloor().ToInt();
+            return (_position.Y - _boundingBox.HeightRadius).TolerantFloor().ToInt();
         }
 
         public int NextSlotX(Direction direction)
@@ -164,23 +162,37 @@ namespace DarkDefenders.Domain.Model.Entities
 
         public int SlotToTheRightX()
         {
-            var right = _boundingBox.Center.X + _boundingBox.WidthRadius;
+            var right = _position.X + _boundingBox.WidthRadius;
 
             return right.NextInteger().ToInt();
         }
 
         public int SlotToTheLeftX()
         {
-            var right = _boundingBox.Center.X - _boundingBox.WidthRadius;
+            var right = _position.X - _boundingBox.WidthRadius;
 
             return right.TolerantFloor().ToInt() - 1;
         }
 
         public int SlotYUnder()
         {
-            var bottom = _boundingBox.Center.Y - _boundingBox.HeightRadius;
+            var bottom = _position.Y - _boundingBox.HeightRadius;
 
             return bottom.PrevInteger().ToInt();
+        }
+
+        public Vector GetPositionOffsetBy(Axis axis, double offset)
+        {
+            if (axis == Axis.Horizontal)
+            {
+                return Vector.XY(_position.X + offset, _position.Y);
+            }
+            if (axis == Axis.Vertical)
+            {
+                return Vector.XY(_position.X, _position.Y + offset);
+            }
+
+            throw new ArgumentException("Invalid value", "axis");
         }
 
         void IRigidBodyEvents.Created(RigidBody rigidBody, Vector initialPosition, Momentum initialMomentum, string propertiesId)
@@ -191,7 +203,8 @@ namespace DarkDefenders.Domain.Model.Entities
 
             _momentum = initialMomentum;
             _topHorizontalMomentum = properties.TopHorizontalMomentum;
-            _boundingBox = new Box(initialPosition, radius, radius);
+            _position = initialPosition;
+            _boundingBox = new Box(radius, radius);
             _mass = properties.Mass;
 
             _externalForce = Force.Zero;
@@ -211,7 +224,7 @@ namespace DarkDefenders.Domain.Model.Entities
 
         void IRigidBodyEvents.Moved(Vector newPosition)
         {
-            _boundingBox = _boundingBox.ChangePosition(newPosition);
+            _position = newPosition;
 
             PrepareTouching();
         }
@@ -224,15 +237,13 @@ namespace DarkDefenders.Domain.Model.Entities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool TryUpdateMomentum(out Momentum newMomentum)
+        private bool TryUpdateMomentum(Seconds elapsed, out Momentum newMomentum)
         {
             if (_isTouchingTheGround && _momentumIsZero && _externalForceIsZero)
             {
                 newMomentum = _momentum;
                 return false;
             }
-
-            var elapsed = _clock.GetElapsedSeconds();
 
             var force = GetForce(elapsed);
 
@@ -253,15 +264,13 @@ namespace DarkDefenders.Domain.Model.Entities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool TryUpdatePosition(Momentum momentum, out Vector newPosition)
+        private bool TryUpdatePosition(Seconds elapsed, Momentum momentum, out Vector newPosition)
         {
             if (momentum.EqualsZero())
             {
-                newPosition = _boundingBox.Center;
+                newPosition = _position;
                 return false;
             }
-
-            var elapsed = _clock.GetElapsedSeconds();
 
             var positionChange = momentum * elapsed * (1.0 / _mass);
 
@@ -384,33 +393,33 @@ namespace DarkDefenders.Domain.Model.Entities
         {
             var x = LeftBoundSlotX();
 
-            return IsTouchingWallsAt(Axis.Vertical, _boundingBox.Center.Y, _boundingBox.HeightRadius, x);
+            return IsTouchingWallsAt(Axis.Vertical, _position.Y, _boundingBox.HeightRadius, x);
         }
 
         private bool CalculateIsTouchingAWallToTheRight()
         {
             var x = RightBoundSlotX();
 
-            return IsTouchingWallsAt(Axis.Vertical, _boundingBox.Center.Y, _boundingBox.HeightRadius, x);
+            return IsTouchingWallsAt(Axis.Vertical, _position.Y, _boundingBox.HeightRadius, x);
         }
 
         private bool CalculateIsTouchingTheGround()
         {
             var y = BottomBoundSlotY();
 
-            return IsTouchingWallsAt(Axis.Horizontal, _boundingBox.Center.X, _boundingBox.WidthRadius, y);
+            return IsTouchingWallsAt(Axis.Horizontal, _position.X, _boundingBox.WidthRadius, y);
         }
 
         private bool CalculateIsTouchingTheCeiling()
         {
             var y = TopBoundSlotY();
 
-            return IsTouchingWallsAt(Axis.Horizontal, _boundingBox.Center.X, _boundingBox.WidthRadius, y);
+            return IsTouchingWallsAt(Axis.Horizontal, _position.X, _boundingBox.WidthRadius, y);
         }
 
         private Vector ApplyPositionChange(Vector positionDelta)
         {
-            var center = _boundingBox.Center;
+            var center = _position;
 
             Vector horizontalAdjustment;
             var horizontalPositionAdjusted = ApplyAxisPositionChange(Axis.Horizontal, positionDelta, out horizontalAdjustment);
@@ -441,7 +450,7 @@ namespace DarkDefenders.Domain.Model.Entities
 
         private bool ApplyAxisPositionChange(Axis axis, Vector positionDelta, out Vector adjustedPosition)
         {
-            var center = _boundingBox.Center;
+            var center = _position;
 
             var mainCenter = center.CoordinateFor(axis);
             var otherCenter = center.CoordinateFor(axis.Other());
@@ -501,7 +510,7 @@ namespace DarkDefenders.Domain.Model.Entities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private int BottomBoundSlotY()
         {
-            var bottom = _boundingBox.Center.Y - _boundingBox.HeightRadius;
+            var bottom = _position.Y - _boundingBox.HeightRadius;
 
             return bottom.PrevInteger().ToInt();
         }
@@ -509,7 +518,7 @@ namespace DarkDefenders.Domain.Model.Entities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private int TopBoundSlotY()
         {
-            var top = _boundingBox.Center.Y + _boundingBox.HeightRadius;
+            var top = _position.Y + _boundingBox.HeightRadius;
 
             return top.TolerantFloor().ToInt();
         }
@@ -530,7 +539,7 @@ namespace DarkDefenders.Domain.Model.Entities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private int LeftBoundSlotX()
         {
-            var left = _boundingBox.Center.X - _boundingBox.WidthRadius;
+            var left = _position.X - _boundingBox.WidthRadius;
 
             return left.PrevInteger().ToInt();
         }
@@ -538,7 +547,7 @@ namespace DarkDefenders.Domain.Model.Entities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private int RightBoundSlotX()
         {
-            var right = _boundingBox.Center.X + _boundingBox.WidthRadius;
+            var right = _position.X + _boundingBox.WidthRadius;
 
             return right.TolerantFloor().ToInt();
         }

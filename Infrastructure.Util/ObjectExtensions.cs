@@ -7,6 +7,18 @@ namespace Infrastructure.Util
 {
     public static class ObjectExtensions
     {
+
+        public static void NullSafe<T>(this T obj, Action<T> action)
+            where T: class 
+        {
+            if (obj == null)
+            {
+                return;
+            }
+
+            action(obj);
+        }
+
         public static bool IsIn<T>(this T obj, params T[] objects) 
         {
             return objects.Any(o => obj.Equals(o));

@@ -4,7 +4,7 @@ using DarkDefenders.Domain.Model.Other;
 
 namespace DarkDefenders.Remote.Model.Internals.Entities
 {
-    internal class RemoteCreature: ICreatureEvents
+    internal class RemoteCreature : ICreatureEvents
     {
         private readonly RemoteEventAdapter _adapter;
 

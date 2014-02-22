@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{46C6CCD9-0683-4A63-82B8-D9C48D5A20C9}</ProjectGuid>
+    <ProjectGuid>{EC022F35-6A7D-4399-8E5B-5961794C1F85}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Infrastructure.Runtime</RootNamespace>
-    <AssemblyName>Infrastructure.Runtime</AssemblyName>
+    <RootNamespace>Infrastructure.Network.Client</RootNamespace>
+    <AssemblyName>Infrastructure.Network.Client</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -32,25 +32,14 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AutoResetStopwatch.cs" />
-    <Compile Include="Button.cs" />
-    <Compile Include="Loop.cs" />
-    <Compile Include="Measure.cs" />
-    <Compile Include="OnOffSwitch.cs" />
-    <Compile Include="PerformanceCounter.cs" />
-    <Compile Include="PeriodicExecutor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SwitchablePeriodicExecutor.cs" />
-    <Compile Include="TimeFiller.cs" />
-    <Compile Include="TimeSplitter.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Infrastructure.Util\Infrastructure.Util.csproj">
-      <Project>{0B407BC3-7B5B-431A-96E7-A41F25AB27BE}</Project>
-      <Name>Infrastructure.Util</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

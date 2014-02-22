@@ -1,4 +1,5 @@
 ﻿using DarkDefenders.Domain.Game;
+using DarkDefenders.Domain.Resources.Internals;
 
 namespace DarkDefenders.Domain.Resources
 {

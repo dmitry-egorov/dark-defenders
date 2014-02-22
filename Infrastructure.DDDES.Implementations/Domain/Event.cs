@@ -2,14 +2,14 @@ using System;
 
 namespace Infrastructure.DDDES.Implementations.Domain
 {
-    public sealed class Event<TEntity, TEntityEvents> : IEvent
-        where TEntity : IEntity<TEntity>, TEntityEvents
+    public sealed class Event<TEntity, TEvents> : IEvent
+        where TEntity : IEntity<TEntity>, TEvents
     {
-        private readonly TEntityEvents _entity;
-        private readonly TEntityEvents _external;
-        private readonly Action<TEntityEvents> _eventAction;
+        private readonly TEvents _entity;
+        private readonly TEvents _external;
+        private readonly Action<TEvents> _eventAction;
 
-        public Event(TEntityEvents entity, TEntityEvents external, Action<TEntityEvents> eventAction)
+        public Event(TEvents entity, TEvents external, Action<TEvents> eventAction)
         {
             _entity = entity;
             _external = external;

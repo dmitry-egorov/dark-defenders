@@ -4,7 +4,7 @@ using Infrastructure.DDDES;
 
 namespace DarkDefenders.Domain.Model.Events
 {
-    public interface IHeroEvents: IEntityEvents
+    public interface IHeroEvents : IEntityEvents
     {
         void Created(Creature creature);
         void StateChanged(IHeroState heroState);

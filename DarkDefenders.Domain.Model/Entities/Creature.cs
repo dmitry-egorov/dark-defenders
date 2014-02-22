@@ -21,12 +21,11 @@ namespace DarkDefenders.Domain.Model.Entities
         private readonly RigidBody _rigidBody;
         private readonly Weapon _weapon;
         
+        private double _movementForceAmplitude;
+        
         private Movement _movement;
         private Direction _direction;
         private Momentum _jumpMomentum;
-
-        private Force _leftMovementForce;
-        private Force _rightMovementForce;
 
         public Creature
         (
@@ -163,15 +162,15 @@ namespace DarkDefenders.Domain.Model.Entities
         {
             var properties = _resources[propertiesId];
 
-            _rightMovementForce = Force.Right * properties.MovementForce;
-            _leftMovementForce = Force.Left * properties.MovementForce;
+            _movementForceAmplitude = properties.MovementForce;
+
             _jumpMomentum = Vector.XY(0, properties.JumpMomentum).ToMomentum();
         }
 
         void ICreatureEvents.MovementChanged(Movement movement)
         {
             _movement = movement;
-            _direction = GetDirection();
+            _direction = GetDirectionFrom(movement);
         }
 
         private bool CantJump()
@@ -184,9 +183,9 @@ namespace DarkDefenders.Domain.Model.Entities
             _rigidBody.AddMomentum(_jumpMomentum);
         }
 
-        private Direction GetDirection()
+        private Direction GetDirectionFrom(Movement movement)
         {
-            switch (_movement)
+            switch (movement)
             {
                 case Movement.Left:
                     return Direction.Left;
@@ -220,9 +219,9 @@ namespace DarkDefenders.Domain.Model.Entities
                 case Movement.Stop:
                     return Force.Zero;
                 case Movement.Left:
-                    return _leftMovementForce;
+                    return Force.Left * _movementForceAmplitude;
                 case Movement.Right:
-                    return _rightMovementForce;
+                    return Force.Right * _movementForceAmplitude;
                 default:
                     throw new ArgumentOutOfRangeException("desiredMovement");
             }

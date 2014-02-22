@@ -5,7 +5,7 @@ using Infrastructure.Physics;
 
 namespace DarkDefenders.Domain.Model.Events
 {
-    public interface IRigidBodyEvents: IEntityEvents
+    public interface IRigidBodyEvents : IEntityEvents
     {
         void Created(RigidBody rigidBody, Vector initialPosition, Momentum initialMomentum, string properties);
         void Accelerated(Momentum newMomentum);

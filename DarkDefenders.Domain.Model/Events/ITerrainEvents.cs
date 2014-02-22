@@ -2,7 +2,7 @@
 
 namespace DarkDefenders.Domain.Model.Events
 {
-    public interface ITerrainEvents: IEntityEvents
+    public interface ITerrainEvents : IEntityEvents
     {
         void Created(string mapId);
     }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using DarkDefenders.Domain.Model.Entities;
-using DarkDefenders.Domain.Model.Other;
 using Infrastructure.DDDES.Implementations.Configuration;
 using Microsoft.Practices.Unity;
 
@@ -14,6 +13,7 @@ namespace DarkDefenders.Domain.Model
             new DomainConfigurator(container, registeredListeners)
 
             .RegisterEntity<RigidBody>()
+            .RegisterEntity<Cooldown>()
             .RegisterEntity<Creature>()
             .RegisterEntity<Weapon>()
             .RegisterEntity<Projectile>()
@@ -26,7 +26,6 @@ namespace DarkDefenders.Domain.Model
             .RegisterSingletonEntity<Clock>()
             .RegisterSingletonEntity<World>()
 
-            .RegisterSingleton<CooldownFactory>()
             .RegisterSingleton<Random>(new InjectionConstructor())
             ;
 

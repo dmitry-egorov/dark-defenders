@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using DarkDefenders.Domain.Game;
 using DarkDefenders.Domain.Game.Interfaces;
 using DarkDefenders.Domain.Resources;
@@ -35,30 +33,22 @@ namespace DarkDefenders.ConsoleServer
         {
             Thread.Sleep(1000);//TODO: remove
 
-            var networkBroadcaster = new EventsDataBroadcaster();
-            var game = InitializeGame(networkBroadcaster);
+            var game = InitializeGame();
 
             var textCommandsProcessor = new TextCommandsProcessor(game);
 
-            var loop = new Loop(MaxFps);
-            var gameTask = Task.Factory.StartNew(() =>
+            var loop = new Loop(MaxFps, _elapsedLimit);
+            var gameTask = loop.RunParallel(elapsed =>
             {
-                var stopwatch = AutoResetStopwatch.StartNew();
-                loop.Run(() =>
+                var actualElapsed = Measure.Time(() =>
                 {
-                    var elapsed = stopwatch.ElapsedSinceLastCall.LimitTo(_elapsedLimit);
+                    ExecuteCommands();
 
-                    var actualElapsed = Measure.Time(() =>
-                    {
-                        ExecuteCommands();
-
-                        game.Update(elapsed);
-                    });
-
-                    textCommandsProcessor.SetActualElapsed(actualElapsed);
+                    game.Update(elapsed);
                 });
-            }, 
-            TaskCreationOptions.LongRunning);
+
+                textCommandsProcessor.SetActualElapsed(actualElapsed);
+            });
 
             RunConsoleCommandsProcessing(textCommandsProcessor, loop);
 
@@ -96,8 +86,10 @@ namespace DarkDefenders.ConsoleServer
             }
         }
 
-        private static IGame InitializeGame(IEventsListener<IRemoteEvents> networkBroadcaster)
+        private static IGame InitializeGame()
         {
+            var networkBroadcaster = new EventsDataBroadcaster();
+
             var game = CreateGame(networkBroadcaster);
 
             game.Initialize(WorldFileName);

@@ -4,7 +4,7 @@ using DarkDefenders.Domain.Model.States.Heroes;
 
 namespace DarkDefenders.Remote.Model.Internals.Entities
 {
-    internal class RemoteHero: IHeroEvents
+    internal class RemoteHero : IHeroEvents
     {
         private readonly RemoteEventAdapter _adapter;
 

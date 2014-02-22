@@ -4,18 +4,14 @@ namespace Infrastructure.Math
 {
     public struct Box
     {
-        private readonly Vector _center;
         private readonly double _widthRadius;
         private readonly double _heightRadius;
-
-        public Vector Center { get { return _center; } }
 
         public double WidthRadius { get { return _widthRadius; } }
         public double HeightRadius { get { return _heightRadius; } }
 
-        public Box(Vector center, double widthRadius, double heightRadius)
+        public Box(double widthRadius, double heightRadius)
         {
-            _center = center;
             _widthRadius = widthRadius;
             _heightRadius = heightRadius;
         }
@@ -25,20 +21,14 @@ namespace Infrastructure.Math
             return axis == Axis.Horizontal ? _widthRadius : _heightRadius;
         }
 
-        public Box ChangePosition(Vector newPosition)
-        {
-            return new Box(newPosition, _widthRadius, _heightRadius);
-        }
-
         public override string ToString()
         {
-            return "[{0}], {1}".FormatWith(_center, _widthRadius);
+            return "{0}, {1}".FormatWith(_widthRadius, _heightRadius);
         }
 
         public bool Equals(Box other)
         {
-            return _center.Equals(other._center) 
-                && _widthRadius.Equals(other._widthRadius)
+            return _widthRadius.Equals(other._widthRadius)
                 && _heightRadius.Equals(other._heightRadius);
         }
 
@@ -52,8 +42,7 @@ namespace Infrastructure.Math
         {
             unchecked
             {
-                var hashCode = _center.GetHashCode();
-                hashCode = (hashCode*397) ^ _widthRadius.GetHashCode();
+                var hashCode = _widthRadius.GetHashCode();
                 hashCode = (hashCode*397) ^ _heightRadius.GetHashCode();
                 return hashCode;
             }

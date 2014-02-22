@@ -1,9 +1,8 @@
 ﻿using DarkDefenders.Domain.Model.Other;
-using DarkDefenders.Domain.Resources.Internals;
 using Infrastructure.DDDES;
 using Infrastructure.Math;
 
-namespace DarkDefenders.Domain.Resources
+namespace DarkDefenders.Domain.Resources.Internals
 {
     internal class MapResources : IResources<Map<Tile>>
     {

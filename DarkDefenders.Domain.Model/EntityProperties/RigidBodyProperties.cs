@@ -4,11 +4,11 @@ namespace DarkDefenders.Domain.Model.EntityProperties
 {
     public class RigidBodyProperties : SlowValueObject
     {
-        public float BoundingBoxRadius { get; private set; }
-        public float Mass { get; private set; }
-        public float TopHorizontalMomentum { get; private set; }
+        public double BoundingBoxRadius { get; private set; }
+        public double Mass { get; private set; }
+        public double TopHorizontalMomentum { get; private set; }
 
-        public RigidBodyProperties(float boundingBoxRadius, float mass, float topHorizontalMomentum)
+        public RigidBodyProperties(double boundingBoxRadius, double mass, double topHorizontalMomentum)
         {
             BoundingBoxRadius = boundingBoxRadius;
             Mass = mass;

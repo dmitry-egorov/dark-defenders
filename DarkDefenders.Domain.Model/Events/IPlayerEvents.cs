@@ -3,7 +3,7 @@ using Infrastructure.DDDES;
 
 namespace DarkDefenders.Domain.Model.Events
 {
-    public interface IPlayerEvents: IEntityEvents
+    public interface IPlayerEvents : IEntityEvents
     {
         void Created(Creature creature);
     }

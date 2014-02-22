@@ -31,6 +31,7 @@ namespace DarkDefenders.Remote.Model.Internals
 
         public void Moved(RigidBody rigidBody, Vector newPosition)
         {
+            _positionsMap[rigidBody] = newPosition;
             _reciever.Moved(rigidBody.Id, newPosition);
         }
 

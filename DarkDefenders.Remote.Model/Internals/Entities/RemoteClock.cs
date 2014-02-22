@@ -1,9 +1,10 @@
 ﻿using System;
+using DarkDefenders.Domain.Model.Entities;
 using DarkDefenders.Domain.Model.Events;
 
 namespace DarkDefenders.Remote.Model.Internals.Entities
 {
-    internal class RemoteClock: IClockEvents
+    internal class RemoteClock : IClockEvents
     {
         private readonly RemoteEventsPacker _packer;
 
@@ -19,7 +20,6 @@ namespace DarkDefenders.Remote.Model.Internals.Entities
 
         public void Destroyed()
         {
-            
         }
 
         public void Created()

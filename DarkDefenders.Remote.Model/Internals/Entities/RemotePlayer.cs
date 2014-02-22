@@ -3,7 +3,7 @@ using DarkDefenders.Domain.Model.Events;
 
 namespace DarkDefenders.Remote.Model.Internals.Entities
 {
-    internal class RemotePlayer: IPlayerEvents
+    internal class RemotePlayer : IPlayerEvents
     {
         private readonly RemoteEventAdapter _adapter;
 

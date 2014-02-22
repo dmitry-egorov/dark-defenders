@@ -4,7 +4,7 @@ using Infrastructure.DDDES;
 
 namespace DarkDefenders.Domain.Model.Events
 {
-    public interface IHeroSpawnerEvents: IEntityEvents
+    public interface IHeroSpawnerEvents : IEntityEvents
     {
         void Created(ReadOnlyCollection<HeroSpawnPoint> spawnPoints);
     }

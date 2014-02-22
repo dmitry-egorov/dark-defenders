@@ -1,4 +1,5 @@
 ﻿using DarkDefenders.Domain.Game;
+using DarkDefenders.Domain.Model.Entities;
 using DarkDefenders.Domain.Model.Events;
 using DarkDefenders.Remote.Model.Interface;
 using DarkDefenders.Remote.Model.Internals;

@@ -5,7 +5,7 @@ using Infrastructure.Physics;
 
 namespace DarkDefenders.Remote.Model.Internals.Entities
 {
-    internal class RemoteRigidBody: IRigidBodyEvents
+    internal class RemoteRigidBody : IRigidBodyEvents
     {
         private readonly RemoteEventAdapter _adapter;
 

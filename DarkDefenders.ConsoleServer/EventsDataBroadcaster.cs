@@ -19,14 +19,19 @@ namespace DarkDefenders.ConsoleServer
         {
             _client = new UdpClient();
 
-            _ipEndPoint = new IPEndPoint(new IPAddress(new byte[] {127, 0, 0, 1}), 1337);
+            _ipEndPoint = new IPEndPoint(new IPAddress(new Byte[] {127, 0, 0, 1}), 1337);
 
             _serializer = new EventsSerializer();
         }
 
         public void Recieve(IEnumerable<Action<IRemoteEvents>> events)
         {
-            Task.Run(() =>
+            SendAsync(events);
+        }
+
+        private async void SendAsync(IEnumerable<Action<IRemoteEvents>> events)
+        {
+            await Task.Run(() =>
             {
                 var buffer = _serializer.Serialize(events);
                 var bytes = buffer.Length;

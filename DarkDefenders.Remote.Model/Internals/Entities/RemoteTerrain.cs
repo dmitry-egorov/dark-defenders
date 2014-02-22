@@ -2,7 +2,7 @@
 
 namespace DarkDefenders.Remote.Model.Internals.Entities
 {
-    internal class RemoteTerrain: ITerrainEvents
+    internal class RemoteTerrain : ITerrainEvents
     {
         private readonly RemoteEventsPacker _packer;
 

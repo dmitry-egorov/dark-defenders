@@ -54,7 +54,7 @@ namespace DarkDefenders.Domain.Model.Entities
             _heroes.ForAll(x => x.Think());
             _heroSpawner.Update();
             _projectiles.ForAll(x => x.CheckForHit());
-            _rigidBodies.ForAll(x => x.UpdatePhysics());
+            _rigidBodies.ForAll(x => x.UpdatePhysics(elapsed));
             _clock.UpdateTime(elapsed);
         }
 

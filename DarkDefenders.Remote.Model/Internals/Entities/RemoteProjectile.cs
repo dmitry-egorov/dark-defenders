@@ -3,7 +3,7 @@ using DarkDefenders.Domain.Model.Events;
 
 namespace DarkDefenders.Remote.Model.Internals.Entities
 {
-    internal class RemoteProjectile: IProjectileEvents
+    internal class RemoteProjectile : IProjectileEvents
     {
         private readonly RemoteEventAdapter _adapter;
 

@@ -2,7 +2,7 @@
 using DarkDefenders.Domain.Model.EntityProperties;
 using Infrastructure.DDDES;
 
-namespace DarkDefenders.Domain.Resources
+namespace DarkDefenders.Domain.Resources.Internals
 {
     internal class RigidBodyPropertiesResources: IResources<RigidBodyProperties>
     {

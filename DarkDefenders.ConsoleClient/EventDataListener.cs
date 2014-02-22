@@ -30,13 +30,15 @@ namespace DarkDefenders.ConsoleClient
             while (!_stopped)
             {
                 var data = await _client.ReceiveAsync();
+                var buffer = data.Buffer;
+
                 Task.Run(() =>
                 {
-                    var acceptors = _deserializer.Deserialize(data.Buffer);
+                    var actions = _deserializer.Deserialize(buffer);
 
-                    foreach (var acceptor in acceptors)
+                    foreach (var action in actions)
                     {
-                        _queue.Enqueue(acceptor);
+                        _queue.Enqueue(action);
                     }
                 });
             }
@@ -44,9 +46,9 @@ namespace DarkDefenders.ConsoleClient
 
         public void ProcessEvents()
         {
-            var acceptors = _queue.DequeueAllCurrent().AsReadOnly();
+            var actions = _queue.DequeueAllCurrent().AsReadOnly();
 
-            _reciever.Recieve(acceptors);
+            _reciever.Recieve(actions);
         }
 
         public void Stop()

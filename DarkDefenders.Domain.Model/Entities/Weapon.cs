@@ -20,35 +20,25 @@ namespace DarkDefenders.Domain.Model.Entities
         private static readonly Momentum _rightProjectileMomentum = Vector.XY(ProjectileMomentum, 0).ToMomentum();
 
         private readonly IFactory<Projectile> _projectileFactory;
-        private readonly Clock _clock;
         private readonly Cooldown _fireCooldown;
 
         private RigidBody _rigidBody;
 
-        public Weapon(Clock clock, IFactory<Projectile> projectileFactory)
+        public Weapon(IFactory<Projectile> projectileFactory, Cooldown fireCooldown)
         {
-            _clock = clock;
             _projectileFactory = projectileFactory;
-            _fireCooldown = new Cooldown(clock, _fireDelay);
+            _fireCooldown = fireCooldown;
         }
 
         public void Create(RigidBody rigidBody)
         {
+            _fireCooldown.Create(_fireDelay);
             CreationEvent(x => x.Created(rigidBody));
         }
 
         public void Fire(Direction direction)
         {
-            if (_fireCooldown.IsInEffect())
-            {
-                return;
-            }
-
-            CreateProjectile(direction);
-
-            var currentTime = _clock.GetCurrentTime();
-
-            Event(x => x.Fired(currentTime));
+            _fireCooldown.Activate(() => CreateProjectile(direction));
         }
 
         void IWeaponEvents.Created(RigidBody rigidBody)
@@ -56,39 +46,27 @@ namespace DarkDefenders.Domain.Model.Entities
             _rigidBody = rigidBody;
         }
 
-        void IWeaponEvents.Fired(TimeSpan activationTime)
-        {
-            _fireCooldown.SetLastActivationTime(activationTime);
-        }
-
         private void CreateProjectile(Direction direction)
         {
             var projectilePosition = GetProjectilePosition(direction);
             var projectileMomentum = GetProjectileMomentum(direction);
 
-            var projectile = _projectileFactory.Create();
-
-            projectile.Create(projectilePosition, projectileMomentum);
+            _projectileFactory.Create().Create(projectilePosition, projectileMomentum);
         }
 
         private Vector GetProjectilePosition(Direction direction)
         {
-            var position = _rigidBody.Position;
-            var x = position.X;
-            var y = position.Y;
+            var offset =  GetProjectileOffset(direction);
 
+            return _rigidBody.GetPositionOffsetBy(Axis.Horizontal, offset);
+        }
+
+        private static double GetProjectileOffset(Direction direction)
+        {
             const double radius = 1.0;
-
-            if (direction == Direction.Right)
-            {
-                x += radius;
-            }
-            else
-            {
-                x -= radius;
-            }
-
-            return Vector.XY(x, y);
+            return direction == Direction.Right 
+                   ? radius
+                   : -radius;
         }
 
         private static Momentum GetProjectileMomentum(Direction direction)

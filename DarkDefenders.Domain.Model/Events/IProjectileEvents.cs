@@ -3,7 +3,7 @@ using Infrastructure.DDDES;
 
 namespace DarkDefenders.Domain.Model.Events
 {
-    public interface IProjectileEvents: IEntityEvents
+    public interface IProjectileEvents : IEntityEvents
     {
         void Created(RigidBody rigidBody);
     }

@@ -36,27 +36,21 @@ namespace DarkDefenders.ConsoleClient
         {
             var renderer = new GamePresenter();
 
-            var rendererListener = DelegatingEventsListener.Create(renderer);
-
             var counter = new CountingEventsListener<IRemoteEvents>();
+            
+            var rendererListener = DelegatingEventsListener.Create(renderer);
 
             var composite = CompositeEventsListener.Create(rendererListener, counter);
 
             var eventDataListener = new EventDataListener(composite);
 
-            var stopwatch = AutoResetStopwatch.StartNew();
-
             eventDataListener.ListenAsync();
 
-            var loop = new Loop(100);
-
-            loop.Run(() => Frame(stopwatch, renderer, counter, eventDataListener));
+            new Loop(100, _elapsedLimit).Run(elapsed => Frame(renderer, counter, eventDataListener, elapsed));
         }
 
-        private static void Frame(AutoResetStopwatch stopwatch, GamePresenter renderer, CountingEventsListener<IRemoteEvents> counter, EventDataListener eventDataListener)
+        private static void Frame(GamePresenter renderer, CountingEventsListener<IRemoteEvents> counter, EventDataListener eventDataListener, TimeSpan elapsed)
         {
-            var elapsed = stopwatch.ElapsedSinceLastCall.LimitTo(_elapsedLimit);
-
             _keyBoardExecutor.Tick(elapsed, ProcessKeyboard);
             //_testHeroSpawnExecutor.Tick(elapsed, world.SpawnHero);
 

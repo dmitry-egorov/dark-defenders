@@ -3,7 +3,7 @@ using Infrastructure.DDDES;
 
 namespace DarkDefenders.Domain.Model.Events
 {
-    public interface IClockEvents: IEntityEvents
+    public interface IClockEvents : IEntityEvents
     {
         void Created();
         void TimeChanged(TimeSpan newTime);

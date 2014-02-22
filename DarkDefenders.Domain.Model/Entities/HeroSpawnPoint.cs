@@ -1,6 +1,5 @@
 ﻿using System;
 using DarkDefenders.Domain.Model.Events;
-using DarkDefenders.Domain.Model.Other;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
@@ -11,26 +10,23 @@ namespace DarkDefenders.Domain.Model.Entities
     [UsedImplicitly]
     public class HeroSpawnPoint : Entity<HeroSpawnPoint, IHeroSpawnPointEvents>, IHeroSpawnPointEvents
     {
-        private readonly CooldownFactory _cooldownFactory;
-
         private readonly TimeSpan _heroesSpawnCooldownTime = TimeSpan.FromSeconds(10);
         private readonly IFactory<Hero> _heroFactory;
-        private readonly Clock _clock;
+        private readonly Cooldown _heroSpawnCooldown;
 
-        private Cooldown _heroSpawnCooldown;
         private Vector _position;
         private bool _enabled;
         private int _queuedForSpawnCount;
 
-        public HeroSpawnPoint(IFactory<Hero> heroFactory, CooldownFactory cooldownFactory, Clock clock)
+        public HeroSpawnPoint(IFactory<Hero> heroFactory, Cooldown heroSpawnCooldown)
         {
-            _cooldownFactory = cooldownFactory;
             _heroFactory = heroFactory;
-            _clock = clock;
+            _heroSpawnCooldown = heroSpawnCooldown;
         }
 
         public void Create(Vector position)
         {
+            _heroSpawnCooldown.Create(_heroesSpawnCooldownTime);
             CreationEvent(x => x.Created(position));
         }
 
@@ -38,16 +34,19 @@ namespace DarkDefenders.Domain.Model.Entities
         {
             if (_queuedForSpawnCount > 0)
             {
-                var newQueuedForSpawnCount = _queuedForSpawnCount - 1;
+                Spawn();
+                
+                DecrementQueuedCount();
 
-                Event(x => x.QueuedForSpawnCountChanged(newQueuedForSpawnCount));
+                return;
             }
-            else if (!_enabled || _heroSpawnCooldown.IsInEffect())
+
+            if (!_enabled)
             {
                 return;
             }
 
-            Spawn();
+            _heroSpawnCooldown.Activate(Spawn);
         }
 
         public void SpawnHeroes(int count)
@@ -56,8 +55,7 @@ namespace DarkDefenders.Domain.Model.Entities
 
             Event(x => x.QueuedForSpawnCountChanged(newQueuedForSpawnCount));
         }
-
-
+        
         public void ChangeSpawnHeroes(bool enabled)
         {
             Event(x => x.SpawnHeroesChanged(enabled));
@@ -67,12 +65,6 @@ namespace DarkDefenders.Domain.Model.Entities
         {
             _position = position;
             _enabled = true;
-            _heroSpawnCooldown = _cooldownFactory.Create(_heroesSpawnCooldownTime);
-        }
-
-        void IHeroSpawnPointEvents.ActivationTimeChanged(TimeSpan time)
-        {
-            _heroSpawnCooldown.SetLastActivationTime(time);
         }
 
         void IHeroSpawnPointEvents.SpawnHeroesChanged(bool enabled)
@@ -80,19 +72,20 @@ namespace DarkDefenders.Domain.Model.Entities
             _enabled = enabled;
         }
 
-        public void QueuedForSpawnCountChanged(int newQueuedForSpawnCount)
+        void IHeroSpawnPointEvents.QueuedForSpawnCountChanged(int newQueuedForSpawnCount)
         {
             _queuedForSpawnCount = newQueuedForSpawnCount;
         }
 
         private void Spawn()
         {
-            var hero = _heroFactory.Create();
-            hero.Create(_position);
+            _heroFactory.Create().Create(_position);
+        }
 
-            var currentTime = _clock.GetCurrentTime();
-
-            Event(x => x.ActivationTimeChanged(currentTime));
+        private void DecrementQueuedCount()
+        {
+            var newQueuedForSpawnCount = _queuedForSpawnCount - 1;
+            Event(x => x.QueuedForSpawnCountChanged(newQueuedForSpawnCount));
         }
     }
 }
