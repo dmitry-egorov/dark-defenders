@@ -11,6 +11,7 @@ using Infrastructure.DDDES;
 using Infrastructure.Math;
 using Infrastructure.Physics;
 using Infrastructure.Util;
+using Microsoft.Practices.Unity;
 using Moq;
 using NSubstitute;
 using NUnit.Framework;
@@ -64,7 +65,8 @@ namespace DarkDefenders.IntegrationTests
 
         private IGameService Setup()
         {
-            return new GameBootstrapper()
+            return new UnityContainer()
+            .ToGameBootstrapper()
 
             .RegisterResource(_mapResources)
             .RegisterResource(_propertiesResources)

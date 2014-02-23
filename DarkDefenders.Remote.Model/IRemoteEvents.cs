@@ -6,8 +6,8 @@ namespace DarkDefenders.Remote.Model
     public interface IRemoteEvents
     {
         void MapLoaded(string mapId);
-        void Created(IdentityOf<RemoteRigidBody> id, Vector initialPosition, RemoteEntityType type);
-        void Moved(IdentityOf<RemoteRigidBody> id, Vector newPosition);
-        void Destroyed(IdentityOf<RemoteRigidBody> id);
+        void Created(IdentityOf<RemoteEntity> id, Vector initialPosition, RemoteEntityType type);
+        void Moved(IdentityOf<RemoteEntity> id, Vector newPosition);
+        void Destroyed(IdentityOf<RemoteEntity> id);
     }
 }

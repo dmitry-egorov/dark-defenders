@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Infrastructure.Util;
 
@@ -8,7 +9,6 @@ namespace Infrastructure.Runtime
     {
         private readonly TimeSpan _elapsedLimit;
         private readonly TimeFiller _timeFiller;
-        private volatile bool _stopped;
         
         public Loop(int maxFps, TimeSpan elapsedLimit)
         {
@@ -19,28 +19,23 @@ namespace Infrastructure.Runtime
             _timeFiller = new TimeFiller(minFrameElapsed);
         }
 
-        public Task RunParallel(Action<TimeSpan> action)
+        public Task RunParallel(Action<TimeSpan> action, CancellationToken token)
         {
-            return Task.Factory.StartNew(() => Run(action), TaskCreationOptions.LongRunning);
+            return Task.Factory.StartNew(() => Run(action, token), TaskCreationOptions.LongRunning);
         }
 
-        public void Run(Action<TimeSpan> action)
+        public void Run(Action<TimeSpan> action, CancellationToken token)
         {
             _timeFiller.Start();
 
             var sw = AutoResetStopwatch.StartNew();
 
-            while (!_stopped)
+            while (!token.IsCancellationRequested)
             {
                 action(sw.ElapsedSinceLastCall.LimitTo(_elapsedLimit));
 
                 _timeFiller.FillTimeFrame();
             }
-        }
-
-        public void Stop()
-        {
-            _stopped = true;
         }
     }
 }

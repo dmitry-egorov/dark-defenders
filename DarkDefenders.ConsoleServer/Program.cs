@@ -1,15 +1,8 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Linq;
 using System.Threading;
-using DarkDefenders.Game.App;
-using DarkDefenders.Game.App.Interfaces;
-using DarkDefenders.Game.Resources;
-using DarkDefenders.Remote.AdapterFromGame;
-using DarkDefenders.Remote.Model;
-using Infrastructure.DDDES;
-using Infrastructure.Runtime;
+using DarkDefenders.Server;
 using Infrastructure.Util;
+using Microsoft.Practices.Unity;
 
 namespace DarkDefenders.ConsoleServer
 {
@@ -23,86 +16,52 @@ namespace DarkDefenders.ConsoleServer
 //        private const string WorldFileName = "testHoleJump.bmp";
 //        private const string WorldFileName = "testHoleJump2.bmp";
         private const string WorldFileName = "world3.bmp";
-        private const int MaxFps = 60;
+
+        private const int MaxFps = 30;
 
         private static readonly TimeSpan _elapsedLimit = TimeSpan.FromSeconds(1);
 
-        private static readonly ConcurrentQueue<Action> _commandsQueue = new ConcurrentQueue<Action>();
-
         static void Main()
         {
-            Thread.Sleep(1000);//TODO: remove
+            Console.Write("Loading...");
 
-            var game = InitializeGameService();
+            var server = CreateGameServer();
 
-            var textCommandsProcessor = new TextCommandsProcessor(game);
+            var source = new CancellationTokenSource();
 
-            var loop = new Loop(MaxFps, _elapsedLimit);
-            var gameTask = loop.RunParallel(elapsed =>
-            {
-                var actualElapsed = Measure.Time(() =>
-                {
-                    ExecuteCommands();
+            var task = server.RunAsync(source.Token, WorldFileName, MaxFps, _elapsedLimit);
 
-                    game.Update(elapsed);
-                });
+            Console.WriteLine("done.");
 
-                textCommandsProcessor.SetActualElapsed(actualElapsed);
-            });
+            RunConsoleCommandsProcessing(server, source);
 
-            RunConsoleCommandsProcessing(textCommandsProcessor, loop);
-
-            gameTask.Wait();
+            task.Wait();
         }
 
-        private static void ExecuteCommands()
+        private static IGameServer CreateGameServer()
         {
-            var commands = _commandsQueue.DequeueAllCurrent().Take(100);
+            var container = new UnityContainer();
 
-            foreach (var command in commands)
-            {
-                command();
-            }
+            container.RegisterGameServer();
+
+            return container.Resolve<IGameServer>();
         }
 
-        private static void RunConsoleCommandsProcessing(TextCommandsProcessor textCommandsProcessor, Loop loop)
+        private static void RunConsoleCommandsProcessing(IGameServer server, CancellationTokenSource source)
         {
             while (true)
             {
+                Console.Write("Input game command: ");
+                
                 var commandText = Console.ReadLine();
-
-                Action action;
-                var result = textCommandsProcessor.ProcessTextCommand(commandText, out action);
-
-                if (result == TextCommandsProcessor.Result.CommandFound)
+                if (commandText.IsIn("q", "quit", "stop", "exit"))
                 {
-                    _commandsQueue.Enqueue(action);
-                }
-                else if (result == TextCommandsProcessor.Result.StopRequested)
-                {
-                    loop.Stop();
+                    source.Cancel();
                     return;
                 }
+
+                server.Command(commandText);
             }
-        }
-
-        private static IGameService InitializeGameService()
-        {
-            var networkBroadcaster = new EventsDataBroadcaster();
-
-            var game = CreateGameService(networkBroadcaster);
-
-            game.Initialize(WorldFileName);
-
-            return game;
-        }
-
-        private static IGameService CreateGameService(IEventsListener<IRemoteEvents> networkBroadcaster)
-        {
-            return new GameBootstrapper()
-            .RegisterResources()
-            .RegisterRemoteEvents(networkBroadcaster)
-            .Bootstrap();
         }
     }
 }

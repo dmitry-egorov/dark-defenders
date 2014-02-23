@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using DarkDefenders.Game.Model.EntityProperties;
 using DarkDefenders.Game.Model.Events;
@@ -7,6 +8,7 @@ using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
 using Infrastructure.Physics;
+using Infrastructure.Util;
 using JetBrains.Annotations;
 
 namespace DarkDefenders.Game.Model.Entities
@@ -175,7 +177,7 @@ namespace DarkDefenders.Game.Model.Entities
 
         private bool CantJump()
         {
-            return _rigidBody.IsInTheAir() || _rigidBody.HasVerticalMomentum();
+            return _rigidBody.IsInTheAir() || _rigidBody.HasMomentum(Axis.Vertical);
         }
 
         private void AddJumpMomentum()

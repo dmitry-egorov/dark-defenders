@@ -40,43 +40,17 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EventsDataBroadcaster.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TextCommandsProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DarkDefenders.Game.App\DarkDefenders.Game.App.csproj">
-      <Project>{9159F40E-E6E4-4F65-966B-2B77CCF0E584}</Project>
-      <Name>DarkDefenders.Game.App</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DarkDefenders.Game.Resources\DarkDefenders.Game.Resources.csproj">
-      <Project>{5696DAC5-7730-42D4-BF7D-C3DAB7BCC083}</Project>
-      <Name>DarkDefenders.Game.Resources</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DarkDefenders.Remote.AdapterFromGame\DarkDefenders.Remote.AdapterFromGame.csproj">
-      <Project>{e193ce47-58e5-497c-b372-299a3f3424a0}</Project>
-      <Name>DarkDefenders.Remote.AdapterFromGame</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DarkDefenders.Remote.Model\DarkDefenders.Remote.Model.csproj">
-      <Project>{E13E986E-AFCD-42BB-ACAB-FC3DFE947C51}</Project>
-      <Name>DarkDefenders.Remote.Model</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DarkDefenders.Remote.Serialization\DarkDefenders.Remote.Serialization.csproj">
-      <Project>{521626FD-F55A-4156-847E-F3FD60CF6658}</Project>
-      <Name>DarkDefenders.Remote.Serialization</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.DDDES\Infrastructure.DDDES.csproj">
-      <Project>{457CCF4D-7E52-4A7F-867C-13BAC32E13F0}</Project>
-      <Name>Infrastructure.DDDES</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.Runtime\Infrastructure.Runtime.csproj">
-      <Project>{46C6CCD9-0683-4A63-82B8-D9C48D5A20C9}</Project>
-      <Name>Infrastructure.Runtime</Name>
+    <ProjectReference Include="..\DarkDefenders.Server\DarkDefenders.Server.csproj">
+      <Project>{621591D3-0FDB-4D25-BA8F-6287AFD78595}</Project>
+      <Name>DarkDefenders.Server</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Util\Infrastructure.Util.csproj">
       <Project>{0B407BC3-7B5B-431A-96E7-A41F25AB27BE}</Project>
@@ -121,6 +95,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="WorldsData\world4.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="WorldsData\world5.bmp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

@@ -5,9 +5,9 @@ namespace DarkDefenders.Remote.AdapterFromGame.Internals.Entities
 {
     internal class PlayerAdapter : IPlayerEvents
     {
-        private readonly RemoteEventAdapter _adapter;
+        private readonly RemoteEventsAdapter _adapter;
 
-        public PlayerAdapter(RemoteEventAdapter adapter)
+        public PlayerAdapter(RemoteEventsAdapter adapter)
         {
             _adapter = adapter;
         }

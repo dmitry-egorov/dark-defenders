@@ -6,9 +6,9 @@ namespace DarkDefenders.Remote.AdapterFromGame.Internals.Entities
 {
     internal class CreatureAdapter : ICreatureEvents
     {
-        private readonly RemoteEventAdapter _adapter;
+        private readonly RemoteEventsAdapter _adapter;
 
-        public CreatureAdapter(RemoteEventAdapter adapter)
+        public CreatureAdapter(RemoteEventsAdapter adapter)
         {
             _adapter = adapter;
         }

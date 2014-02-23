@@ -66,9 +66,11 @@ namespace DarkDefenders.Game.Resources.Internals
                             break;
                         case '@':
                             playerSpawns.Add(new Vector(x + 0.5, worldY + 0.5));
+                            map[x, worldY] = Tile.Open;
                             break;
                         case 'H':
                             heroSpawns.Add(new Vector(x + 0.5, worldY + 0.5));
+                            map[x, worldY] = Tile.Open;
                             break;
                         default:
                             map[x, worldY] = Tile.Solid;

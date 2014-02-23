@@ -17,6 +17,7 @@ namespace Infrastructure.DDDES.Implementations.Domain
 
         private readonly IdentityOf<TEntity> _id;
         private readonly TEntity _entity;
+        private bool _destroyed;
 
         protected Entity()
         {
@@ -36,7 +37,14 @@ namespace Infrastructure.DDDES.Implementations.Domain
 
         protected void Event(Action<TEvents> action)
         {
-            _processor.Publish(new Event<TEntity, TEvents>(_entity, _external, action));
+            Action<TEvents> eventAction = x =>
+            {
+                if (!_destroyed)
+                {
+                    action(x);
+                }
+            };
+            _processor.Publish(new Event<TEntity, TEvents>(_entity, _external, eventAction));
         }
 
         protected void DestructionEvent()
@@ -46,6 +54,7 @@ namespace Infrastructure.DDDES.Implementations.Domain
 
         void IEntityEvents.Destroyed()
         {
+            _destroyed = true;
         }
     }
 }

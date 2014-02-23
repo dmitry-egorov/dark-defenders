@@ -5,9 +5,9 @@ namespace DarkDefenders.Remote.AdapterFromGame.Internals.Entities
 {
     internal class ProjectileAdapter : IProjectileEvents
     {
-        private readonly RemoteEventAdapter _adapter;
+        private readonly RemoteEventsAdapter _adapter;
 
-        public ProjectileAdapter(RemoteEventAdapter adapter)
+        public ProjectileAdapter(RemoteEventsAdapter adapter)
         {
             _adapter = adapter;
         }

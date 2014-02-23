@@ -1,13 +1,21 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
-using Infrastructure.DDDES;
-using Infrastructure.Math;
 
 namespace Infrastructure.Serialization
 {
     public static class SerializationExtensions
     {
+        public static void UsingGZipBinaryReader(this byte[] buffer, Action<BinaryReader> action)
+        {
+            var array = buffer.Decompress();
+            using (var readStream = new MemoryStream(array))
+            using (var reader = new BinaryReader(readStream))
+            {
+                action(reader);
+            }
+        }
+
         public static T UsingGZipBinaryReader<T>(this byte[] buffer, Func<BinaryReader, T> action)
         {
             var array = buffer.Decompress();
@@ -39,31 +47,6 @@ namespace Infrastructure.Serialization
                     return memory.ToArray();
                 }
             }
-        }
-
-        public static IdentityOf<T> ReadIdentityOf<T>(this BinaryReader reader)
-        {
-            var value = reader.ReadInt64();
-            return new IdentityOf<T>(value);
-        }
-
-        public static Vector ReadVector(this BinaryReader reader)
-        {
-            var x = reader.ReadSingle();
-            var y = reader.ReadSingle();
-
-            return Vector.XY(x, y);
-        }
-
-        public static void Write<T>(this BinaryWriter writer, IdentityOf<T> identity)
-        {
-            writer.Write(identity.Value);
-        }
-
-        public static void Write(this BinaryWriter writer, Vector vector)
-        {
-            writer.Write((float)vector.X);
-            writer.Write((float)vector.Y);
         }
     }
 }

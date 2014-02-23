@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{621591D3-0FDB-4D25-BA8F-6287AFD78595}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DarkDefenders.Server</RootNamespace>
+    <AssemblyName>DarkDefenders.Server</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="JetBrains.Annotations, Version=6.1.0.0, Culture=neutral, PublicKeyToken=3f033448d4bb5376, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\JetBrains.Annotations.7.0\lib\net45\JetBrains.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Unity.3.0.1304.1\lib\Net45\Microsoft.Practices.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Configurator.cs" />
+    <Compile Include="Internals\CommandInterpretersManager.cs" />
+    <Compile Include="Internals\GameCommandsDataInterpreter.cs" />
+    <Compile Include="IGameServer.cs" />
+    <Compile Include="Internals\RemoteEventsDataWriter.cs" />
+    <Compile Include="Internals\GameServer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Internals\GameServerState.cs" />
+    <Compile Include="Internals\TextCommandsProcessor.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DarkDefenders.Game.App\DarkDefenders.Game.App.csproj">
+      <Project>{9159F40E-E6E4-4F65-966B-2B77CCF0E584}</Project>
+      <Name>DarkDefenders.Game.App</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DarkDefenders.Game.Model\DarkDefenders.Game.Model.csproj">
+      <Project>{ECE63230-99C3-42F9-A87E-D9FEAED42004}</Project>
+      <Name>DarkDefenders.Game.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DarkDefenders.Game.Resources\DarkDefenders.Game.Resources.csproj">
+      <Project>{5696DAC5-7730-42D4-BF7D-C3DAB7BCC083}</Project>
+      <Name>DarkDefenders.Game.Resources</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DarkDefenders.Game.Serialization\DarkDefenders.Game.Serialization.csproj">
+      <Project>{B186D7C0-CB92-44AD-9E6E-2BB8D1899B67}</Project>
+      <Name>DarkDefenders.Game.Serialization</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DarkDefenders.Remote.AdapterFromGame\DarkDefenders.Remote.AdapterFromGame.csproj">
+      <Project>{E193CE47-58E5-497C-B372-299A3F3424A0}</Project>
+      <Name>DarkDefenders.Remote.AdapterFromGame</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DarkDefenders.Remote.Model\DarkDefenders.Remote.Model.csproj">
+      <Project>{E13E986E-AFCD-42BB-ACAB-FC3DFE947C51}</Project>
+      <Name>DarkDefenders.Remote.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DarkDefenders.Remote.Serialization\DarkDefenders.Remote.Serialization.csproj">
+      <Project>{521626FD-F55A-4156-847E-F3FD60CF6658}</Project>
+      <Name>DarkDefenders.Remote.Serialization</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.DDDES\Infrastructure.DDDES.csproj">
+      <Project>{457ccf4d-7e52-4a7f-867c-13bac32e13f0}</Project>
+      <Name>Infrastructure.DDDES</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Network.Subscription.Server\Infrastructure.Network.Subscription.Server.csproj">
+      <Project>{C21E136B-A088-4B43-8DD3-E7EEDDCFA622}</Project>
+      <Name>Infrastructure.Network.Subscription.Server</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Runtime\Infrastructure.Runtime.csproj">
+      <Project>{46C6CCD9-0683-4A63-82B8-D9C48D5A20C9}</Project>
+      <Name>Infrastructure.Runtime</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Util\Infrastructure.Util.csproj">
+      <Project>{0B407BC3-7B5B-431A-96E7-A41F25AB27BE}</Project>
+      <Name>Infrastructure.Util</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

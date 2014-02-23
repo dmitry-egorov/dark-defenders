@@ -7,11 +7,11 @@ namespace DarkDefenders.Remote.AdapterFromGame.Internals.Entities
 {
     internal class RigidBodyAdapter : IRigidBodyEvents
     {
-        private readonly RemoteEventAdapter _adapter;
+        private readonly RemoteEventsAdapter _adapter;
 
         private RigidBody _rigidBody;
 
-        public RigidBodyAdapter(RemoteEventAdapter adapter)
+        public RigidBodyAdapter(RemoteEventsAdapter adapter)
         {
             _adapter = adapter;
         }

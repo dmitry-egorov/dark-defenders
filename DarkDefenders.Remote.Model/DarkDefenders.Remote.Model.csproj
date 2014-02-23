@@ -37,7 +37,7 @@
     <Compile Include="IRemoteEvents.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RemoteEntityType.cs" />
-    <Compile Include="RemoteRigidBody.cs" />
+    <Compile Include="RemoteEntity.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Infrastructure.DDDES\Infrastructure.DDDES.csproj">

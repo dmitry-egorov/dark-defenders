@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{EC022F35-6A7D-4399-8E5B-5961794C1F85}</ProjectGuid>
+    <ProjectGuid>{85DAB93D-910A-4115-9340-C660CB49AE7C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Infrastructure.Network.Client</RootNamespace>
@@ -34,7 +34,18 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Client.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Infrastructure.Network\Infrastructure.Network.csproj">
+      <Project>{D5844217-1672-4C49-8469-155106D43232}</Project>
+      <Name>Infrastructure.Network</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Udp\Infrastructure.Udp.csproj">
+      <Project>{91C9DF04-4457-4ED0-9969-2C3B2FD08C67}</Project>
+      <Name>Infrastructure.Udp</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

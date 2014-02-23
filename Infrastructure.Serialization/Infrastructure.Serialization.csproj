@@ -46,16 +46,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Infrastructure.DDDES\Infrastructure.DDDES.csproj">
-      <Project>{457CCF4D-7E52-4A7F-867C-13BAC32E13F0}</Project>
-      <Name>Infrastructure.DDDES</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.Math\Infrastructure.Math.csproj">
-      <Project>{9DA761FD-492C-4BF7-A50D-10930664021D}</Project>
-      <Name>Infrastructure.Math</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

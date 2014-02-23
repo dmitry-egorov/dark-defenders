@@ -4,16 +4,16 @@ namespace DarkDefenders.Remote.AdapterFromGame.Internals.Entities
 {
     internal class TerrainAdapter : ITerrainEvents
     {
-        private readonly RemoteEventsPacker _packer;
+        private readonly RemoteState _adapter;
 
-        public TerrainAdapter(RemoteEventsPacker packer)
+        public TerrainAdapter(RemoteState adapter)
         {
-            _packer = packer;
+            _adapter = adapter;
         }
 
         public void Created(string mapId)
         {
-            _packer.MapLoaded(mapId);
+            _adapter.MapLoaded(mapId);
         }
 
         public void Destroyed()

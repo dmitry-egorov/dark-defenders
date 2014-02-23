@@ -4,6 +4,7 @@ using DarkDefenders.Game.App.Interfaces;
 using DarkDefenders.Game.App.Internals;
 using DarkDefenders.Game.Model;
 using Infrastructure.DDDES;
+using Infrastructure.Unity;
 using Microsoft.Practices.Unity;
 
 namespace DarkDefenders.Game.App
@@ -13,6 +14,11 @@ namespace DarkDefenders.Game.App
         private readonly IUnityContainer _container = new UnityContainer();
         private readonly List<Type> _registeredListeners = new List<Type>();
 
+        internal GameBootstrapper(IUnityContainer container)
+        {
+            _container = container;
+        }
+
         public GameBootstrapper RegisterResource<TResource>(IResources<TResource> resource)
         {
             _container.RegisterInstance(resource);
@@ -20,20 +26,51 @@ namespace DarkDefenders.Game.App
             return this;
         }
 
-        public GameBootstrapper RegisterListener<TEvents>(Func<TEvents> recieverFactory)
+        public GameBootstrapper RegisterListener<TEvents>(Func<TEvents> factoryFunc)
         {
-            _container.RegisterType<TEvents>(new InjectionFactory(_ => recieverFactory()));
+            _container.RegisterType<TEvents>(new InjectionFactory(x => factoryFunc));
 
             _registeredListeners.Add(typeof(TEvents));
 
             return this;
         }
 
+        public GameBootstrapper RegisterListener<TEvents, TListener>() 
+            where TListener : TEvents
+            where TEvents: IEntityEvents
+        {
+            _container.RegisterType<TEvents, TListener>();
+
+            _registeredListeners.Add(typeof(TEvents));
+
+            return this;
+        }
+
+        public GameBootstrapper RegisterGameService()
+        {
+            _container
+                .RegisterDomain(_registeredListeners)
+                .RegisterSingleton<GameService, IGameService>();
+
+            return this;
+        }
+
         public IGameService Bootstrap()
         {
-            return _container
-            .RegisterDomain(_registeredListeners)
-            .ResolveGame();
+            return _container.ResolveGame();
+        }
+
+        public GameBootstrapper RegisterSingleton<T>()
+        {
+            _container.RegisterSingleton<T>();
+            return this;
+        }
+
+        public GameBootstrapper RegisterSingleton<T, TI>() 
+            where T : TI
+        {
+            _container.RegisterSingleton<T, TI>();
+            return this;
         }
 
         public IUnityContainer RegisterType(Type @from, Type to, string name, LifetimeManager lifetimeManager,

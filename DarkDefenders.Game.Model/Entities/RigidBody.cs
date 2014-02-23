@@ -23,6 +23,7 @@ namespace DarkDefenders.Game.Model.Entities
 
         private double _mass;
         private double _topHorizontalMomentum;
+        
         private Force _gravityForce;
         
         private Vector _position;
@@ -104,9 +105,9 @@ namespace DarkDefenders.Game.Model.Entities
             return !_isTouchingTheGround;
         }
 
-        public bool HasVerticalMomentum()
+        public bool HasMomentum(Axis d)
         {
-            return Math.Abs(_momentum.Value.Y) > 0.01d;
+            return Math.Abs(_momentum.Value.CoordinateFor(d)) > 0.01 ;
         }
 
         public bool MomentumHasDifferentHorizontalDirectionFrom(Vector vector)

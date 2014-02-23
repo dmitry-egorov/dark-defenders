@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C21E136B-A088-4B43-8DD3-E7EEDDCFA622}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Infrastructure.Network.Subscription.Server</RootNamespace>
+    <AssemblyName>Infrastructure.Network.Subscription.Server</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Interfaces\ICommandsDataInterpreter.cs" />
+    <Compile Include="Interfaces\IEventsDataWriter.cs" />
+    <Compile Include="Interfaces\ISubscriptionServer.cs" />
+    <Compile Include="Internals\CommandsDataReciever.cs" />
+    <Compile Include="Internals\Server.cs" />
+    <Compile Include="Internals\ServerConnectionManager.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SubscriptionServer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Infrastructure.Network.Server\Infrastructure.Network.Server.csproj">
+      <Project>{37663b45-0a81-4ef9-9188-050efd65fc30}</Project>
+      <Name>Infrastructure.Network.Server</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Network.Subscription\Infrastructure.Network.Subscription.csproj">
+      <Project>{A8736F1C-0AD1-4FC5-A3E2-4B48951C8DDC}</Project>
+      <Name>Infrastructure.Network.Subscription</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Network\Infrastructure.Network.csproj">
+      <Project>{d5844217-1672-4c49-8469-155106d43232}</Project>
+      <Name>Infrastructure.Network</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Runtime\Infrastructure.Runtime.csproj">
+      <Project>{46C6CCD9-0683-4A63-82B8-D9C48D5A20C9}</Project>
+      <Name>Infrastructure.Runtime</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Serialization\Infrastructure.Serialization.csproj">
+      <Project>{75E3B4B6-49F0-4064-967F-3C125C7CE19D}</Project>
+      <Name>Infrastructure.Serialization</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Util\Infrastructure.Util.csproj">
+      <Project>{0B407BC3-7B5B-431A-96E7-A41F25AB27BE}</Project>
+      <Name>Infrastructure.Util</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

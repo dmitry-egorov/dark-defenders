@@ -34,6 +34,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActionProcessor.cs" />
     <Compile Include="AutoResetStopwatch.cs" />
     <Compile Include="Button.cs" />
     <Compile Include="Collections\ConcurrentHashSet.cs" />

@@ -1,24 +1,48 @@
-using System;
-using System.Collections.Generic;
+using System.IO;
 using DarkDefenders.Remote.Model;
 using DarkDefenders.Remote.Serialization.Internals;
-using Infrastructure.Serialization;
+using Infrastructure.DDDES;
+using Infrastructure.Math;
+using Infrastructure.Serialization.DDDES;
+using Infrastructure.Serialization.Math;
 
 namespace DarkDefenders.Remote.Serialization
 {
-    public class EventsSerializer
+    public class RemoteEventsSerializer : IRemoteEvents
     {
-        public byte[] Serialize(IEnumerable<Action<IRemoteEvents>> events)
-        {
-            return Using.GZipBinaryWriter(writer =>
-            {
-                var reciever = new SerializingReciever(writer);
+        private readonly BinaryWriter _writer;
 
-                foreach (var e in events)
-                {
-                    e(reciever);
-                }
-            });
+        public RemoteEventsSerializer(BinaryWriter writer)
+        {
+            _writer = writer;
+        }
+
+        public void MapLoaded(string mapId)
+        {
+            _writer.Write((short)SerializableEvents.MapLoaded);
+            _writer.Write(mapId);
+        }
+
+        public void Created(IdentityOf<RemoteEntity> id, Vector position, RemoteEntityType type)
+        {
+            _writer.Write((short)SerializableEvents.Created);
+            _writer.Write(id);
+            _writer.Write(position);
+            _writer.Write((byte)type);
+        }
+
+        public void Destroyed(IdentityOf<RemoteEntity> id)
+        {
+            _writer.Write((short)SerializableEvents.Destroyed);
+            _writer.Write(id);
+        }
+
+        public void Moved(IdentityOf<RemoteEntity> id, Vector newPosition)
+        {
+            _writer.Write((short)SerializableEvents.Moved);
+            _writer.Write(id);
+            _writer.Write(newPosition);
         }
     }
+
 }
