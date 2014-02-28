@@ -41,7 +41,6 @@
     <Compile Include="Presenters\GamePresenter.cs" />
     <Compile Include="Presenters\RigidBodyPresenter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Internal\RemoteEventsDataInterpreter.cs" />
     <Compile Include="Renderers\ConsoleRenderer.cs" />
     <Compile Include="Renderers\EmptyConsoleRenderer.cs" />
     <Compile Include="IConsoleRenderer.cs" />

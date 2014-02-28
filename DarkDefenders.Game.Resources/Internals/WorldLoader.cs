@@ -10,9 +10,9 @@ namespace DarkDefenders.Game.Resources.Internals
 {
     public static class WorldLoader
     {
-        public static WorldData LoadFromFile(string mapId)
+        public static WorldData LoadFromFile(string mapId, string worldsdata = "WorldsData")
         {
-            var pathToFiles = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "WorldsData");
+            var pathToFiles = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, worldsdata);
             var path = Path.Combine(pathToFiles, mapId);
 
             var extension = Path.GetExtension(path);

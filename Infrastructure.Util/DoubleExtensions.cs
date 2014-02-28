@@ -11,6 +11,11 @@ namespace Infrastructure.Util
             return (int) d;
         }
 
+        public static float ToSingle(this double d)
+        {
+            return (float)d;
+        }
+
         public static double TolerantFloor(this double d, double tolerance = DefaultTolerance)
         {
             var ceiling = Math.Ceiling(d);

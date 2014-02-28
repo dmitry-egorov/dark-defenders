@@ -202,14 +202,16 @@ namespace DarkDefenders.Game.Model.Entities
         {
             var force = GetMovementForceDirection(desiredMovement);
 
+            if (_rigidBody.MomentumHasDifferentHorizontalDirectionFrom(force.Value))
+            {
+                force *= 4.0;
+            }
+
             if (_rigidBody.IsInTheAir())
             {
                 force *= 0.5;
             }
-            else if (_rigidBody.MomentumHasDifferentHorizontalDirectionFrom(force.Value))
-            {
-                force *= 2.0;
-            }
+            
 
             return force;
         }

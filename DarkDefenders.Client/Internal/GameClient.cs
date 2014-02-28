@@ -38,7 +38,7 @@ namespace DarkDefenders.Client.Internal
 
             var composite = CompositeEventsListener.Create(rendererListener, _counter);
 
-            var interpreter = new RemoteEventsDataInterpreter(new EventsDeserializer(composite));
+            var interpreter = new EventsDeserializer(composite);
 
             _client = SubscriptionClient.Create(interpreter, ipAddress, port);
 

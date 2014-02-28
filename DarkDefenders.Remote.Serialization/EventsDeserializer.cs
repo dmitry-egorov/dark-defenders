@@ -4,13 +4,14 @@ using System.IO;
 using DarkDefenders.Remote.Model;
 using DarkDefenders.Remote.Serialization.Internals;
 using Infrastructure.DDDES;
+using Infrastructure.Network.Subscription.Client.Interfaces;
 using Infrastructure.Serialization.DDDES;
 using Infrastructure.Serialization.Math;
 using Infrastructure.Util;
 
 namespace DarkDefenders.Remote.Serialization
 {
-    public class EventsDeserializer
+    public class EventsDeserializer : IEventsDataInterpreter
     {
         private readonly IEventsListener<IRemoteEvents> _reciever;
 
@@ -19,7 +20,7 @@ namespace DarkDefenders.Remote.Serialization
             _reciever = reciever;
         }
 
-        public Action Deserialize(BinaryReader reader)
+        public Action Interpret(BinaryReader reader)
         {
             var actions = DeserializeAll(reader).AsReadOnly();
 
@@ -31,7 +32,8 @@ namespace DarkDefenders.Remote.Serialization
                 }
             };
         }
-        public IEnumerable<Action> DeserializeAll(BinaryReader reader)
+
+        private IEnumerable<Action> DeserializeAll(BinaryReader reader)
         {
             while (reader.PeekChar() != -1)
             {

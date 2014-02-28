@@ -46,7 +46,7 @@
     <Compile Include="Internals\CommandInterpretersManager.cs" />
     <Compile Include="Internals\GameCommandsDataInterpreter.cs" />
     <Compile Include="IGameServer.cs" />
-    <Compile Include="Internals\RemoteEventsDataWriter.cs" />
+    <Compile Include="Internals\RemoteEventsDataSource.cs" />
     <Compile Include="Internals\GameServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Internals\GameServerState.cs" />

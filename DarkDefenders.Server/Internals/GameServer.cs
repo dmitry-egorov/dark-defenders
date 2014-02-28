@@ -10,7 +10,7 @@ namespace DarkDefenders.Server.Internals
     internal class GameServer : IGameServer
     {
         private readonly IGameService _gameService;
-        private readonly RemoteEventsDataWriter _writer;
+        private readonly RemoteEventsDataSource _source;
         private readonly TextCommandsProcessor _processor;
         private readonly CommandInterpretersManager _interpretersManager;
         private readonly GameServerState _state;
@@ -18,14 +18,14 @@ namespace DarkDefenders.Server.Internals
         public GameServer
         (
             IGameService gameService, 
-            RemoteEventsDataWriter writer, 
+            RemoteEventsDataSource source, 
             TextCommandsProcessor processor, 
             CommandInterpretersManager interpretersManager,
             GameServerState state
         )
         {
             _gameService = gameService;
-            _writer = writer;
+            _source = source;
             _processor = processor;
             _interpretersManager = interpretersManager;
             _state = state;
@@ -33,7 +33,7 @@ namespace DarkDefenders.Server.Internals
 
         public Task RunAsync(CancellationToken cancellationToken, string mapId, int maxFps, TimeSpan elapsedLimit)
         {
-            var server = SubscriptionServer.Create(_writer, () => _interpretersManager.Create(), 1337);
+            var server = SubscriptionServer.Create(_source, () => _interpretersManager.Create(), 1337);
 
             _gameService.Initialize(mapId);
 

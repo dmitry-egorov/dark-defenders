@@ -32,7 +32,7 @@ namespace Infrastructure.Network.Subscription.Client.Internals
 
             if (type == SubscriptionDataType.InitialState)
             {
-                return _interpreter.InterpretInitial(reader);
+                return _interpreter.Interpret(reader);
             }
             
             if (type == SubscriptionDataType.Update)

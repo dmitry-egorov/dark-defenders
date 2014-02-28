@@ -52,6 +52,10 @@
       <Project>{9DA761FD-492C-4BF7-A50D-10930664021D}</Project>
       <Name>Infrastructure.Math</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Network.Subscription.Client\Infrastructure.Network.Subscription.Client.csproj">
+      <Project>{1CDE28B4-9957-4B2B-9994-5212A2126272}</Project>
+      <Name>Infrastructure.Network.Subscription.Client</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Serialization.DDDES\Infrastructure.Serialization.DDDES.csproj">
       <Project>{9240E972-CC19-4BFD-96BE-4BD1D9237FA8}</Project>
       <Name>Infrastructure.Serialization.DDDES</Name>

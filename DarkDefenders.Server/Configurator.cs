@@ -16,7 +16,8 @@ namespace DarkDefenders.Server
             .RegisterResources()
             .RegisterRemoteEvents()
             .RegisterGameService()
-            .RegisterSingleton<GameServer, IGameServer>();
+            .RegisterSingleton<GameServer, IGameServer>()
+            .RegisterSingleton<GameServerState>();
         }
     }
 }

@@ -18,13 +18,13 @@ namespace Infrastructure.Network.Subscription.Server.Internals
         private readonly ConcurrentQueue<IDataSender> _disconnecting = new ConcurrentQueue<IDataSender>();
         private readonly HashSet<IDataSender> _senders = new HashSet<IDataSender>();
 
-        private readonly IEventsDataWriter _eventsDataWriter;
+        private readonly IEventsDataSource _eventsDataSource;
         private readonly Func<ICommandsDataInterpreter> _interpretersFactory;
         private readonly ActionProcessor _commandsProcessor = new ActionProcessor();
 
-        public ServerConnectionManager(IEventsDataWriter eventsDataWriter, Func<ICommandsDataInterpreter> interpretersFactory)
+        public ServerConnectionManager(IEventsDataSource eventsDataSource, Func<ICommandsDataInterpreter> interpretersFactory)
         {
-            _eventsDataWriter = eventsDataWriter;
+            _eventsDataSource = eventsDataSource;
             _interpretersFactory = interpretersFactory;
         }
 
@@ -122,13 +122,13 @@ namespace Infrastructure.Network.Subscription.Server.Internals
         private void WriteEventsData(BinaryWriter writer)
         {
             writer.Write((byte) SubscriptionDataType.Update);
-            _eventsDataWriter.WriteEventsData(writer);
+            _eventsDataSource.WriteEventsData(writer);
         }
 
         private void WriteInitialEventsData(BinaryWriter writer)
         {
             writer.Write((byte) SubscriptionDataType.InitialState);
-            _eventsDataWriter.WriteInitialEventsData(writer);
+            _eventsDataSource.WriteInitialEventsData(writer);
         }
     }
 }
