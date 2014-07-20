@@ -9,11 +9,15 @@ namespace DarkDefenders.Mono.Client
     /// </summary>
     public class DarkDefendersMonoClient : Microsoft.Xna.Framework.Game
     {
+        private GraphicsDeviceManager _gdm;
+
         public DarkDefendersMonoClient()
         {
-            var gdm = new GraphicsDeviceManager(this);
-            gdm.PreferredBackBufferWidth = 1200;
-            gdm.PreferredBackBufferHeight = 900;
+            _gdm = new GraphicsDeviceManager(this)
+            {
+                PreferredBackBufferWidth = 1200, 
+                PreferredBackBufferHeight = 900
+            };
             Content.RootDirectory = "Content";
 
             var screenManager = new ScreenManager(this);

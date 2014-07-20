@@ -2,6 +2,7 @@
 using DarkDefenders.Game.Model.Other;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
+using Infrastructure.Physics;
 using JetBrains.Annotations;
 
 namespace DarkDefenders.Game.Model.Entities
@@ -10,15 +11,21 @@ namespace DarkDefenders.Game.Model.Entities
     public class Player : Entity<Player, IPlayerEvents>, IPlayerEvents
     {
         private readonly Creature _creature;
+        private readonly Weapon _weapon;
+        private readonly RigidBody _rigidBody;
 
-        public Player(Creature creature)
+        public Player(Creature creature, Weapon weapon, RigidBody rigidBody)
         {
             _creature = creature;
+            _weapon = weapon;
+            _rigidBody = rigidBody;
         }
 
         public void Create(Vector initialPosition)
         {
-            _creature.Create(initialPosition, "Player");
+            _rigidBody.Create(initialPosition, Momentum.Zero, "Player");
+            _creature.Create(_rigidBody, "Player");
+            _weapon.Create(_rigidBody);
 
             CreationEvent(x => x.Created(_creature));
         }
@@ -30,12 +37,14 @@ namespace DarkDefenders.Game.Model.Entities
 
         public void Jump()
         {
-            _creature.Jump();
+            _creature.TryJump();
         }
 
         public void Fire()
         {
-            _creature.Fire();
+            var direction = _creature.GetDirection();
+
+            _weapon.Fire(direction);
         }
 
         void IPlayerEvents.Created(Creature creature)

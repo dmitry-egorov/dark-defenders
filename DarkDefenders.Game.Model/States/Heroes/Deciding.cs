@@ -9,17 +9,19 @@ namespace DarkDefenders.Game.Model.States.Heroes
         private readonly Random _random;
         private readonly HeroStateFactory _factory;
         private readonly Creature _creature;
+        private readonly RigidBody _rigidBody;
 
-        public Deciding(Random random, HeroStateFactory factory, Creature creature)
+        public Deciding(Random random, HeroStateFactory factory, Creature creature, RigidBody rigidBody)
         {
             _random = random;
             _factory = factory;
             _creature = creature;
+            _rigidBody = rigidBody;
         }
 
         public void Update()
         {
-            if (_creature.IsInTheAir())
+            if (_rigidBody.IsInTheAir())
             {
                 return;
             }

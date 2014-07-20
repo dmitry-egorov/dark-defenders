@@ -4,18 +4,18 @@ namespace DarkDefenders.Game.Model.States.Heroes
 {
     internal class Jumping : IHeroState
     {
-        private readonly Creature _creature;
         private readonly HeroStateFactory _stateFactory;
+        private readonly RigidBody _rigidBody;
 
-        public Jumping(HeroStateFactory stateFactory, Creature creature)
+        public Jumping(HeroStateFactory stateFactory, RigidBody rigidBody)
         {
-            _creature = creature;
+            _rigidBody = rigidBody;
             _stateFactory = stateFactory;
         }
 
         public void Update()
         {
-            if (_creature.IsInTheAir())
+            if (_rigidBody.IsInTheAir())
             {
                 return;
             }

@@ -9,19 +9,23 @@ namespace DarkDefenders.Game.Model.States.Heroes
         private readonly Random _random;
         private readonly Creature _creature;
         private readonly Hero _hero;
+        private readonly RigidBody _rigidBody;
+        private readonly Terrain _terrain;
 
-        public static IHeroState CreateInitial(Random random, Hero hero, Creature creature)
+        public static IHeroState CreateInitial(Random random, Hero hero, RigidBody rigidBody, Creature creature, Terrain terrain)
         {
-            var factory = new HeroStateFactory(random, hero, creature);
+            var factory = new HeroStateFactory(random, hero, rigidBody, creature, terrain);
 
             return factory.CreateDeciding();
         }
 
-        private HeroStateFactory(Random random, Hero hero, Creature creature)
+        private HeroStateFactory(Random random, Hero hero, RigidBody rigidBody, Creature creature, Terrain terrain)
         {
             _random = random;
             _creature = creature;
+            _terrain = terrain;
             _hero = hero;
+            _rigidBody = rigidBody;
         }
 
         public void Moving()
@@ -54,22 +58,22 @@ namespace DarkDefenders.Game.Model.States.Heroes
 
         private IHeroState CreateDeciding()
         {
-            return new Deciding(_random, this, _creature);
+            return new Deciding(_random, this, _creature, _rigidBody);
         }
 
         private IHeroState CreateMoving()
         {
-            return new Moving(this, _creature);
+            return new Moving(this, _rigidBody, _creature);
         }
 
         private IHeroState CreateJumping()
         {
-            return new Jumping(this, _creature);
+            return new Jumping(this, _rigidBody);
         }
 
         private IHeroState CreateFalling(Point fallenFrom)
         {
-            return new Falling(this, _creature, fallenFrom);
+            return new Falling(this, _rigidBody, _creature, fallenFrom, _terrain);
         }
     }
 }
