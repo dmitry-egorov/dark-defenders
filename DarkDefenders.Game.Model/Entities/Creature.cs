@@ -123,7 +123,7 @@ namespace DarkDefenders.Game.Model.Entities
         {
             var force = GetMovementForceDirection(desiredMovement);
 
-            if (_rigidBody.MomentumHasDifferentHorizontalDirectionFrom(force.Value))
+            if (MomentumHasDifferentHorizontalDirectionFrom(force.Value))
             {
                 force *= 4.0;
             }
@@ -133,7 +133,6 @@ namespace DarkDefenders.Game.Model.Entities
                 force *= 0.5;
             }
             
-
             return force;
         }
 
@@ -150,6 +149,13 @@ namespace DarkDefenders.Game.Model.Entities
                 default:
                     throw new ArgumentOutOfRangeException("desiredMovement");
             }
+        }
+
+        private bool MomentumHasDifferentHorizontalDirectionFrom(Vector vector)
+        {
+            var momentumSign = _rigidBody.GetMomentum().Value.Sign(Axis.Horizontal);
+
+            return momentumSign != 0 && momentumSign != vector.Sign(Axis.Horizontal);
         }
     }
 }

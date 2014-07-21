@@ -1,3 +1,4 @@
+using System;
 using System.Drawing;
 using System.Globalization;
 using System.Runtime.CompilerServices;
@@ -124,6 +125,25 @@ namespace Infrastructure.Math
         public static Vector operator -(Vector vector1, Vector vector2)
         {
             return new Vector(vector1._x - vector2._x, vector1._y - vector2._y);
+        }
+
+        public int Sign(Axis axis)
+        {
+            return System.Math.Sign(CoordinateFor(axis));
+        }
+
+        public Vector OffsetBy(Axis axis, double offset)
+        {
+            if (axis == Axis.Horizontal)
+            {
+                return Vector.XY(X + offset, Y);
+            }
+            if (axis == Axis.Vertical)
+            {
+                return Vector.XY(X, Y + offset);
+            }
+
+            throw new ArgumentException("Invalid value", "axis");
         }
     }
 }

@@ -46,7 +46,7 @@ namespace DarkDefenders.Game.Model.Entities
                 return;
             }
 
-            _heroSpawnCooldown.Activate(Spawn);
+            _heroSpawnCooldown.TryActivate(Spawn);
         }
 
         public void SpawnHeroes(int count)

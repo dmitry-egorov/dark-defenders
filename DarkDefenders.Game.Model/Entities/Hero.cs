@@ -14,7 +14,6 @@ namespace DarkDefenders.Game.Model.Entities
         const string PropertiesId = "Hero";
 
         private readonly RigidBody _rigidBody;
-        private readonly Terrain _terrain;
         private readonly Creature _creature;
 
         private IHeroState _state;
@@ -23,7 +22,6 @@ namespace DarkDefenders.Game.Model.Entities
         {
             _creature = creature;
             _rigidBody = rigidBody;
-            _terrain = terrain;
 
             _state = HeroStateFactory.CreateInitial(random, this, rigidBody, creature, terrain);
         }

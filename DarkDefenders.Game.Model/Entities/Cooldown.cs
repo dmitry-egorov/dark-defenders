@@ -24,7 +24,7 @@ namespace DarkDefenders.Game.Model.Entities
             CreationEvent(x => x.Created(cooldownDelay));
         }
 
-        public void Activate(Action action)
+        public void TryActivate(Action action)
         {
             var currentTime = _clock.GetCurrentTime();
 

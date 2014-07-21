@@ -20,12 +20,12 @@ namespace DarkDefenders.Game.App.Internals
 
         public void Jump()
         {
-            _palyer.Jump();
+            _palyer.TryJump();
         }
 
         public void Fire()
         {
-            _palyer.Fire();
+            _palyer.TryFire();
         }
     }
 }

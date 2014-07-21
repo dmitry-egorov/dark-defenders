@@ -36,9 +36,9 @@ namespace DarkDefenders.Game.Model.Entities
             CreationEvent(x => x.Created(rigidBody));
         }
 
-        public void Fire(Direction direction)
+        public void TryFire(Direction direction)
         {
-            _fireCooldown.Activate(() => CreateProjectile(direction));
+            _fireCooldown.TryActivate(() => CreateProjectile(direction));
         }
 
         void IWeaponEvents.Created(RigidBody rigidBody)
@@ -58,22 +58,26 @@ namespace DarkDefenders.Game.Model.Entities
         {
             var offset =  GetProjectileOffset(direction);
 
-            return _rigidBody.GetPositionOffsetBy(Axis.Horizontal, offset);
+            var position = _rigidBody.GetPosition();
+
+            return position.OffsetBy(Axis.Horizontal, offset);
         }
 
         private static double GetProjectileOffset(Direction direction)
         {
             const double radius = 1.0;
-            return direction == Direction.Right 
-                   ? radius
-                   : -radius;
+            return 
+            direction == Direction.Right 
+            ? radius
+            : -radius;
         }
 
         private static Momentum GetProjectileMomentum(Direction direction)
         {
-            return direction == Direction.Right
-                   ? _rightProjectileMomentum
-                   : _leftProjectileMomentum;
+            return 
+            direction == Direction.Right
+            ? _rightProjectileMomentum
+            : _leftProjectileMomentum;
         }
     }
 }

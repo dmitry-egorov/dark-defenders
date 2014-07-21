@@ -37,14 +37,20 @@ namespace DarkDefenders.Game.Model.Entities
             return _map.IsAnyAtLine(axis, mainStart, mainEnd, other, Tile.Open);
         }
 
-        public bool IsSolidWallAt(int x, int y)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsTouchingWallsAt(Axis axis, double mainCenter, double radius, int other)
         {
-            return _map[x, y] == Tile.Solid;
+            return _map.IsTouchingWallsAt(axis, mainCenter, radius, other, Tile.Solid);
         }
 
         void ITerrainEvents.Created(string mapId)
         {
             _map = _mapResources[mapId];
+        }
+
+        public Vector IntersectMovingBox(Vector center, Vector positionDelta, Box boundingBox)
+        {
+            return _map.IntersectMovingBox(center, positionDelta, boundingBox, Tile.Solid);
         }
     }
 }

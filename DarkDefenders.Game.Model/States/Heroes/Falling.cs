@@ -51,10 +51,9 @@ namespace DarkDefenders.Game.Model.States.Heroes
             var xEnd = fallenFrom.X;
             var sign = direction.GetXIncrement();
 
-            var terrain = _terrain;
             for (var x = xStart; (xEnd - x) * sign >= 0; x += sign)
             {
-                if (!terrain.AnyOpenWallsAt(Axis.Vertical, yStart, yEnd, x))
+                if (!_terrain.AnyOpenWallsAt(Axis.Vertical, yStart, yEnd, x))
                 {
                     return false;
                 }

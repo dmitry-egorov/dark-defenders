@@ -10,6 +10,10 @@ namespace Infrastructure.Math
     public struct Map<T>: IEnumerable<T> 
         where T: struct 
     {
+        private readonly Dimensions _dimensions;
+        private readonly T[] _data;
+        private readonly T _defaultItem;
+
         public Dimensions Dimensions
         {
             get { return _dimensions; }
@@ -157,8 +161,92 @@ namespace Infrastructure.Math
             return x >= _dimensions.Width || x < 0 || y >= _dimensions.Height || y < 0;
         }
 
-        private readonly Dimensions _dimensions;
-        private readonly T[] _data;
-        private readonly T _defaultItem;
+        public bool IsTouchingWallsAt(Axis axis, double mainCenter, double radius, int other, T blockValue)
+        {
+            var start = (mainCenter - radius).TolerantFloor().ToInt();
+            var end = (mainCenter + radius).PrevInteger().ToInt();
+
+            return IsAnyAtLine(axis, start, end, other, blockValue);
+        }
+
+        public Vector IntersectMovingBox(Vector center, Vector positionDelta, Box box, T blockValue)
+        {
+            Vector horizontalAdjustment;
+            var horizontalPositionAdjusted = ApplyAxisPositionChange(Axis.Horizontal, center, box, positionDelta, blockValue, out horizontalAdjustment);
+
+            Vector verticalAdjustment;
+            var verticalPositionAdjusted = ApplyAxisPositionChange(Axis.Vertical, center, box, positionDelta, blockValue, out verticalAdjustment);
+
+            if (verticalPositionAdjusted && horizontalPositionAdjusted)
+            {
+                var horizontalDelta = (horizontalAdjustment - center).LengthSquared();
+                var verticalDelta = (verticalAdjustment - center).LengthSquared();
+
+                return
+                    horizontalDelta < verticalDelta
+                        ? horizontalAdjustment
+                        : verticalAdjustment;
+            }
+
+            if (horizontalPositionAdjusted)
+            {
+                return horizontalAdjustment;
+            }
+
+            if (verticalPositionAdjusted)
+            {
+                return verticalAdjustment;
+            }
+
+            return center + positionDelta;
+        }
+
+        private bool ApplyAxisPositionChange(Axis axis, Vector center, Box boundingBox, Vector positionDelta, T blockValue, out Vector adjustedPosition)
+        {
+            var mainCenter = center.CoordinateFor(axis);
+            var otherCenter = center.CoordinateFor(axis.Other());
+
+            var mainRadius = boundingBox.RadiusFor(axis);
+            var otherRadius = boundingBox.RadiusFor(axis.Other());
+
+            var dMain = positionDelta.CoordinateFor(axis);
+            var dOther = positionDelta.CoordinateFor(axis.Other());
+
+            if (dMain == 0.0)
+            {
+                adjustedPosition = Vector.Zero;
+                return false;
+            }
+
+            var sign = System.Math.Sign(dMain);
+            var slope = dOther / dMain;
+
+            var boundOffset = sign * mainRadius;
+            var startBoundOther = otherCenter;
+            var startBoundMain = mainCenter + boundOffset;
+            var endBoundMain = startBoundMain + dMain;
+
+            var start = ((sign == 1) ? startBoundMain.TolerantCeiling() : startBoundMain.TolerantFloor()).ToInt();
+            var end = ((sign == 1) ? endBoundMain.PrevInteger() : endBoundMain.NextInteger()).ToInt();
+
+            for (var main = start; (end - main) * sign >= 0; main += sign)
+            {
+                var mainToCheck = (sign == 1) ? main : main - 1;
+                var other = slope * (main - startBoundMain) + startBoundOther;
+
+                var isTouchingWalls = IsTouchingWallsAt(axis.Other(), other, otherRadius, mainToCheck, blockValue);
+
+                if (!isTouchingWalls)
+                {
+                    continue;
+                }
+
+                adjustedPosition = Vector.ByAxis(axis, main - boundOffset, other);
+                return true;
+            }
+
+            adjustedPosition = Vector.Zero;
+            return false;
+        }
     }
 }

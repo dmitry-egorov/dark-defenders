@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using DarkDefenders.Game.Model.Entities;
 using DarkDefenders.Game.Model.Other;
+using Infrastructure.Math;
 
 namespace DarkDefenders.Game.Model.States.Heroes
 {
@@ -10,10 +11,12 @@ namespace DarkDefenders.Game.Model.States.Heroes
         private readonly Creature _creature;
         private readonly HeroStateFactory _stateFactory;
         private readonly RigidBody _rigidBody;
+        private readonly Terrain _terrain;
 
-        public Moving(HeroStateFactory stateFactory, RigidBody rigidBody, Creature creature)
+        public Moving(HeroStateFactory stateFactory, RigidBody rigidBody, Creature creature, Terrain terrain)
         {
             _creature = creature;
+            _terrain = terrain;
             _stateFactory = stateFactory;
             _rigidBody = rigidBody;
         }
@@ -53,7 +56,9 @@ namespace DarkDefenders.Game.Model.States.Heroes
                 throw new InvalidOperationException("Is not in the air");
             }
 
-            var x = _rigidBody.NextSlotX(_creature.GetDirection().Other());
+            var direction = _creature.GetDirection();
+
+            var x = _rigidBody.NextSlotX(direction.Other());
             var y = _rigidBody.SlotYUnder();
 
             return new Point(x, y);
@@ -68,16 +73,21 @@ namespace DarkDefenders.Game.Model.States.Heroes
                 case Direction.Right:
                     return _rigidBody.IsTouchingAWallToTheRight();
                 default:
-                    throw new InvalidOperationException("Invalid movement state.");
+                    throw new InvalidOperationException("Invalid direction.");
             }
         }
 
-        public bool CanJumpOver()
+        private bool CanJumpOver()
         {
             //TODO: depends on parameters
             var maxJumpHeight = 2;
 
-            return _rigidBody.AreOpeningsNextTo(_creature.GetDirection(), 1, maxJumpHeight);
+            var direction = _creature.GetDirection();
+
+            var x = _rigidBody.BoundSlotX(direction);
+            var y = _rigidBody.Level();
+
+            return _terrain.AnyOpenWallsAt(Axis.Vertical, y + 1, y + maxJumpHeight, x);
         }
     }
 }

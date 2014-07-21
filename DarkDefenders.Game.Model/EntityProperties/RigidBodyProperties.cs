@@ -6,13 +6,13 @@ namespace DarkDefenders.Game.Model.EntityProperties
     {
         public double BoundingBoxRadius { get; private set; }
         public double Mass { get; private set; }
-        public double TopHorizontalMomentum { get; private set; }
+        public double HorizontalMomentumLimit { get; private set; }
 
-        public RigidBodyProperties(double boundingBoxRadius, double mass, double topHorizontalMomentum)
+        public RigidBodyProperties(double boundingBoxRadius, double mass, double horizontalMomentumLimit)
         {
             BoundingBoxRadius = boundingBoxRadius;
             Mass = mass;
-            TopHorizontalMomentum = topHorizontalMomentum;
+            HorizontalMomentumLimit = horizontalMomentumLimit;
         }
     }
 }

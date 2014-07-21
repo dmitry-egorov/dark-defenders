@@ -10,6 +10,8 @@ namespace DarkDefenders.Game.Model.Entities
     [UsedImplicitly]
     public class Player : Entity<Player, IPlayerEvents>, IPlayerEvents
     {
+        const string PropertiesId = "Player";
+
         private readonly Creature _creature;
         private readonly Weapon _weapon;
         private readonly RigidBody _rigidBody;
@@ -23,8 +25,8 @@ namespace DarkDefenders.Game.Model.Entities
 
         public void Create(Vector initialPosition)
         {
-            _rigidBody.Create(initialPosition, Momentum.Zero, "Player");
-            _creature.Create(_rigidBody, "Player");
+            _rigidBody.Create(initialPosition, Momentum.Zero, PropertiesId);
+            _creature.Create(_rigidBody, PropertiesId);
             _weapon.Create(_rigidBody);
 
             CreationEvent(x => x.Created(_creature));
@@ -35,16 +37,16 @@ namespace DarkDefenders.Game.Model.Entities
             _creature.ChangeMovementTo(movement);
         }
 
-        public void Jump()
+        public void TryJump()
         {
             _creature.TryJump();
         }
 
-        public void Fire()
+        public void TryFire()
         {
             var direction = _creature.GetDirection();
 
-            _weapon.Fire(direction);
+            _weapon.TryFire(direction);
         }
 
         void IPlayerEvents.Created(Creature creature)
