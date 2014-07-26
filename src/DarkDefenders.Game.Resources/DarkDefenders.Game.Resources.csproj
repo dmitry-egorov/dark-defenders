@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5696DAC5-7730-42D4-BF7D-C3DAB7BCC083}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DarkDefenders.Game.Resources</RootNamespace>
+    <AssemblyName>DarkDefenders.Game.Resources</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Practices.Unity">
+      <HintPath>..\packages\Unity.3.0.1304.1\lib\Net45\Microsoft.Practices.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Configurator.cs" />
+    <Compile Include="Internals\CreaturePropertiesResources.cs" />
+    <Compile Include="Internals\MapResources.cs" />
+    <Compile Include="Internals\RigidBodyPropertiesResources.cs" />
+    <Compile Include="Internals\WorldData.cs" />
+    <Compile Include="Internals\WorldDataCache.cs" />
+    <Compile Include="Internals\WorldLoader.cs" />
+    <Compile Include="Internals\WorldPropertiesResources.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DarkDefenders.Game.App\DarkDefenders.Game.App.csproj">
+      <Project>{9159F40E-E6E4-4F65-966B-2B77CCF0E584}</Project>
+      <Name>DarkDefenders.Game.App</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DarkDefenders.Game.Model\DarkDefenders.Game.Model.csproj">
+      <Project>{ECE63230-99C3-42F9-A87E-D9FEAED42004}</Project>
+      <Name>DarkDefenders.Game.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.DDDES\Infrastructure.DDDES.csproj">
+      <Project>{457CCF4D-7E52-4A7F-867C-13BAC32E13F0}</Project>
+      <Name>Infrastructure.DDDES</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Math\Infrastructure.Math.csproj">
+      <Project>{9DA761FD-492C-4BF7-A50D-10930664021D}</Project>
+      <Name>Infrastructure.Math</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Util\Infrastructure.Util.csproj">
+      <Project>{0B407BC3-7B5B-431A-96E7-A41F25AB27BE}</Project>
+      <Name>Infrastructure.Util</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
