@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DarkDefenders.Kernel.Model;
 using DarkDefenders.Remote.Model;
 using Infrastructure.DDDES;
 using Infrastructure.Math;
@@ -23,9 +24,9 @@ namespace DarkDefenders.Remote.AdapterFromGame.Internals
             _actionsQueue.Enqueue(r => r.MapLoaded(mapId));
         }
 
-        public void Created(IdentityOf<RemoteEntity> id, Vector initialPosition, RemoteEntityType type)
+        public void Created(IdentityOf<RemoteEntity> id, Vector initialPosition, Direction initialDirection, RemoteEntityType type)
         {
-            _currentEntities.Add(id, new RemoteEntity(id, initialPosition, type));
+            _currentEntities.Add(id, new RemoteEntity(id, initialPosition, initialDirection, type));
 
             _actionsQueue.Enqueue(r => r.Created(id, initialPosition, type));
         }
@@ -35,6 +36,13 @@ namespace DarkDefenders.Remote.AdapterFromGame.Internals
             _currentEntities[id].Position = newPosition;
 
             _actionsQueue.Enqueue(r => r.Moved(id, newPosition));
+        }
+
+        public void ChangedDirection(IdentityOf<RemoteEntity> id, Direction newDirection)
+        {
+            _currentEntities[id].Direction = newDirection;
+
+            _actionsQueue.Enqueue(r => r.ChangedDirection(id, newDirection));
         }
 
         public void Destroyed(IdentityOf<RemoteEntity> id)

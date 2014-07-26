@@ -1,4 +1,5 @@
 using System.IO;
+using DarkDefenders.Kernel.Model;
 using DarkDefenders.Remote.Model;
 using DarkDefenders.Remote.Serialization.Internals;
 using Infrastructure.DDDES;
@@ -29,6 +30,13 @@ namespace DarkDefenders.Remote.Serialization
             _writer.Write(id);
             _writer.Write(position);
             _writer.Write((byte)type);
+        }
+
+        public void ChangedDirection(IdentityOf<RemoteEntity> id, Direction newDirection)
+        {
+            _writer.Write((short)SerializableEvents.ChangedDirection);
+            _writer.Write(id);
+            _writer.WriteByteEnum(newDirection);
         }
 
         public void Destroyed(IdentityOf<RemoteEntity> id)

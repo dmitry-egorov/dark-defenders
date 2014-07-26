@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using DarkDefenders.Kernel.Model;
 using DarkDefenders.Remote.Model;
 using DarkDefenders.Remote.Serialization.Internals;
 using Infrastructure.DDDES;
@@ -53,6 +54,9 @@ namespace DarkDefenders.Remote.Serialization
                     case SerializableEvents.Moved:
                         yield return ReadMoved(reader);
                         break;
+                    case SerializableEvents.ChangedDirection:
+                        yield return ReadChangedDirection(reader);
+                        break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
@@ -87,6 +91,14 @@ namespace DarkDefenders.Remote.Serialization
             var newPosition = reader.ReadVector();
 
             return Yield(r => r.Moved(id, newPosition));
+        }
+
+        private Action ReadChangedDirection(BinaryReader reader)
+        {
+            var id = reader.ReadIdentityOf<RemoteEntity>();
+            var newPosition = reader.ReadByteEnum<Direction>();
+
+            return Yield(r => r.ChangedDirection(id, newPosition));
         }
 
         private Action Yield(Action<IRemoteEvents> action)

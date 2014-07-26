@@ -9,7 +9,7 @@ namespace DarkDefenders.Game.Resources.Internals
         private readonly Dictionary<string, CreatureProperties> _map = new Dictionary<string, CreatureProperties>
         {
             { "Player", new CreatureProperties(120, 60) },
-            { "Hero",   new CreatureProperties(120, 30) },
+            { "Hero",   new CreatureProperties(60, 30) },
         };
 
         public CreatureProperties this[string resourceId]

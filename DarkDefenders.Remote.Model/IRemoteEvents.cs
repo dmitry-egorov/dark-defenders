@@ -1,4 +1,5 @@
-﻿using Infrastructure.DDDES;
+﻿using DarkDefenders.Kernel.Model;
+using Infrastructure.DDDES;
 using Infrastructure.Math;
 
 namespace DarkDefenders.Remote.Model
@@ -8,6 +9,7 @@ namespace DarkDefenders.Remote.Model
         void MapLoaded(string mapId);
         void Created(IdentityOf<RemoteEntity> id, Vector initialPosition, RemoteEntityType type);
         void Moved(IdentityOf<RemoteEntity> id, Vector newPosition);
+        void ChangedDirection(IdentityOf<RemoteEntity> id, Direction newDirection);
         void Destroyed(IdentityOf<RemoteEntity> id);
     }
 }

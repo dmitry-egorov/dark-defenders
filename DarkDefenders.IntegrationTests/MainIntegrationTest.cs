@@ -7,6 +7,7 @@ using DarkDefenders.Game.Model.EntityProperties;
 using DarkDefenders.Game.Model.Events;
 using DarkDefenders.Game.Model.Other;
 using DarkDefenders.Game.Resources;
+using DarkDefenders.Kernel.Model;
 using Infrastructure.DDDES;
 using Infrastructure.Math;
 using Infrastructure.Physics;
@@ -109,7 +110,7 @@ namespace DarkDefenders.IntegrationTests
             _weapon        .Setup(x => x.Created(It.IsAny<RigidBody>()));
             _creature      .Setup(x => x.Created(It.IsAny<Creature>(), It.IsAny<RigidBody>(), "Player"));
             _player        .Setup(x => x.Created(It.IsAny<Creature>()));
-            _creature      .Setup(x => x.MovementChanged(Movement.Left));
+            _creature      .Setup(x => x.MovementChanged(Movement.Left, Direction.Left));
             _rigidBody     .Setup(x => x.ExternalForceChanged(new Force(-180, 0)));
             _clock         .Setup(x => x.TimeChanged(_elapsed));
             _rigidBody     .Setup(x => x.Accelerated(new Momentum(-18, 0)));

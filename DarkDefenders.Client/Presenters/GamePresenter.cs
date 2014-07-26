@@ -4,6 +4,7 @@ using System.Globalization;
 using DarkDefenders.Client.Renderers;
 using DarkDefenders.Game.Model.Other;
 using DarkDefenders.Game.Resources.Internals;
+using DarkDefenders.Kernel.Model;
 using DarkDefenders.Remote.Model;
 using Infrastructure.DDDES;
 using Infrastructure.Math;
@@ -53,6 +54,11 @@ namespace DarkDefenders.Client.Presenters
             {
                 _playersRigidBodyId = id;
             }
+        }
+
+        public void ChangedDirection(IdentityOf<RemoteEntity> id, Direction newDirection)
+        {
+            
         }
 
         public void Destroyed(IdentityOf<RemoteEntity> id)

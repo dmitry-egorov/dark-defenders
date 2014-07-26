@@ -1,6 +1,7 @@
 ﻿using System;
 using DarkDefenders.Game.Model.Events;
 using DarkDefenders.Game.Model.Other;
+using DarkDefenders.Kernel.Model;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;

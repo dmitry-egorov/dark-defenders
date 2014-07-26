@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using DarkDefenders.Game.Model.Entities;
 using DarkDefenders.Game.Model.Other;
+using DarkDefenders.Kernel.Model;
 using Infrastructure.Math;
 
 namespace DarkDefenders.Game.Model.States.Heroes

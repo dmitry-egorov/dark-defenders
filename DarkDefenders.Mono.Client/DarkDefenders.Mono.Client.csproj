@@ -41,6 +41,10 @@
   <ItemGroup>
     <Compile Include="DarkDefendersMonoClient.cs" />
     <Compile Include="Presenters\AllEntitiesPresenter.cs" />
+    <Compile Include="Presenters\Camera.cs" />
+    <Compile Include="Presenters\EntityProperties.cs" />
+    <Compile Include="Presenters\EntityPropertiesResources.cs" />
+    <Compile Include="Presenters\PlayerFollowingOperator.cs" />
     <Compile Include="Presenters\TerrainPresenter.cs" />
     <Compile Include="ScreenManagers\LoadingScreen.cs" />
     <Compile Include="ScreenManagers\MessageBoxScreen.cs" />
@@ -69,6 +73,9 @@
     <Content Include="Content\blank.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\dwarf.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\White.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -94,6 +101,10 @@
     <ProjectReference Include="..\DarkDefenders.Game.Serialization\DarkDefenders.Game.Serialization.csproj">
       <Project>{B186D7C0-CB92-44AD-9E6E-2BB8D1899B67}</Project>
       <Name>DarkDefenders.Game.Serialization</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DarkDefenders.Kernel.Model\DarkDefenders.Kernel.Model.csproj">
+      <Project>{E0147C10-6742-426B-A061-C78AE1806D69}</Project>
+      <Name>DarkDefenders.Kernel.Model</Name>
     </ProjectReference>
     <ProjectReference Include="..\DarkDefenders.Remote.Model\DarkDefenders.Remote.Model.csproj">
       <Project>{E13E986E-AFCD-42BB-ACAB-FC3DFE947C51}</Project>

@@ -1,15 +1,14 @@
 ﻿using DarkDefenders.Game.Resources.Internals;
+using DarkDefenders.Kernel.Model;
 using DarkDefenders.Remote.Model;
 using Infrastructure.DDDES;
 using Infrastructure.Math;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace DarkDefenders.Mono.Client.Presenters
 {
     public class GamePresenter : IRemoteEvents
     {
-        private readonly GraphicsDevice _graphicsDevice;
         private readonly Texture2D _whiteTexture;
 
         private readonly SpriteBatch _spriteBatch;
@@ -17,13 +16,41 @@ namespace DarkDefenders.Mono.Client.Presenters
 
         private volatile bool _loaded;
         private volatile TerrainPresenter _terrainPresenter;
+        private readonly Camera _camera;
+        private readonly PlayerFollowingOperator _operator;
+        private readonly IResources<RemoteEntityType, EntityProperties> _resources;
 
-        public GamePresenter(GraphicsDevice graphicsDevice, Texture2D whiteTexture)
+        public GamePresenter(GraphicsDevice graphicsDevice, Texture2D whiteTexture, IResources<RemoteEntityType, EntityProperties> resources)
         {
-            _graphicsDevice = graphicsDevice;
             _whiteTexture = whiteTexture;
+            _resources = resources;
             _spriteBatch = new SpriteBatch(graphicsDevice);
-            _entitiesPresenter = new AllEntitiesPresenter(_spriteBatch, whiteTexture);
+
+            _entitiesPresenter = CreateEntitiesPresenter();
+            _camera = CreateCamera(graphicsDevice.Viewport);
+            _operator = new PlayerFollowingOperator(_camera);
+        }
+
+        public void Update()
+        {
+            _operator.Update();
+        }
+
+        public void Present()
+        {
+            if (!_loaded)
+            {
+                return;
+            }
+
+            var projection = _camera.GetProjectionMatrix();
+
+            _spriteBatch.Begin(0, null, SamplerState.PointClamp, null, RasterizerState.CullClockwise, null, projection);
+
+            _terrainPresenter.Draw();
+            _entitiesPresenter.Draw();
+
+            _spriteBatch.End();
         }
 
         public void MapLoaded(string mapId)
@@ -35,46 +62,36 @@ namespace DarkDefenders.Mono.Client.Presenters
             _loaded = true;
         }
 
+        public void Created(IdentityOf<RemoteEntity> id, Vector initialPosition, RemoteEntityType type)
+        {
+            _operator.NotifyCreated(id, initialPosition, type);
+            _entitiesPresenter.CreateNewEntity(id, initialPosition, type);
+        }
+
+        public void Moved(IdentityOf<RemoteEntity> id, Vector newPosition)
+        {
+            _operator.NotifyMoved(id, newPosition);
+            _entitiesPresenter.ChangePosition(id, newPosition);
+        }
+
+        public void ChangedDirection(IdentityOf<RemoteEntity> id, Direction newDirection)
+        {
+            _entitiesPresenter.ChangeDirection(id, newDirection);
+        }
+
         public void Destroyed(IdentityOf<RemoteEntity> id)
         {
             _entitiesPresenter.Remove(id);
         }
 
-        public void Moved(IdentityOf<RemoteEntity> id, Vector newPosition)
+        private AllEntitiesPresenter CreateEntitiesPresenter()
         {
-            _entitiesPresenter.ChangePosition(id, newPosition);
+            return new AllEntitiesPresenter(_spriteBatch, _resources);
         }
 
-        public void Created(IdentityOf<RemoteEntity> id, Vector initialPosition, RemoteEntityType type)
+        private static Camera CreateCamera(Viewport viewport)
         {
-            _entitiesPresenter.CreateNewEntity(id, initialPosition, type);
-        }
-
-        public void Present()
-        {
-            if (!_loaded)
-            {
-                return;
-            }
-            
-            var projection = CreateProjectionMatrix();
-
-            _spriteBatch.Begin(0, null, null, null, RasterizerState.CullClockwise, null, projection);
-
-            _terrainPresenter.DrawTerrain();
-            _entitiesPresenter.DrawEntities();
-
-            _spriteBatch.End();
-        }
-
-        private Matrix CreateProjectionMatrix()
-        {
-            var viewport = _graphicsDevice.Viewport;
-
-            return Matrix.CreateTranslation(-50f, -40f, 0)
-                 * Matrix.CreateScale(8000.0f / viewport.Height)
-                 * Matrix.CreateScale(1, -1, 1)
-                 * Matrix.CreateTranslation(viewport.Width / 2.0f, viewport.Height / 2.0f, 0.0f);
+            return new Camera(viewport.Width, viewport.Height, 20.0f, new Vector(50, 40));
         }
     }
 }

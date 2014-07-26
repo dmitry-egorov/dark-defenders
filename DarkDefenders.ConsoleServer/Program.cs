@@ -17,7 +17,7 @@ namespace DarkDefenders.ConsoleServer
 //        private const string WorldFileName = "testHoleJump2.bmp";
         private const string WorldFileName = "world3.bmp";
 
-        private const int MaxFps = 30;
+        private const int MaxFps = 50;
 
         private static readonly TimeSpan _elapsedLimit = TimeSpan.FromSeconds(1);
 

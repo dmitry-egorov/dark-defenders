@@ -6,5 +6,6 @@ namespace DarkDefenders.Remote.Serialization.Internals
         Created = 1,
         Destroyed = 2,
         Moved = 3,
+        ChangedDirection = 4
     }
 }

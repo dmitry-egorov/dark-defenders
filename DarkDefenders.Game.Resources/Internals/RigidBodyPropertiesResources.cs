@@ -8,9 +8,9 @@ namespace DarkDefenders.Game.Resources.Internals
     {
         private readonly Dictionary<string, RigidBodyProperties> _map = new Dictionary<string, RigidBodyProperties>
         {
-            { "Player",     new RigidBodyProperties(0.4f, 1.0f, 35.0f) },
-            { "Hero",       new RigidBodyProperties(0.4f, 1.0f, 20.0f) },
-            { "Projectile", new RigidBodyProperties(0.1f, 0.001f, 100.0f) },
+            { "Player",     new RigidBodyProperties(0.4, 1    , 35 ) },
+            { "Hero",       new RigidBodyProperties(0.4, 1.0f , 10 ) },
+            { "Projectile", new RigidBodyProperties(0.1, 0.001, 100) },
         };
 
         public RigidBodyProperties this[string resourceId]

@@ -2,7 +2,7 @@ using System;
 using System.Runtime.CompilerServices;
 using DarkDefenders.Game.Model.EntityProperties;
 using DarkDefenders.Game.Model.Events;
-using DarkDefenders.Game.Model.Other;
+using DarkDefenders.Kernel.Model;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;

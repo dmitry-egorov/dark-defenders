@@ -1,10 +1,23 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Infrastructure.Math;
 
 namespace Infrastructure.Serialization.Math
 {
     public static class SerializationExtensions
     {
+        public static T ReadByteEnum<T>(this BinaryReader reader) where T: struct 
+        {
+            var value = reader.ReadByte();
+
+            return (T)(object)value;
+        }
+
+        public static void WriteByteEnum<T>(this BinaryWriter writer, T value)
+        {
+            writer.Write((byte)(object)value);
+        }
+
         public static Vector ReadVector(this BinaryReader reader)
         {
             var x = reader.ReadSingle();

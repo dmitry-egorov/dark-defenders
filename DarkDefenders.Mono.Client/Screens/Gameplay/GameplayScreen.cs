@@ -21,9 +21,12 @@ namespace DarkDefenders.Mono.Client.Screens.Gameplay
 
         public override void LoadContent()
         {
-            var whiteTexture = ScreenManager.Game.Content.Load<Texture2D>("White");
+            var contentManager = ScreenManager.Game.Content;
 
-            _presenter = new GamePresenter(ScreenManager.Game.GraphicsDevice, whiteTexture);
+            var whiteTexture = contentManager.Load<Texture2D>("White");
+            var resource = new EntityPropertiesResources(contentManager);
+
+            _presenter = new GamePresenter(ScreenManager.Game.GraphicsDevice, whiteTexture, resource);
 
             var listener = DelegatingEventsListener.Create(_presenter);
 
@@ -55,6 +58,7 @@ namespace DarkDefenders.Mono.Client.Screens.Gameplay
         public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
         {
             _client.Pulse();
+            _presenter.Update();
 
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
         }

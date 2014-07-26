@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using DarkDefenders.Game.Model.Entities;
+using DarkDefenders.Kernel.Model;
 using DarkDefenders.Remote.Model;
 using Infrastructure.Math;
 
@@ -32,6 +33,11 @@ namespace DarkDefenders.Remote.AdapterFromGame.Internals
             _reciever.Moved(rigidBody.Id.ToRemote(), newPosition);
         }
 
+        public void ChangedDirection(RigidBody rigidBody, Direction newDirection)
+        {
+            _reciever.ChangedDirection(rigidBody.Id.ToRemote(), newDirection);
+        }
+
         public void CreatureCreated(Creature creature, RigidBody rigidBody)
         {
             _rigidBodiesMap[creature] = rigidBody;
@@ -57,7 +63,7 @@ namespace DarkDefenders.Remote.AdapterFromGame.Internals
             var initialPosition = _initialPositionsMap[rigidBody];
 
             _initialPositionsMap.Remove(rigidBody);
-            _reciever.Created(rigidBody.Id.ToRemote(), initialPosition, type);
+            _reciever.Created(rigidBody.Id.ToRemote(), initialPosition, Direction.Right, type);
         }
 
         private void RigidBodyCreatedInternal(Creature creature, RemoteEntityType type)
@@ -66,7 +72,7 @@ namespace DarkDefenders.Remote.AdapterFromGame.Internals
             var initialPosition = _initialPositionsMap[rigidBody];
 
             _initialPositionsMap.Remove(rigidBody);
-            _reciever.Created(rigidBody.Id.ToRemote(), initialPosition, type);
+            _reciever.Created(rigidBody.Id.ToRemote(), initialPosition, Direction.Right, type);
         }
     }
 }

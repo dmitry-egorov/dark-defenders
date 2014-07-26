@@ -18,7 +18,7 @@ namespace DarkDefenders.Mono.Client.Presenters
             _colorMap = ConvertToColorMap(map);
         }
 
-        public void DrawTerrain()
+        public void Draw()
         {
             for (var x = 0; x < _colorMap.Dimensions.Width; x++)
             {

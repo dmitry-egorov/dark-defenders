@@ -2,6 +2,7 @@
 using DarkDefenders.Game.Model.EntityProperties;
 using DarkDefenders.Game.Model.Events;
 using DarkDefenders.Game.Model.Other;
+using DarkDefenders.Kernel.Model;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
@@ -45,7 +46,9 @@ namespace DarkDefenders.Game.Model.Entities
                 return;
             }
 
-            Event(x => x.MovementChanged(movement));
+            var direction = GetDirectionFrom(movement);
+
+            Event(x => x.MovementChanged(movement, direction));
 
             var movementForce = GetMovementForceFor(movement);
 
@@ -90,10 +93,10 @@ namespace DarkDefenders.Game.Model.Entities
             _jumpMomentum = Vector.XY(0, properties.JumpMomentum).ToMomentum();
         }
 
-        void ICreatureEvents.MovementChanged(Movement movement)
+        void ICreatureEvents.MovementChanged(Movement movement, Direction direction)
         {
             _movement = movement;
-            _direction = GetDirectionFrom(movement);
+            _direction = direction;
         }
 
         private bool CantJump()

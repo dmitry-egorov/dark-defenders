@@ -1,7 +1,12 @@
 ﻿namespace Infrastructure.DDDES
 {
-    public interface IResources<out TResource>
+    public interface IResources<out TResource> : IResources<string, TResource>
     {
-        TResource this[string resourceId] { get; }
+        
+    }
+
+    public interface IResources<in TKey, out TResource>
+    {
+        TResource this[TKey resourceId] { get; }
     }
 }

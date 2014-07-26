@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using DarkDefenders.Kernel.Model;
 using DarkDefenders.Remote.Model;
 using Infrastructure.DDDES;
 using Infrastructure.Math;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace DarkDefenders.Mono.Client.Presenters
@@ -11,13 +11,13 @@ namespace DarkDefenders.Mono.Client.Presenters
     public class AllEntitiesPresenter
     {
         private readonly Dictionary<IdentityOf<RemoteEntity>, EntityPresenter> _presenters = new Dictionary<IdentityOf<RemoteEntity>, EntityPresenter>();
+        private readonly IResources<RemoteEntityType, EntityProperties> _resources;
         private readonly SpriteBatch _spriteBatch;
-        private readonly Texture2D _whiteTexture;
 
-        public AllEntitiesPresenter(SpriteBatch spriteBatch, Texture2D whiteTexture)
+        public AllEntitiesPresenter(SpriteBatch spriteBatch, IResources<RemoteEntityType, EntityProperties> resources)
         {
             _spriteBatch = spriteBatch;
-            _whiteTexture = whiteTexture;
+            _resources = resources;
         }
 
         public void Remove(IdentityOf<RemoteEntity> id)
@@ -27,11 +27,21 @@ namespace DarkDefenders.Mono.Client.Presenters
 
         public void ChangePosition(IdentityOf<RemoteEntity> id, Vector newPosition)
         {
+            TryApply(id, e => e.SetPosition(newPosition));
+        }
+
+        private void TryApply(IdentityOf<RemoteEntity> id, Action<EntityPresenter> action)
+        {
             EntityPresenter entity;
             if (_presenters.TryGetValue(id, out entity))
             {
-                entity.SetPosition(newPosition);
+                action(entity);
             }
+        }
+
+        public void ChangeDirection(IdentityOf<RemoteEntity> id, Direction newDirection)
+        {
+            TryApply(id, e => e.SetDirection(newDirection));
         }
 
         public void CreateNewEntity(IdentityOf<RemoteEntity> id, Vector initialPosition, RemoteEntityType type)
@@ -39,7 +49,7 @@ namespace DarkDefenders.Mono.Client.Presenters
             _presenters[id] = CreateEntityPresenter(initialPosition, type);
         }
 
-        public void DrawEntities()
+        public void Draw()
         {
             foreach (var entity in _presenters.Values)
             {
@@ -49,22 +59,7 @@ namespace DarkDefenders.Mono.Client.Presenters
 
         private EntityPresenter CreateEntityPresenter(Vector initialPosition, RemoteEntityType type)
         {
-            return new EntityPresenter(initialPosition, _spriteBatch, _whiteTexture, GetEntityColor(type));
-        }
-
-        private static Color GetEntityColor(RemoteEntityType type)
-        {
-            switch (type)
-            {
-                case RemoteEntityType.Player:
-                    return Color.Blue;
-                case RemoteEntityType.Hero:
-                    return Color.BlueViolet;
-                case RemoteEntityType.Projectile:
-                    return Color.Purple;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            return new EntityPresenter(_spriteBatch, initialPosition, _resources[type]);
         }
     }
 }
