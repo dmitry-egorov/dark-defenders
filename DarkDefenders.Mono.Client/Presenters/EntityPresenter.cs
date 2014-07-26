@@ -8,7 +8,7 @@ namespace DarkDefenders.Mono.Client.Presenters
     internal class EntityPresenter
     {
         private readonly SpriteBatch _spriteBatch;
-        private readonly Texture2D _groundTexture;
+        private readonly Texture2D _whiteTexture;
         private readonly Color _color;
 
         private Vector2 _position;
@@ -18,17 +18,17 @@ namespace DarkDefenders.Mono.Client.Presenters
             _position = Transform(value);
         }
 
-        public EntityPresenter(Vector initialPosition, SpriteBatch spriteBatch, Texture2D groundTexture, Color color)
+        public EntityPresenter(Vector initialPosition, SpriteBatch spriteBatch, Texture2D whiteTexture, Color color)
         {
             _position = Transform(initialPosition);
             _spriteBatch = spriteBatch;
-            _groundTexture = groundTexture;
+            _whiteTexture = whiteTexture;
             _color = color;
         }
 
         public void Draw()
         {
-            _spriteBatch.Draw(_groundTexture, _position, new Rectangle(0, 0, 1, 1), _color);
+            _spriteBatch.Draw(_whiteTexture, _position, new Rectangle(0, 0, 1, 1), _color);
         }
 
         private static Vector2 Transform(Vector position)

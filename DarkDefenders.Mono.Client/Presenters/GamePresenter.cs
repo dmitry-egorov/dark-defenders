@@ -10,27 +10,27 @@ namespace DarkDefenders.Mono.Client.Presenters
     public class GamePresenter : IRemoteEvents
     {
         private readonly GraphicsDevice _graphicsDevice;
-        private readonly Texture2D _groundTexture;
+        private readonly Texture2D _whiteTexture;
 
-        private volatile bool _loaded;
         private readonly SpriteBatch _spriteBatch;
         private readonly AllEntitiesPresenter _entitiesPresenter;
 
-        private TerrainPresenter _terrainPresenter;
+        private volatile bool _loaded;
+        private volatile TerrainPresenter _terrainPresenter;
 
-        public GamePresenter(GraphicsDevice graphicsDevice, Texture2D groundTexture)
+        public GamePresenter(GraphicsDevice graphicsDevice, Texture2D whiteTexture)
         {
             _graphicsDevice = graphicsDevice;
-            _groundTexture = groundTexture;
+            _whiteTexture = whiteTexture;
             _spriteBatch = new SpriteBatch(graphicsDevice);
-            _entitiesPresenter = new AllEntitiesPresenter(_spriteBatch, groundTexture);
+            _entitiesPresenter = new AllEntitiesPresenter(_spriteBatch, whiteTexture);
         }
 
         public void MapLoaded(string mapId)
         {
             var data = WorldLoader.LoadFromFile(mapId, "Content");
 
-            _terrainPresenter = new TerrainPresenter(data.Map, _groundTexture, _spriteBatch);
+            _terrainPresenter = new TerrainPresenter(data.Map, _whiteTexture, _spriteBatch);
 
             _loaded = true;
         }

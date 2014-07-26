@@ -21,9 +21,9 @@ namespace DarkDefenders.Mono.Client.Screens.Gameplay
 
         public override void LoadContent()
         {
-            var groundTexture = ScreenManager.Game.Content.Load<Texture2D>("White");
+            var whiteTexture = ScreenManager.Game.Content.Load<Texture2D>("White");
 
-            _presenter = new GamePresenter(ScreenManager.Game.GraphicsDevice, groundTexture);
+            _presenter = new GamePresenter(ScreenManager.Game.GraphicsDevice, whiteTexture);
 
             var listener = DelegatingEventsListener.Create(_presenter);
 

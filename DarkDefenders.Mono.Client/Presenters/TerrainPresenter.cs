@@ -7,28 +7,41 @@ namespace DarkDefenders.Mono.Client.Presenters
 {
     public class TerrainPresenter
     {
-        private readonly Texture2D _groundTexture;
+        private readonly Texture2D _whiteTexture;
         private readonly SpriteBatch _spriteBatch;
-        private Map<Tile> _map;
+        private Map<Color> _colorMap;
 
-        public TerrainPresenter(Map<Tile> map, Texture2D groundTexture, SpriteBatch spriteBatch)
+        public TerrainPresenter(Map<Tile> map, Texture2D whiteTexture, SpriteBatch spriteBatch)
         {
-            _groundTexture = groundTexture;
+            _whiteTexture = whiteTexture;
             _spriteBatch = spriteBatch;
-            _map = map;
+            _colorMap = ConvertToColorMap(map);
         }
 
         public void DrawTerrain()
         {
-            for (var x = 0; x < _map.Dimensions.Width; x++)
+            for (var x = 0; x < _colorMap.Dimensions.Width; x++)
             {
-                for (var y = 0; y < _map.Dimensions.Height; y++)
+                for (var y = 0; y < _colorMap.Dimensions.Height; y++)
                 {
-                    var color = GetTileColor(_map, x, y);
-
-                    _spriteBatch.Draw(_groundTexture, new Rectangle(x, y, 1, 1), color);
+                    _spriteBatch.Draw(_whiteTexture, new Rectangle(x, y, 1, 1), _colorMap[x, y]);
                 }
             }
+        }
+
+        private static Map<Color> ConvertToColorMap(Map<Tile> tiles)
+        {
+            var colorMap = new Map<Color>(tiles.Dimensions, Color.SaddleBrown);
+
+            for (var x = 0; x < tiles.Dimensions.Width; x++)
+            {
+                for (var y = 0; y < tiles.Dimensions.Height; y++)
+                {
+                    colorMap[x, y] = GetTileColor(tiles, x, y);
+                }
+            }
+
+            return colorMap;
         }
 
         private static Color GetTileColor(Map<Tile> map, int x, int y)

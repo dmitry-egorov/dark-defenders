@@ -10,25 +10,25 @@ namespace DarkDefenders.Mono.Client.Presenters
 {
     public class AllEntitiesPresenter
     {
-        private readonly Dictionary<IdentityOf<RemoteEntity>, EntityPresenter> _entities = new Dictionary<IdentityOf<RemoteEntity>, EntityPresenter>();
+        private readonly Dictionary<IdentityOf<RemoteEntity>, EntityPresenter> _presenters = new Dictionary<IdentityOf<RemoteEntity>, EntityPresenter>();
         private readonly SpriteBatch _spriteBatch;
-        private readonly Texture2D _groundTexture;
+        private readonly Texture2D _whiteTexture;
 
-        public AllEntitiesPresenter(SpriteBatch spriteBatch, Texture2D groundTexture)
+        public AllEntitiesPresenter(SpriteBatch spriteBatch, Texture2D whiteTexture)
         {
             _spriteBatch = spriteBatch;
-            _groundTexture = groundTexture;
+            _whiteTexture = whiteTexture;
         }
 
         public void Remove(IdentityOf<RemoteEntity> id)
         {
-            _entities.Remove(id);
+            _presenters.Remove(id);
         }
 
         public void ChangePosition(IdentityOf<RemoteEntity> id, Vector newPosition)
         {
             EntityPresenter entity;
-            if (_entities.TryGetValue(id, out entity))
+            if (_presenters.TryGetValue(id, out entity))
             {
                 entity.SetPosition(newPosition);
             }
@@ -36,15 +36,20 @@ namespace DarkDefenders.Mono.Client.Presenters
 
         public void CreateNewEntity(IdentityOf<RemoteEntity> id, Vector initialPosition, RemoteEntityType type)
         {
-            _entities[id] = new EntityPresenter(initialPosition, _spriteBatch, _groundTexture, GetEntityColor(type));
+            _presenters[id] = CreateEntityPresenter(initialPosition, type);
         }
 
         public void DrawEntities()
         {
-            foreach (var entity in _entities.Values)
+            foreach (var entity in _presenters.Values)
             {
                 entity.Draw();
             }
+        }
+
+        private EntityPresenter CreateEntityPresenter(Vector initialPosition, RemoteEntityType type)
+        {
+            return new EntityPresenter(initialPosition, _spriteBatch, _whiteTexture, GetEntityColor(type));
         }
 
         private static Color GetEntityColor(RemoteEntityType type)
