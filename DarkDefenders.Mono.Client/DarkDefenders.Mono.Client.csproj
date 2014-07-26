@@ -40,9 +40,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="DarkDefendersMonoClient.cs" />
+    <Compile Include="Presenters\AllEntitiesPresenter.cs" />
+    <Compile Include="Presenters\TerrainPresenter.cs" />
     <Compile Include="ScreenManagers\LoadingScreen.cs" />
     <Compile Include="ScreenManagers\MessageBoxScreen.cs" />
     <Compile Include="Screens\BackgroundScreen.cs" />
+    <Compile Include="Presenters\EntityPresenter.cs" />
     <Compile Include="Screens\Gameplay\GameInputManager.cs" />
     <Compile Include="Screens\Gameplay\GameplayScreen.cs" />
     <Compile Include="Program.cs" />
@@ -52,7 +55,7 @@
     <Compile Include="ScreenManagers\MenuEntry.cs" />
     <Compile Include="ScreenManagers\MenuScreen.cs" />
     <Compile Include="ScreenManagers\ScreenManager.cs" />
-    <Compile Include="Screens\Gameplay\GamePresenter.cs" />
+    <Compile Include="Presenters\GamePresenter.cs" />
     <Compile Include="Screens\MainMenuScreen.cs" />
   </ItemGroup>
   <ItemGroup>
