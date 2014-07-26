@@ -12,7 +12,7 @@ namespace Infrastructure.Math.Tests
             
             map.Fill(1);
 
-            var actual = map.IsAnyAtLine(Axis.Horizontal, 0, 2, 0, 0);
+            var actual = map.IsAnyAtLine(Axis.X, 0, 2, 0, 0);
 
             Assert.IsFalse(actual);
         }
@@ -24,7 +24,7 @@ namespace Infrastructure.Math.Tests
 
             map.Fill(1);
 
-            var actual = map.IsAnyAtLine(Axis.Vertical, 0, 2, 0, 0);
+            var actual = map.IsAnyAtLine(Axis.Y, 0, 2, 0, 0);
 
             Assert.IsFalse(actual);
         }
@@ -38,7 +38,7 @@ namespace Infrastructure.Math.Tests
 
             map[1, 1] = 0;
 
-            var actual = map.IsAnyAtLine(Axis.Horizontal, 0, 2, 1, 0);
+            var actual = map.IsAnyAtLine(Axis.X, 0, 2, 1, 0);
 
             Assert.IsTrue(actual);
         }
@@ -51,7 +51,7 @@ namespace Infrastructure.Math.Tests
             map.Fill(1);
             map[1, 1] = 0;
 
-            var actual = map.IsAnyAtLine(Axis.Vertical, 0, 2, 1, 0);
+            var actual = map.IsAnyAtLine(Axis.Y, 0, 2, 1, 0);
 
             Assert.IsTrue(actual);
         }
@@ -63,7 +63,7 @@ namespace Infrastructure.Math.Tests
 
             map.Fill(1);
 
-            var actual = map.IsAnyAtLine(Axis.Horizontal, 1, 3, 0, 0);
+            var actual = map.IsAnyAtLine(Axis.X, 1, 3, 0, 0);
 
             Assert.IsTrue(actual);
         }
@@ -75,7 +75,7 @@ namespace Infrastructure.Math.Tests
 
             map.Fill(1);
 
-            var actual = map.IsAnyAtLine(Axis.Vertical, 1, 3, 0, 0);
+            var actual = map.IsAnyAtLine(Axis.Y, 1, 3, 0, 0);
 
             Assert.IsTrue(actual);
         }

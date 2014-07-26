@@ -1,5 +1,4 @@
-﻿using DarkDefenders.Kernel.Model;
-using Infrastructure.DDDES;
+﻿using Infrastructure.DDDES;
 using Infrastructure.Math;
 
 namespace DarkDefenders.Remote.Model

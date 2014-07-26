@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using DarkDefenders.Kernel.Model;
 using DarkDefenders.Remote.Model;
 using Infrastructure.DDDES;
 using Infrastructure.Math;

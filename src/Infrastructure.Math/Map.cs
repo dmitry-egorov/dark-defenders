@@ -97,9 +97,9 @@ namespace Infrastructure.Math
             }
 
             var width = _dimensions.Width;
-            var start = axis == Axis.Horizontal ? other * width + mainStart : mainStart * width + other;
+            var start = axis == Axis.X ? other * width + mainStart : mainStart * width + other;
             var count = mainEnd - mainStart + 1;
-            var step = axis == Axis.Horizontal ? 1 : width;
+            var step = axis == Axis.X ? 1 : width;
 
             for (int i = 0, index = start; i < count; i++, index += step)
             {
@@ -169,13 +169,16 @@ namespace Infrastructure.Math
             return IsAnyAtLine(axis, start, end, other, blockValue);
         }
 
-        public Vector IntersectMovingBox(Vector center, Vector positionDelta, Box box, T blockValue)
+        public Vector IntersectMovingBox(ObjectInSpace objectInSpace, Vector positionDelta, T blockValue)
         {
+            var center = objectInSpace.GetPosition();
+            var box = objectInSpace.GetBoundingBox();
+
             Vector horizontalAdjustment;
-            var horizontalPositionAdjusted = ApplyAxisPositionChange(Axis.Horizontal, center, box, positionDelta, blockValue, out horizontalAdjustment);
+            var horizontalPositionAdjusted = ApplyAxisPositionChange(Axis.X, center, box, positionDelta, blockValue, out horizontalAdjustment);
 
             Vector verticalAdjustment;
-            var verticalPositionAdjusted = ApplyAxisPositionChange(Axis.Vertical, center, box, positionDelta, blockValue, out verticalAdjustment);
+            var verticalPositionAdjusted = ApplyAxisPositionChange(Axis.Y, center, box, positionDelta, blockValue, out verticalAdjustment);
 
             if (verticalPositionAdjusted && horizontalPositionAdjusted)
             {

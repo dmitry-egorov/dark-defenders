@@ -7,7 +7,7 @@ namespace Infrastructure.Math
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Axis Other(this Axis axis)
         {
-            return axis == Axis.Horizontal ? Axis.Vertical : Axis.Horizontal;
+            return axis == Axis.X ? Axis.Y : Axis.X;
         }
     }
 }

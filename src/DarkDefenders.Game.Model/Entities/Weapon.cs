@@ -1,7 +1,5 @@
 ﻿using System;
 using DarkDefenders.Game.Model.Events;
-using DarkDefenders.Game.Model.Other;
-using DarkDefenders.Kernel.Model;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
@@ -17,8 +15,8 @@ namespace DarkDefenders.Game.Model.Entities
 
         private const double ProjectileMomentum = 150.0 * Projectile.Mass;
 
-        private static readonly Momentum _leftProjectileMomentum = Vector.XY(-ProjectileMomentum, 0).ToMomentum();
-        private static readonly Momentum _rightProjectileMomentum = Vector.XY(ProjectileMomentum, 0).ToMomentum();
+        private static readonly Momentum _leftProjectileMomentum  = Vector.XY(-ProjectileMomentum, 0).ToMomentum();
+        private static readonly Momentum _rightProjectileMomentum = Vector.XY( ProjectileMomentum, 0).ToMomentum();
 
         private readonly IFactory<Projectile> _projectileFactory;
         private readonly Cooldown _fireCooldown;
@@ -61,7 +59,7 @@ namespace DarkDefenders.Game.Model.Entities
 
             var position = _rigidBody.GetPosition();
 
-            return position.OffsetBy(Axis.Horizontal, offset);
+            return position.OffsetBy(Axis.X, offset);
         }
 
         private static double GetProjectileOffset(Direction direction)

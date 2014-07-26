@@ -1,4 +1,4 @@
-﻿namespace DarkDefenders.Kernel.Model
+﻿namespace Infrastructure.Math
 {
     public enum Direction: byte
     {

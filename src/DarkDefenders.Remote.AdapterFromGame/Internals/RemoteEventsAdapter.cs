@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using DarkDefenders.Game.Model.Entities;
-using DarkDefenders.Kernel.Model;
 using DarkDefenders.Remote.Model;
 using Infrastructure.Math;
 

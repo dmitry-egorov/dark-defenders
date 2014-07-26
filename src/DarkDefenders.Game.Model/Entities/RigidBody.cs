@@ -2,12 +2,10 @@ using System;
 using System.Runtime.CompilerServices;
 using DarkDefenders.Game.Model.EntityProperties;
 using DarkDefenders.Game.Model.Events;
-using DarkDefenders.Kernel.Model;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
 using Infrastructure.Physics;
-using Infrastructure.Util;
 using JetBrains.Annotations;
 
 namespace DarkDefenders.Game.Model.Entities
@@ -26,8 +24,7 @@ namespace DarkDefenders.Game.Model.Entities
         
         private Force _gravityForce;
         
-        private Vector _position;
-        private Box _boundingBox;
+        private ObjectInSpace _object;
         private Momentum _momentum;
         private Force _externalForce;
 
@@ -100,9 +97,14 @@ namespace DarkDefenders.Game.Model.Entities
             DestructionEvent();
         }
 
+        public ObjectInSpace GetObject()
+        {
+            return _object;
+        }
+
         public Vector GetPosition()
         {
-            return _position;
+            return _object.GetPosition();
         }
 
         public Momentum GetMomentum()
@@ -138,58 +140,6 @@ namespace DarkDefenders.Game.Model.Entities
                 || _isTouchingTheGround;
         }
 
-        public int Level()
-        {
-            return (_position.Y - _boundingBox.HeightRadius).TolerantFloor().ToInt();
-        }
-
-        public int NextSlotX(Direction direction)
-        {
-            switch (direction)
-            {
-                case Direction.Left:
-                    return SlotToTheLeftX();
-                case Direction.Right:
-                    return SlotToTheRightX();
-                default:
-                    throw new ArgumentOutOfRangeException("direction");
-            }
-        }
-
-        public int SlotToTheRightX()
-        {
-            var right = _position.X + _boundingBox.WidthRadius;
-
-            return right.NextInteger().ToInt();
-        }
-
-        public int SlotToTheLeftX()
-        {
-            var right = _position.X - _boundingBox.WidthRadius;
-
-            return right.TolerantFloor().ToInt() - 1;
-        }
-
-        public int SlotYUnder()
-        {
-            var bottom = _position.Y - _boundingBox.HeightRadius;
-
-            return bottom.PrevInteger().ToInt();
-        }
-
-        public int BoundSlotX(Direction direction)
-        {
-            switch (direction)
-            {
-                case Direction.Left:
-                    return LeftBoundSlotX();
-                case Direction.Right:
-                    return RightBoundSlotX();
-                default:
-                    throw new ArgumentOutOfRangeException("direction");
-            }
-        }
-
         void IRigidBodyEvents.Created(RigidBody rigidBody, Vector initialPosition, Momentum initialMomentum, string propertiesId)
         {
             var properties = _resources[propertiesId];
@@ -198,8 +148,7 @@ namespace DarkDefenders.Game.Model.Entities
 
             _momentum                = initialMomentum;
             _horizontalMomentumLimit = properties.HorizontalMomentumLimit;
-            _position                = initialPosition;
-            _boundingBox             = new Box(radius, radius);
+            _object                  = new ObjectInSpace(initialPosition, new Box(radius, radius));
             _mass                    = properties.Mass;
 
             _externalForce = Force.Zero;
@@ -219,7 +168,7 @@ namespace DarkDefenders.Game.Model.Entities
 
         void IRigidBodyEvents.Moved(Vector newPosition)
         {
-            _position = newPosition;
+            _object = _object.MovedTo(newPosition);
 
             PrepareTouching();
         }
@@ -263,7 +212,7 @@ namespace DarkDefenders.Game.Model.Entities
         {
             if (momentum.EqualsZero())
             {
-                newPosition = _position;
+                newPosition = _object.GetPosition();
                 return false;
             }
 
@@ -275,10 +224,10 @@ namespace DarkDefenders.Game.Model.Entities
 
         private void PrepareTouching()
         {
-            _isTouchingAWallToTheRight = CalculateIsTouchingAWallToTheRight();
-            _isTouchingAWallToTheLeft = CalculateIsTouchingAWallToTheLeft();
-            _isTouchingTheCeiling = CalculateIsTouchingTheCeiling();
-            _isTouchingTheGround = CalculateIsTouchingTheGround();
+            _isTouchingAWallToTheRight = _terrain.IsTouchingWallsAt(_object, Axis.Y, AxisDirection.Positive);
+            _isTouchingAWallToTheLeft  = _terrain.IsTouchingWallsAt(_object, Axis.Y, AxisDirection.Negative);
+            _isTouchingTheCeiling      = _terrain.IsTouchingWallsAt(_object, Axis.X, AxisDirection.Positive);
+            _isTouchingTheGround       = _terrain.IsTouchingWallsAt(_object, Axis.X, AxisDirection.Negative);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -384,72 +333,9 @@ namespace DarkDefenders.Game.Model.Entities
             return Vector.XY(px, py).ToMomentum();
         }
 
-        private bool CalculateIsTouchingAWallToTheLeft()
-        {
-            var x = LeftBoundSlotX();
-
-            return _terrain.IsTouchingWallsAt(Axis.Vertical, _position.Y, _boundingBox.HeightRadius, x);
-        }
-
-        private bool CalculateIsTouchingAWallToTheRight()
-        {
-            var x = RightBoundSlotX();
-
-            return _terrain.IsTouchingWallsAt(Axis.Vertical, _position.Y, _boundingBox.HeightRadius, x);
-        }
-
-        private bool CalculateIsTouchingTheGround()
-        {
-            var y = BottomBoundSlotY();
-
-            return _terrain.IsTouchingWallsAt(Axis.Horizontal, _position.X, _boundingBox.WidthRadius, y);
-        }
-
-        private bool CalculateIsTouchingTheCeiling()
-        {
-            var y = TopBoundSlotY();
-
-            return _terrain.IsTouchingWallsAt(Axis.Horizontal, _position.X, _boundingBox.WidthRadius, y);
-        }
-
         private Vector ApplyPositionChange(Vector positionDelta)
         {
-            var center = _position;
-            var boundingBox = _boundingBox;
-
-            return _terrain.IntersectMovingBox(center, positionDelta, boundingBox);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private int BottomBoundSlotY()
-        {
-            var bottom = _position.Y - _boundingBox.HeightRadius;
-
-            return bottom.PrevInteger().ToInt();
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private int TopBoundSlotY()
-        {
-            var top = _position.Y + _boundingBox.HeightRadius;
-
-            return top.TolerantFloor().ToInt();
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private int LeftBoundSlotX()
-        {
-            var left = _position.X - _boundingBox.WidthRadius;
-
-            return left.PrevInteger().ToInt();
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private int RightBoundSlotX()
-        {
-            var right = _position.X + _boundingBox.WidthRadius;
-
-            return right.TolerantFloor().ToInt();
+            return _terrain.IntersectMovingBox(_object, positionDelta);
         }
     }
 }

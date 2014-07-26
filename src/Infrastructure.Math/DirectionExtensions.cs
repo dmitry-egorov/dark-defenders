@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DarkDefenders.Kernel.Model
+namespace Infrastructure.Math
 {
     public static class DirectionExtensions
     {
@@ -25,6 +25,19 @@ namespace DarkDefenders.Kernel.Model
                     return -1;
                 case Direction.Right:
                     return 1;
+                default:
+                    throw new ArgumentOutOfRangeException("direction");
+            }
+        }
+
+        public static AxisDirection ToAxisDirection(this Direction direction)
+        {
+            switch (direction)
+            {
+                case Direction.Left:
+                    return AxisDirection.Negative;
+                case Direction.Right:
+                    return AxisDirection.Positive;
                 default:
                     throw new ArgumentOutOfRangeException("direction");
             }

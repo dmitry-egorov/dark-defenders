@@ -36,10 +36,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Axis.cs" />
+    <Compile Include="AxisDirection.cs" />
     <Compile Include="AxisExtensions.cs" />
     <Compile Include="Box.cs" />
     <Compile Include="Dimensions.cs" />
+    <Compile Include="Direction.cs" />
+    <Compile Include="DirectionExtensions.cs" />
     <Compile Include="Map.cs" />
+    <Compile Include="ObjectInSpace.cs" />
     <Compile Include="Round.cs" />
     <Compile Include="Vector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

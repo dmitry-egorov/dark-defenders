@@ -1,5 +1,4 @@
-﻿using DarkDefenders.Kernel.Model;
-using Infrastructure.Math;
+﻿using Infrastructure.Math;
 using Infrastructure.Util;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

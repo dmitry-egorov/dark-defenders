@@ -66,10 +66,6 @@
       <Project>{ECE63230-99C3-42F9-A87E-D9FEAED42004}</Project>
       <Name>DarkDefenders.Game.Model</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DarkDefenders.Kernel.Model\DarkDefenders.Kernel.Model.csproj">
-      <Project>{E0147C10-6742-426B-A061-C78AE1806D69}</Project>
-      <Name>DarkDefenders.Kernel.Model</Name>
-    </ProjectReference>
     <ProjectReference Include="..\DarkDefenders.Remote.Model\DarkDefenders.Remote.Model.csproj">
       <Project>{E13E986E-AFCD-42BB-ACAB-FC3DFE947C51}</Project>
       <Name>DarkDefenders.Remote.Model</Name>

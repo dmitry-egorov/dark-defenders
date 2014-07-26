@@ -1,5 +1,5 @@
 ﻿using System;
-using DarkDefenders.Kernel.Model;
+using Infrastructure.Math;
 
 namespace DarkDefenders.Game.Model.Other
 {

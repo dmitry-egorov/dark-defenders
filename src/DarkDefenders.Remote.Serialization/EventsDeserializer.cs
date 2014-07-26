@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using DarkDefenders.Kernel.Model;
 using DarkDefenders.Remote.Model;
 using DarkDefenders.Remote.Serialization.Internals;
 using Infrastructure.DDDES;
+using Infrastructure.Math;
 using Infrastructure.Network.Subscription.Client.Interfaces;
 using Infrastructure.Serialization.DDDES;
 using Infrastructure.Serialization.Math;

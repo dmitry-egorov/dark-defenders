@@ -18,7 +18,7 @@ namespace Infrastructure.Math
 
         public double RadiusFor(Axis axis)
         {
-            return axis == Axis.Horizontal ? _widthRadius : _heightRadius;
+            return axis == Axis.X ? _widthRadius : _heightRadius;
         }
 
         public override string ToString()

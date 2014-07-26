@@ -19,13 +19,13 @@ namespace Infrastructure.Math
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public double CoordinateFor(Axis axis)
         {
-            return axis == Axis.Horizontal ? _x : _y;
+            return axis == Axis.X ? _x : _y;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector ByAxis(Axis axis, double main, double other)
         {
-            return axis == Axis.Horizontal ? XY(main, other) : XY(other, main);
+            return axis == Axis.X ? XY(main, other) : XY(other, main);
         }
 
         public static Vector XY(double x, double y)
@@ -134,11 +134,11 @@ namespace Infrastructure.Math
 
         public Vector OffsetBy(Axis axis, double offset)
         {
-            if (axis == Axis.Horizontal)
+            if (axis == Axis.X)
             {
                 return Vector.XY(X + offset, Y);
             }
-            if (axis == Axis.Vertical)
+            if (axis == Axis.Y)
             {
                 return Vector.XY(X, Y + offset);
             }

@@ -1,8 +1,6 @@
 using System;
 using System.Drawing;
 using DarkDefenders.Game.Model.Entities;
-using DarkDefenders.Game.Model.Other;
-using DarkDefenders.Kernel.Model;
 using Infrastructure.Math;
 
 namespace DarkDefenders.Game.Model.States.Heroes
@@ -57,10 +55,12 @@ namespace DarkDefenders.Game.Model.States.Heroes
                 throw new InvalidOperationException("Is not in the air");
             }
 
+            var objectInSpace = _rigidBody.GetObject();
+
             var direction = _creature.GetDirection();
 
-            var x = _rigidBody.NextSlotX(direction.Other());
-            var y = _rigidBody.SlotYUnder();
+            var x = objectInSpace.NextSlotX(direction.Other());
+            var y = objectInSpace.SlotYUnder();
 
             return new Point(x, y);
         }
@@ -83,12 +83,14 @@ namespace DarkDefenders.Game.Model.States.Heroes
             //TODO: depends on parameters
             var maxJumpHeight = 2;
 
-            var direction = _creature.GetDirection();
+            var direction = _creature.GetDirection().ToAxisDirection();
 
-            var x = _rigidBody.BoundSlotX(direction);
-            var y = _rigidBody.Level();
+            var objectInSpace = _rigidBody.GetObject();
 
-            return _terrain.AnyOpenWallsAt(Axis.Vertical, y + 1, y + maxJumpHeight, x);
+            var x = objectInSpace.BoundSlotX(direction);
+            var y = objectInSpace.Level();
+
+            return _terrain.AnyOpenWallsAt(Axis.Y, y + 1, y + maxJumpHeight, x);
         }
     }
 }

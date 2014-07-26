@@ -2,7 +2,6 @@
 using DarkDefenders.Game.Model.EntityProperties;
 using DarkDefenders.Game.Model.Events;
 using DarkDefenders.Game.Model.Other;
-using DarkDefenders.Kernel.Model;
 using Infrastructure.DDDES;
 using Infrastructure.DDDES.Implementations.Domain;
 using Infrastructure.Math;
@@ -101,7 +100,7 @@ namespace DarkDefenders.Game.Model.Entities
 
         private bool CantJump()
         {
-            return _rigidBody.IsInTheAir() || _rigidBody.HasMomentum(Axis.Vertical);
+            return _rigidBody.IsInTheAir() || _rigidBody.HasMomentum(Axis.Y);
         }
 
         private void AddJumpMomentum()
@@ -156,9 +155,9 @@ namespace DarkDefenders.Game.Model.Entities
 
         private bool MomentumHasDifferentHorizontalDirectionFrom(Vector vector)
         {
-            var momentumSign = _rigidBody.GetMomentum().Value.Sign(Axis.Horizontal);
+            var momentumSign = _rigidBody.GetMomentum().Value.Sign(Axis.X);
 
-            return momentumSign != 0 && momentumSign != vector.Sign(Axis.Horizontal);
+            return momentumSign != 0 && momentumSign != vector.Sign(Axis.X);
         }
     }
 }

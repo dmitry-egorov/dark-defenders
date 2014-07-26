@@ -1,8 +1,6 @@
 using System;
 using System.Drawing;
 using DarkDefenders.Game.Model.Entities;
-using DarkDefenders.Game.Model.Other;
-using DarkDefenders.Kernel.Model;
 using Infrastructure.Math;
 
 namespace DarkDefenders.Game.Model.States.Heroes
@@ -43,18 +41,20 @@ namespace DarkDefenders.Game.Model.States.Heroes
 
         private bool CanMoveBackwardsAfterFall(Point fallenFrom)
         {
-            var yStart = _rigidBody.Level();
+            var objectInSpace = _rigidBody.GetObject();
+
+            var yStart = objectInSpace.Level();
             var yEnd = Math.Min(fallenFrom.Y, yStart + 2);
 
             var direction = _creature.GetDirection().Other();
 
-            var xStart = _rigidBody.NextSlotX(direction);
+            var xStart = objectInSpace.NextSlotX(direction);
             var xEnd = fallenFrom.X;
             var sign = direction.GetXIncrement();
 
             for (var x = xStart; (xEnd - x) * sign >= 0; x += sign)
             {
-                if (!_terrain.AnyOpenWallsAt(Axis.Vertical, yStart, yEnd, x))
+                if (!_terrain.AnyOpenWallsAt(Axis.Y, yStart, yEnd, x))
                 {
                     return false;
                 }

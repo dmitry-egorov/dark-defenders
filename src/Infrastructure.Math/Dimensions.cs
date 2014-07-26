@@ -20,7 +20,7 @@
 
         public int DimensionFor(Axis axis)
         {
-            return axis == Axis.Horizontal ? _width : _height;
+            return axis == Axis.X ? _width : _height;
         }
 
         public bool Equals(Dimensions other)

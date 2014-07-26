@@ -38,8 +38,14 @@ namespace DarkDefenders.Game.Model.Entities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsTouchingWallsAt(Axis axis, double mainCenter, double radius, int other)
+        public bool IsTouchingWallsAt(ObjectInSpace @object, Axis axis, AxisDirection direction)
         {
+            var otherAxis = axis.Other();
+
+            var other = @object.BoundSlot(otherAxis, direction);
+            var mainCenter = @object.GetPosition().CoordinateFor(axis);
+            var radius = @object.GetBoundingBox().RadiusFor(axis);
+
             return _map.IsTouchingWallsAt(axis, mainCenter, radius, other, Tile.Solid);
         }
 
@@ -48,9 +54,9 @@ namespace DarkDefenders.Game.Model.Entities
             _map = _mapResources[mapId];
         }
 
-        public Vector IntersectMovingBox(Vector center, Vector positionDelta, Box boundingBox)
+        public Vector IntersectMovingBox(ObjectInSpace objectInSpace, Vector positionDelta)
         {
-            return _map.IntersectMovingBox(center, positionDelta, boundingBox, Tile.Solid);
+            return _map.IntersectMovingBox(objectInSpace, positionDelta, Tile.Solid);
         }
     }
 }

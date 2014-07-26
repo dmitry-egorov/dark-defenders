@@ -1,7 +1,7 @@
 ﻿using DarkDefenders.Game.Model.Entities;
 using DarkDefenders.Game.Model.Events;
 using DarkDefenders.Game.Model.Other;
-using DarkDefenders.Kernel.Model;
+using Infrastructure.Math;
 
 namespace DarkDefenders.Remote.AdapterFromGame.Internals.Entities
 {

@@ -1,5 +1,4 @@
 using System.IO;
-using DarkDefenders.Kernel.Model;
 using DarkDefenders.Remote.Model;
 using DarkDefenders.Remote.Serialization.Internals;
 using Infrastructure.DDDES;
