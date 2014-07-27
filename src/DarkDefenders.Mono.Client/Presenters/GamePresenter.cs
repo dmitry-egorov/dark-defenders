@@ -16,7 +16,7 @@ namespace DarkDefenders.Mono.Client.Presenters
         private volatile bool _loaded;
         private volatile TerrainPresenter _terrainPresenter;
         private readonly Camera _camera;
-        private readonly PlayerFollowingOperator _operator;
+        private readonly PlayerFollowingDirector _director;
         private readonly IResources<RemoteEntityType, EntityProperties> _resources;
 
         public GamePresenter(GraphicsDevice graphicsDevice, Texture2D whiteTexture, IResources<RemoteEntityType, EntityProperties> resources)
@@ -27,12 +27,12 @@ namespace DarkDefenders.Mono.Client.Presenters
 
             _entitiesPresenter = CreateEntitiesPresenter();
             _camera = CreateCamera(graphicsDevice.Viewport);
-            _operator = new PlayerFollowingOperator(_camera);
+            _director = new PlayerFollowingDirector(_camera);
         }
 
         public void Update()
         {
-            _operator.Update();
+            _director.Update();
         }
 
         public void Present()
@@ -63,17 +63,17 @@ namespace DarkDefenders.Mono.Client.Presenters
 
         public void Created(IdentityOf<RemoteEntity> id, Vector initialPosition, RemoteEntityType type)
         {
-            _operator.NotifyCreated(id, initialPosition, type);
+            _director.NotifyCreated(id, initialPosition, type);
             _entitiesPresenter.CreateNewEntity(id, initialPosition, type);
         }
 
         public void Moved(IdentityOf<RemoteEntity> id, Vector newPosition)
         {
-            _operator.NotifyMoved(id, newPosition);
+            _director.NotifyMoved(id, newPosition);
             _entitiesPresenter.ChangePosition(id, newPosition);
         }
 
-        public void ChangedDirection(IdentityOf<RemoteEntity> id, Direction newDirection)
+        public void ChangedDirection(IdentityOf<RemoteEntity> id, HorizontalDirection newDirection)
         {
             _entitiesPresenter.ChangeDirection(id, newDirection);
         }

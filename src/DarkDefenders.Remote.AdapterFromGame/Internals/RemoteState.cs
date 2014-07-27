@@ -23,7 +23,7 @@ namespace DarkDefenders.Remote.AdapterFromGame.Internals
             _actionsQueue.Enqueue(r => r.MapLoaded(mapId));
         }
 
-        public void Created(IdentityOf<RemoteEntity> id, Vector initialPosition, Direction initialDirection, RemoteEntityType type)
+        public void Created(IdentityOf<RemoteEntity> id, Vector initialPosition, HorizontalDirection initialDirection, RemoteEntityType type)
         {
             _currentEntities.Add(id, new RemoteEntity(id, initialPosition, initialDirection, type));
 
@@ -37,7 +37,7 @@ namespace DarkDefenders.Remote.AdapterFromGame.Internals
             _actionsQueue.Enqueue(r => r.Moved(id, newPosition));
         }
 
-        public void ChangedDirection(IdentityOf<RemoteEntity> id, Direction newDirection)
+        public void ChangedDirection(IdentityOf<RemoteEntity> id, HorizontalDirection newDirection)
         {
             _currentEntities[id].Direction = newDirection;
 

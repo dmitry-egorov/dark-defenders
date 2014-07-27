@@ -8,7 +8,7 @@ namespace DarkDefenders.Remote.Model
         void MapLoaded(string mapId);
         void Created(IdentityOf<RemoteEntity> id, Vector initialPosition, RemoteEntityType type);
         void Moved(IdentityOf<RemoteEntity> id, Vector newPosition);
-        void ChangedDirection(IdentityOf<RemoteEntity> id, Direction newDirection);
+        void ChangedDirection(IdentityOf<RemoteEntity> id, HorizontalDirection newDirection);
         void Destroyed(IdentityOf<RemoteEntity> id);
     }
 }

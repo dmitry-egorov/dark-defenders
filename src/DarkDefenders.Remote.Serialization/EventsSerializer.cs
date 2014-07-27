@@ -31,7 +31,7 @@ namespace DarkDefenders.Remote.Serialization
             _writer.Write((byte)type);
         }
 
-        public void ChangedDirection(IdentityOf<RemoteEntity> id, Direction newDirection)
+        public void ChangedDirection(IdentityOf<RemoteEntity> id, HorizontalDirection newDirection)
         {
             _writer.Write((short)SerializableEvents.ChangedDirection);
             _writer.Write(id);

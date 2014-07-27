@@ -32,7 +32,7 @@ namespace DarkDefenders.Remote.AdapterFromGame.Internals
             _reciever.Moved(rigidBody.Id.ToRemote(), newPosition);
         }
 
-        public void ChangedDirection(RigidBody rigidBody, Direction newDirection)
+        public void ChangedDirection(RigidBody rigidBody, HorizontalDirection newDirection)
         {
             _reciever.ChangedDirection(rigidBody.Id.ToRemote(), newDirection);
         }
@@ -62,7 +62,7 @@ namespace DarkDefenders.Remote.AdapterFromGame.Internals
             var initialPosition = _initialPositionsMap[rigidBody];
 
             _initialPositionsMap.Remove(rigidBody);
-            _reciever.Created(rigidBody.Id.ToRemote(), initialPosition, Direction.Right, type);
+            _reciever.Created(rigidBody.Id.ToRemote(), initialPosition, HorizontalDirection.Right, type);
         }
 
         private void RigidBodyCreatedInternal(Creature creature, RemoteEntityType type)
@@ -71,7 +71,7 @@ namespace DarkDefenders.Remote.AdapterFromGame.Internals
             var initialPosition = _initialPositionsMap[rigidBody];
 
             _initialPositionsMap.Remove(rigidBody);
-            _reciever.Created(rigidBody.Id.ToRemote(), initialPosition, Direction.Right, type);
+            _reciever.Created(rigidBody.Id.ToRemote(), initialPosition, HorizontalDirection.Right, type);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace DarkDefenders.Game.Model.Entities
     [UsedImplicitly]
     public class Creature : Entity<Creature, ICreatureEvents>, ICreatureEvents
     {
-        private const Direction InitialDirection = Direction.Right;
+        private const HorizontalDirection InitialDirection = HorizontalDirection.Right;
 
         private readonly IResources<CreatureProperties> _resources;
 
@@ -22,7 +22,7 @@ namespace DarkDefenders.Game.Model.Entities
         private double _movementForceAmplitude;
         
         private Movement _movement;
-        private Direction _direction;
+        private HorizontalDirection _direction;
         private Momentum _jumpMomentum;
 
         public Creature(IResources<CreatureProperties> resources)
@@ -76,7 +76,7 @@ namespace DarkDefenders.Game.Model.Entities
             _rigidBody.Destroy();
         }
 
-        public Direction GetDirection()
+        public HorizontalDirection GetDirection()
         {
             return _direction;
         }
@@ -92,7 +92,7 @@ namespace DarkDefenders.Game.Model.Entities
             _jumpMomentum = Vector.XY(0, properties.JumpMomentum).ToMomentum();
         }
 
-        void ICreatureEvents.MovementChanged(Movement movement, Direction direction)
+        void ICreatureEvents.MovementChanged(Movement movement, HorizontalDirection direction)
         {
             _movement = movement;
             _direction = direction;
@@ -108,14 +108,14 @@ namespace DarkDefenders.Game.Model.Entities
             _rigidBody.AddMomentum(_jumpMomentum);
         }
 
-        private Direction GetDirectionFrom(Movement movement)
+        private HorizontalDirection GetDirectionFrom(Movement movement)
         {
             switch (movement)
             {
                 case Movement.Left:
-                    return Direction.Left;
+                    return HorizontalDirection.Left;
                 case Movement.Right:
-                    return Direction.Right;
+                    return HorizontalDirection.Right;
                 default:
                     return _direction;
             }

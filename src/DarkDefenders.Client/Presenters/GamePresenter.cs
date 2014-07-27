@@ -55,7 +55,7 @@ namespace DarkDefenders.Client.Presenters
             }
         }
 
-        public void ChangedDirection(IdentityOf<RemoteEntity> id, Direction newDirection)
+        public void ChangedDirection(IdentityOf<RemoteEntity> id, HorizontalDirection newDirection)
         {
             
         }

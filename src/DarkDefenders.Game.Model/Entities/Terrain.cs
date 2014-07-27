@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Linq;
+using System.Runtime.CompilerServices;
 using DarkDefenders.Game.Model.Events;
 using DarkDefenders.Game.Model.Other;
 using Infrastructure.DDDES;
@@ -8,6 +9,26 @@ using JetBrains.Annotations;
 
 namespace DarkDefenders.Game.Model.Entities
 {
+    public class AccessabilityMap
+    {
+        private readonly Map<bool> _map;
+
+        public AccessabilityMap(Map<bool> map)
+        {
+            _map = map;
+        }
+
+        public bool IsAccessible(int x, int y)
+        {
+            return _map[x, y];
+        }
+
+        public bool IsAccessible(DiscreteAxisAlignedLine line)
+        {
+            return _map.ValuesOn(line).All(x => x);
+        }
+    }
+
     [UsedImplicitly]
     public class Terrain : Entity<Terrain, ITerrainEvents>, ITerrainEvents
     {
@@ -26,27 +47,19 @@ namespace DarkDefenders.Game.Model.Entities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool AnySolidWallsAt(Axis axis, int mainStart, int mainEnd, int other)
+        public bool AnyOpenWallsAt(DiscreteAxisAlignedLine line)
         {
-            return _map.IsAnyAtLine(axis, mainStart, mainEnd, other, Tile.Solid);
+            return _map.ValuesOn(line).Any(x => x == Tile.Open);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool AnyOpenWallsAt(Axis axis, int mainStart, int mainEnd, int other)
+        public bool IsTouchingWalls(Box box, Direction direction)
         {
-            return _map.IsAnyAtLine(axis, mainStart, mainEnd, other, Tile.Open);
-        }
+            var bound = box.GetBound(direction);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsTouchingWallsAt(ObjectInSpace @object, Axis axis, AxisDirection direction)
-        {
-            var otherAxis = axis.Other();
+            var axisDirection = direction.AxisDirection();
 
-            var other = @object.BoundSlot(otherAxis, direction);
-            var mainCenter = @object.GetPosition().CoordinateFor(axis);
-            var radius = @object.GetBoundingBox().RadiusFor(axis);
-
-            return _map.IsTouchingWallsAt(axis, mainCenter, radius, other, Tile.Solid);
+            return AdjacentToAWall(bound, axisDirection);
         }
 
         void ITerrainEvents.Created(string mapId)
@@ -54,9 +67,47 @@ namespace DarkDefenders.Game.Model.Entities
             _map = _mapResources[mapId];
         }
 
-        public Vector IntersectMovingBox(ObjectInSpace objectInSpace, Vector positionDelta)
+        public Vector IntersectMovingBox(Box box, Vector positionDelta)
         {
-            return _map.IntersectMovingBox(objectInSpace, positionDelta, Tile.Solid);
+            var center = box.GetPosition();
+
+            var horizontalPosition = Intersect(Axis.X, box, positionDelta);
+
+            var verticalPosition   = Intersect(Axis.Y, box, positionDelta);
+            
+            var horizontalDelta = (horizontalPosition - center).Length();
+            var verticalDelta   = (verticalPosition   - center).Length();
+
+            return
+            horizontalDelta < verticalDelta
+            ? horizontalPosition
+            : verticalPosition;
+        }
+
+        private Vector Intersect(Axis axis, Box box, Vector positionDelta)
+        {
+            var axisDirection = positionDelta.AxisDirection(axis);
+            var direction = axis.AbsoluteDirection(axisDirection);
+
+            var snappedBoxes = box.GetSnappedBoxes(axis, positionDelta);
+
+            var adjacentBoxes = 
+            snappedBoxes
+            .Where(snappedBox => AdjacentToAWall(snappedBox.GetBound(direction), axisDirection));
+
+            foreach (var adjacentBox in adjacentBoxes)
+            {
+                return adjacentBox.GetPosition();
+            }
+
+            return box.GetPosition() + positionDelta;
+        }
+
+        private bool AdjacentToAWall(AxisAlignedLine line, AxisDirection axisDirection)
+        {
+            var discreteLine = line.DiscreteExpanded(axisDirection);
+
+            return _map.ValuesOn(discreteLine).Any(x => x == Tile.Solid);
         }
     }
 }

@@ -5,14 +5,14 @@ namespace DarkDefenders.Game.Model.Other
 {
     public static class MovementExtensions
     {
-        public static Direction ToDirection(this Movement movement)
+        public static HorizontalDirection ToDirection(this Movement movement)
         {
             switch (movement)
             {
                 case Movement.Left:
-                    return Direction.Left;
+                    return HorizontalDirection.Left;
                 case Movement.Right:
-                    return Direction.Right;
+                    return HorizontalDirection.Right;
                 default:
                     throw new ArgumentOutOfRangeException("movement");
             }

@@ -14,7 +14,7 @@ namespace DarkDefenders.Mono.Client.Presenters
         private readonly Color _color;
 
         private Vector2 _position;
-        private Direction _direction;
+        private HorizontalDirection _direction;
 
         public EntityPresenter(SpriteBatch spriteBatch, Vector initialPosition, EntityProperties properties)
         {
@@ -31,7 +31,7 @@ namespace DarkDefenders.Mono.Client.Presenters
             _position = Transform(value);
         }
 
-        public void SetDirection(Direction newDirection)
+        public void SetDirection(HorizontalDirection newDirection)
         {
             _direction = newDirection;
         }
@@ -42,7 +42,7 @@ namespace DarkDefenders.Mono.Client.Presenters
 
             var spriteEffects = SpriteEffects.FlipVertically;
 
-            if (_direction == Direction.Left)
+            if (_direction == HorizontalDirection.Left)
             {
                 spriteEffects |= SpriteEffects.FlipHorizontally;
             }

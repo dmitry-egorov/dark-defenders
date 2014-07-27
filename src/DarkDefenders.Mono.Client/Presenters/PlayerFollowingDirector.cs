@@ -4,7 +4,7 @@ using Infrastructure.Math;
 
 namespace DarkDefenders.Mono.Client.Presenters
 {
-    public class PlayerFollowingOperator
+    public class PlayerFollowingDirector
     {
         private readonly Camera _camera;
 
@@ -12,7 +12,7 @@ namespace DarkDefenders.Mono.Client.Presenters
         private bool _playerFound;
         private Vector _currentPlayerPosition;
 
-        public PlayerFollowingOperator(Camera camera)
+        public PlayerFollowingDirector(Camera camera)
         {
             _camera = camera;
         }
@@ -38,9 +38,18 @@ namespace DarkDefenders.Mono.Client.Presenters
 
             var current = _camera.GetPosition();
 
-            var delta = (_currentPlayerPosition - current) * 0.1f;
+            var delta = (_currentPlayerPosition - current);
 
-            var newPosition = current + delta;
+            if (delta.LengthSquared() <= 25.0)
+            {
+                return;
+            }
+
+            var positionDelta = (delta - delta.Direction() * 5.0) * 0.1f;
+
+            
+
+            var newPosition = current + positionDelta;
 
             _camera.SetPosition(newPosition);
         }

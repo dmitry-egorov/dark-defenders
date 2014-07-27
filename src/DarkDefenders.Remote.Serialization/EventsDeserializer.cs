@@ -96,7 +96,7 @@ namespace DarkDefenders.Remote.Serialization
         private Action ReadChangedDirection(BinaryReader reader)
         {
             var id = reader.ReadIdentityOf<RemoteEntity>();
-            var newPosition = reader.ReadByteEnum<Direction>();
+            var newPosition = reader.ReadByteEnum<HorizontalDirection>();
 
             return Yield(r => r.ChangedDirection(id, newPosition));
         }

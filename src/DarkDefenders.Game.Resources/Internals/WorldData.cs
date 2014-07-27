@@ -16,7 +16,7 @@ namespace DarkDefenders.Game.Resources.Internals
         {
             Map = map;
             PlayerSpawns = playerSpawns.AsReadOnly().ShouldNotBeEmpty("playerSpawns");
-            HeroSpawns = heroSpawns.AsReadOnly().ShouldNotBeEmpty("heroSpawns");
+            HeroSpawns = heroSpawns.AsReadOnly();
         }
     }
 }

@@ -109,7 +109,7 @@ namespace DarkDefenders.IntegrationTests
             _weapon        .Setup(x => x.Created(It.IsAny<RigidBody>()));
             _creature      .Setup(x => x.Created(It.IsAny<Creature>(), It.IsAny<RigidBody>(), "Player"));
             _player        .Setup(x => x.Created(It.IsAny<Creature>()));
-            _creature      .Setup(x => x.MovementChanged(Movement.Left, Direction.Left));
+            _creature      .Setup(x => x.MovementChanged(Movement.Left, HorizontalDirection.Left));
             _rigidBody     .Setup(x => x.ExternalForceChanged(new Force(-180, 0)));
             _clock         .Setup(x => x.TimeChanged(_elapsed));
             _rigidBody     .Setup(x => x.Accelerated(new Momentum(-18, 0)));

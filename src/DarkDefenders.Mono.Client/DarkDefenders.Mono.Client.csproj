@@ -44,7 +44,7 @@
     <Compile Include="Presenters\Camera.cs" />
     <Compile Include="Presenters\EntityProperties.cs" />
     <Compile Include="Presenters\EntityPropertiesResources.cs" />
-    <Compile Include="Presenters\PlayerFollowingOperator.cs" />
+    <Compile Include="Presenters\PlayerFollowingDirector.cs" />
     <Compile Include="Presenters\TerrainPresenter.cs" />
     <Compile Include="ScreenManagers\LoadingScreen.cs" />
     <Compile Include="ScreenManagers\MessageBoxScreen.cs" />
@@ -74,6 +74,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\dwarf.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\testHeroFalling.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\testHeroFalling2.bmp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\White.png">

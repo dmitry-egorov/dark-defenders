@@ -2,7 +2,8 @@
 {
     public enum AxisDirection : byte
     {
-        Positive = 0,
-        Negative = 1
+        None = 0,
+        Positive = 1,
+        Negative = 2
     }
 }

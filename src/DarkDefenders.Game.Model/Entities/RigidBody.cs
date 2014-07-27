@@ -24,7 +24,7 @@ namespace DarkDefenders.Game.Model.Entities
         
         private Force _gravityForce;
         
-        private ObjectInSpace _object;
+        private Box _boundingBox;
         private Momentum _momentum;
         private Force _externalForce;
 
@@ -97,14 +97,14 @@ namespace DarkDefenders.Game.Model.Entities
             DestructionEvent();
         }
 
-        public ObjectInSpace GetObject()
+        public Box GetBoundingBox()
         {
-            return _object;
+            return _boundingBox;
         }
 
         public Vector GetPosition()
         {
-            return _object.GetPosition();
+            return _boundingBox.GetPosition();
         }
 
         public Momentum GetMomentum()
@@ -148,7 +148,7 @@ namespace DarkDefenders.Game.Model.Entities
 
             _momentum                = initialMomentum;
             _horizontalMomentumLimit = properties.HorizontalMomentumLimit;
-            _object                  = new ObjectInSpace(initialPosition, new Box(radius, radius));
+            _boundingBox             = new Box(initialPosition, Bounds.Square(radius));
             _mass                    = properties.Mass;
 
             _externalForce = Force.Zero;
@@ -168,7 +168,7 @@ namespace DarkDefenders.Game.Model.Entities
 
         void IRigidBodyEvents.Moved(Vector newPosition)
         {
-            _object = _object.MovedTo(newPosition);
+            _boundingBox = _boundingBox.MovedTo(newPosition);
 
             PrepareTouching();
         }
@@ -212,7 +212,7 @@ namespace DarkDefenders.Game.Model.Entities
         {
             if (momentum.EqualsZero())
             {
-                newPosition = _object.GetPosition();
+                newPosition = Vector.Zero;
                 return false;
             }
 
@@ -224,10 +224,10 @@ namespace DarkDefenders.Game.Model.Entities
 
         private void PrepareTouching()
         {
-            _isTouchingAWallToTheRight = _terrain.IsTouchingWallsAt(_object, Axis.Y, AxisDirection.Positive);
-            _isTouchingAWallToTheLeft  = _terrain.IsTouchingWallsAt(_object, Axis.Y, AxisDirection.Negative);
-            _isTouchingTheCeiling      = _terrain.IsTouchingWallsAt(_object, Axis.X, AxisDirection.Positive);
-            _isTouchingTheGround       = _terrain.IsTouchingWallsAt(_object, Axis.X, AxisDirection.Negative);
+            _isTouchingAWallToTheRight = _terrain.IsTouchingWalls(_boundingBox, Direction.Right);
+            _isTouchingAWallToTheLeft  = _terrain.IsTouchingWalls(_boundingBox, Direction.Left);
+            _isTouchingTheCeiling      = _terrain.IsTouchingWalls(_boundingBox, Direction.Top);
+            _isTouchingTheGround       = _terrain.IsTouchingWalls(_boundingBox, Direction.Bottom);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -335,7 +335,7 @@ namespace DarkDefenders.Game.Model.Entities
 
         private Vector ApplyPositionChange(Vector positionDelta)
         {
-            return _terrain.IntersectMovingBox(_object, positionDelta);
+            return _terrain.IntersectMovingBox(_boundingBox, positionDelta);
         }
     }
 }

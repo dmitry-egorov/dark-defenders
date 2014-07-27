@@ -1,4 +1,5 @@
 ﻿using System;
+using Infrastructure.Math;
 using Infrastructure.Util;
 
 namespace DarkDefenders.Server.Internals

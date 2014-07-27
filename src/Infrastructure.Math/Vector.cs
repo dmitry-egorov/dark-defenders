@@ -43,6 +43,13 @@ namespace Infrastructure.Math
             _y = y;
         }
 
+        public Vector Direction()
+        {
+            var length = Length();
+
+            return XY(_x / length, _y / length);
+        }
+
         public double LengthSquared()
         {
             return _x*_x + _y*_y;
@@ -136,14 +143,27 @@ namespace Infrastructure.Math
         {
             if (axis == Axis.X)
             {
-                return Vector.XY(X + offset, Y);
+                return XY(X + offset, Y);
             }
             if (axis == Axis.Y)
             {
-                return Vector.XY(X, Y + offset);
+                return XY(X, Y + offset);
             }
 
             throw new ArgumentException("Invalid value", "axis");
+        }
+
+        public AxisDirection AxisDirection(Axis axis)
+        {
+            return CoordinateFor(axis).Direction();
+        }
+
+        public double SlopeFor(Axis axis)
+        {
+            var dMain = CoordinateFor(axis);
+            var dOther = CoordinateFor(axis.Other());
+
+            return dOther / dMain;
         }
     }
 }

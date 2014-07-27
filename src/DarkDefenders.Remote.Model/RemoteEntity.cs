@@ -7,10 +7,10 @@ namespace DarkDefenders.Remote.Model
     {
         public IdentityOf<RemoteEntity> Id { get; private set; }
         public Vector Position { get; set; }
-        public Direction Direction { get; set; }
+        public HorizontalDirection Direction { get; set; }
         public RemoteEntityType Type { get; private set; }
 
-        public RemoteEntity(IdentityOf<RemoteEntity> id, Vector initialPosition, Direction initialDirection, RemoteEntityType type)
+        public RemoteEntity(IdentityOf<RemoteEntity> id, Vector initialPosition, HorizontalDirection initialDirection, RemoteEntityType type)
         {
             Id = id;
             Position = initialPosition;

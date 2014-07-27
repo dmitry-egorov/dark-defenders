@@ -85,6 +85,10 @@
       <Project>{457ccf4d-7e52-4a7f-867c-13bac32e13f0}</Project>
       <Name>Infrastructure.DDDES</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Math\Infrastructure.Math.csproj">
+      <Project>{9DA761FD-492C-4BF7-A50D-10930664021D}</Project>
+      <Name>Infrastructure.Math</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Network.Subscription.Server\Infrastructure.Network.Subscription.Server.csproj">
       <Project>{C21E136B-A088-4B43-8DD3-E7EEDDCFA622}</Project>
       <Name>Infrastructure.Network.Subscription.Server</Name>

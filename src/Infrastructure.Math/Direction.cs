@@ -1,8 +1,11 @@
 ﻿namespace Infrastructure.Math
 {
-    public enum Direction: byte
+    public enum Direction
     {
-        Left = 0,
-        Right = 1,
+        None = 0,
+        Left = 1,
+        Right = 2,
+        Top = 3,
+        Bottom = 4
     }
 }

@@ -41,20 +41,23 @@ namespace DarkDefenders.Game.Model.States.Heroes
 
         private bool CanMoveBackwardsAfterFall(Point fallenFrom)
         {
-            var objectInSpace = _rigidBody.GetObject();
+            //TODO: refactor, use line transformation
+            var boundingBox = _rigidBody.GetBoundingBox();
 
-            var yStart = objectInSpace.Level();
+            var yStart = boundingBox.BoundSlot(Direction.Bottom);
             var yEnd = Math.Min(fallenFrom.Y, yStart + 2);
 
-            var direction = _creature.GetDirection().Other();
+            var direction = _creature.GetDirection().ToDirection().Other();
 
-            var xStart = objectInSpace.NextSlotX(direction);
+            var xStart = boundingBox.NextSlot(direction);
             var xEnd = fallenFrom.X;
-            var sign = direction.GetXIncrement();
+            var sign = direction.GetIncrement();
 
             for (var x = xStart; (xEnd - x) * sign >= 0; x += sign)
             {
-                if (!_terrain.AnyOpenWallsAt(Axis.Y, yStart, yEnd, x))
+                var line = DiscreteAxisAlignedLine.From(Axis.Y, yStart, yEnd, x);
+
+                if (!_terrain.AnyOpenWallsAt(line))
                 {
                     return false;
                 }

@@ -55,12 +55,12 @@ namespace DarkDefenders.Game.Model.States.Heroes
                 throw new InvalidOperationException("Is not in the air");
             }
 
-            var objectInSpace = _rigidBody.GetObject();
+            var objectInSpace = _rigidBody.GetBoundingBox();
 
-            var direction = _creature.GetDirection();
+            var direction = _creature.GetDirection().ToDirection();
 
-            var x = objectInSpace.NextSlotX(direction.Other());
-            var y = objectInSpace.SlotYUnder();
+            var x = objectInSpace.NextSlot(direction);
+            var y = objectInSpace.BoundSlot(Direction.Bottom);
 
             return new Point(x, y);
         }
@@ -69,9 +69,9 @@ namespace DarkDefenders.Game.Model.States.Heroes
         {
             switch (_creature.GetDirection())
             {
-                case Direction.Left:
+                case HorizontalDirection.Left:
                     return _rigidBody.IsTouchingAWallToTheLeft();
-                case Direction.Right:
+                case HorizontalDirection.Right:
                     return _rigidBody.IsTouchingAWallToTheRight();
                 default:
                     throw new InvalidOperationException("Invalid direction.");
@@ -80,17 +80,20 @@ namespace DarkDefenders.Game.Model.States.Heroes
 
         private bool CanJumpOver()
         {
+            //TODO: refactor, use line transformations
             //TODO: depends on parameters
             var maxJumpHeight = 2;
 
-            var direction = _creature.GetDirection().ToAxisDirection();
+            var direction = _creature.GetDirection().ToDirection();
 
-            var objectInSpace = _rigidBody.GetObject();
+            var objectInSpace = _rigidBody.GetBoundingBox();
 
-            var x = objectInSpace.BoundSlotX(direction);
-            var y = objectInSpace.Level();
+            var x = objectInSpace.BoundSlot(direction);
+            var y = objectInSpace.BoundSlot(Direction.Bottom);
+            
+            var line = DiscreteAxisAlignedLine.From(Axis.Y, y + 1, y + maxJumpHeight, x);
 
-            return _terrain.AnyOpenWallsAt(Axis.Y, y + 1, y + maxJumpHeight, x);
+            return _terrain.AnyOpenWallsAt(line);
         }
     }
 }

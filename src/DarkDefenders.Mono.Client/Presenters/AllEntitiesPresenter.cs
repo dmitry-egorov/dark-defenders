@@ -38,7 +38,7 @@ namespace DarkDefenders.Mono.Client.Presenters
             }
         }
 
-        public void ChangeDirection(IdentityOf<RemoteEntity> id, Direction newDirection)
+        public void ChangeDirection(IdentityOf<RemoteEntity> id, HorizontalDirection newDirection)
         {
             TryApply(id, e => e.SetDirection(newDirection));
         }

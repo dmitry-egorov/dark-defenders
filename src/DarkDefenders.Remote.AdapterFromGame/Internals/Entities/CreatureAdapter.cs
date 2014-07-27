@@ -21,7 +21,7 @@ namespace DarkDefenders.Remote.AdapterFromGame.Internals.Entities
             _adapter.CreatureCreated(creature, rigidBody);
         }
 
-        public void MovementChanged(Movement movement, Direction direction)
+        public void MovementChanged(Movement movement, HorizontalDirection direction)
         {
             _adapter.ChangedDirection(_rigidBody, direction);
         }
