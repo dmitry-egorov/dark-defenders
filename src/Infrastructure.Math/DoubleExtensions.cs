@@ -38,40 +38,6 @@ namespace Infrastructure.Math
             return ceiling - d <= tolerance ? ceiling : d.Floor();
         }
 
-        public static int CeilingTolerantInt(this double d, double tolerance = DefaultTolerance)
-        {
-            return d.TolerantCeiling(tolerance).ToInt();
-        }
-
-        public static double TolerantCeiling(this double d, double tolerance = DefaultTolerance)
-        {
-            var floor = System.Math.Floor(d);
-
-            return d - floor < tolerance ? floor : d.Ceiling();
-        }
-
-        public static int PrevInt(this double d)
-        {
-            return d.PrevInteger().ToInt();
-        }
-        public static double PrevInteger(this double d)
-        {
-            var floor = System.Math.Floor(d);
-
-            return floor == d ? d - 1.0 : floor;
-        }
-
-        public static int NextInt(this double d)
-        {
-            return d.RoundTo().ToInt();
-        }
-        public static double RoundTo(this double d)
-        {
-            var ceiling = d.Ceiling();
-
-            return ceiling == d ? d + 1.0 : ceiling;
-        }
-
         public static double LimitTop(this double d, double top)
         {
             return d > top ? top : d;

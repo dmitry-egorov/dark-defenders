@@ -24,11 +24,6 @@ namespace Infrastructure.Math
             return _position;
         }
 
-        public Bounds GetBounds()
-        {
-            return _bounds;
-        }
-
         public int BoundSlot(Direction direction)
         {
             var coordinate = GetBoundCoordinate(direction);
