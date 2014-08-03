@@ -13,7 +13,7 @@ namespace Infrastructure.Serialization.DDDES
 
         public static void Write<T>(this BinaryWriter writer, IdentityOf<T> identity)
         {
-            writer.Write((long) identity.Value);
+            writer.Write(identity.Value);
         }
     }
 }
